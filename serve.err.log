@@ -1,0 +1,389 @@
+- Building...
+
+- Changes detected. Rebuilding...
+
+- Changes detected. Rebuilding...
+
+- Changes detected. Rebuilding...
+
+- Changes detected. Rebuilding...
+
+- Changes detected. Rebuilding...
+
+- Changes detected. Rebuilding...
+
+- Changes detected. Rebuilding...
+
+X [ERROR] TS2339: Property 'resizeCanvasForImage' does not exist on type 'AppComponent'. [plugin angular-compiler]
+
+    src/app/app.component.ts:494:11:
+      494 │       this.resizeCanvasForImage(image);
+          ╵            ~~~~~~~~~~~~~~~~~~~~
+
+
+- Changes detected. Rebuilding...
+
+X [ERROR] TS2339: Property 'resizeCanvasForImage' does not exist on type 'AppComponent'. [plugin angular-compiler]
+
+    src/app/app.component.ts:494:11:
+      494 │       this.resizeCanvasForImage(image);
+          ╵            ~~~~~~~~~~~~~~~~~~~~
+
+
+- Changes detected. Rebuilding...
+
+- Changes detected. Rebuilding...
+
+- Changes detected. Rebuilding...
+
+- Changes detected. Rebuilding...
+
+X [ERROR] TS2339: Property 'captureWorkspace' does not exist on type 'AppComponent'. [plugin angular-compiler]
+
+    src/app/app.component.ts:103:39:
+      103 │ ...es: WorkspaceState[] = [this.captureWorkspace('Workspace 1', 1)];
+          ╵                                 ~~~~~~~~~~~~~~~~
+
+
+X [ERROR] TS2339: Property 'saveCurrentWorkspace' does not exist on type 'AppComponent'. [plugin angular-compiler]
+
+    src/app/app.component.ts:166:9:
+      166 │     this.saveCurrentWorkspace();
+          ╵          ~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] TS2339: Property 'createBlankWorkspace' does not exist on type 'AppComponent'. [plugin angular-compiler]
+
+    src/app/app.component.ts:169:27:
+      169 │ ...nst workspace = this.createBlankWorkspace(`Workspace ${id}`, id);
+          ╵                         ~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] TS2339: Property 'applyWorkspace' does not exist on type 'AppComponent'. [plugin angular-compiler]
+
+    src/app/app.component.ts:172:9:
+      172 │     this.applyWorkspace(workspace);
+          ╵          ~~~~~~~~~~~~~~
+
+
+X [ERROR] TS2339: Property 'saveCurrentWorkspace' does not exist on type 'AppComponent'. [plugin angular-compiler]
+
+    src/app/app.component.ts:176:9:
+      176 │     this.saveCurrentWorkspace();
+          ╵          ~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] TS2339: Property 'captureWorkspace' does not exist on type 'AppComponent'. [plugin angular-compiler]
+
+    src/app/app.component.ts:179:22:
+      179 │     const copy = this.captureWorkspace(`${this.activeWorkspace.na...
+          ╵                       ~~~~~~~~~~~~~~~~
+
+
+X [ERROR] TS2339: Property 'applyWorkspace' does not exist on type 'AppComponent'. [plugin angular-compiler]
+
+    src/app/app.component.ts:182:9:
+      182 │     this.applyWorkspace(copy);
+          ╵          ~~~~~~~~~~~~~~
+
+
+X [ERROR] TS2339: Property 'saveCurrentWorkspace' does not exist on type 'AppComponent'. [plugin angular-compiler]
+
+    src/app/app.component.ts:189:9:
+      189 │     this.saveCurrentWorkspace();
+          ╵          ~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] TS2339: Property 'applyWorkspace' does not exist on type 'AppComponent'. [plugin angular-compiler]
+
+    src/app/app.component.ts:191:9:
+      191 │     this.applyWorkspace(this.activeWorkspace);
+          ╵          ~~~~~~~~~~~~~~
+
+
+X [ERROR] TS2339: Property 'saveCurrentWorkspace' does not exist on type 'AppComponent'. [plugin angular-compiler]
+
+    src/app/app.component.ts:198:11:
+      198 │       this.saveCurrentWorkspace();
+          ╵            ~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] TS2339: Property 'saveCurrentWorkspace' does not exist on type 'AppComponent'. [plugin angular-compiler]
+
+    src/app/app.component.ts:201:9:
+      201 │     this.saveCurrentWorkspace();
+          ╵          ~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] TS2339: Property 'applyWorkspace' does not exist on type 'AppComponent'. [plugin angular-compiler]
+
+    src/app/app.component.ts:204:9:
+      204 │     this.applyWorkspace(this.activeWorkspace);
+          ╵          ~~~~~~~~~~~~~~
+
+
+- Changes detected. Rebuilding...
+
+- Changes detected. Rebuilding...
+
+- Changes detected. Rebuilding...
+
+- Changes detected. Rebuilding...
+
+- Changes detected. Rebuilding...
+
+X [ERROR] TS2339: Property 'loadIdlePresetExample' does not exist on type 'AppComponent'. [plugin angular-compiler]
+
+    src/app/app.component.ts:175:14:
+      175 │     void this.loadIdlePresetExample();
+          ╵               ~~~~~~~~~~~~~~~~~~~~~
+
+
+- Changes detected. Rebuilding...
+
+X [ERROR] TS2551: Property 'loadImageUrl' does not exist on type 'AppComponent'. Did you mean 'loadImage'? [plugin angular-compiler]
+
+    src/app/app.component.ts:226:31:
+      226 │ ...const image = await this.loadImageUrl('assets/idle-preset.webp');
+          ╵                             ~~~~~~~~~~~~
+
+  'loadImage' is declared here.
+
+    src/app/app.component.ts:1249:10:
+      1249 │   private loadImage(file: File): Promise<HTMLImageElement> {
+           ╵           ~~~~~~~~~
+
+
+X [ERROR] TS2554: Expected 3 arguments, but got 4. [plugin angular-compiler]
+
+    src/app/app.component.ts:245:75:
+      245 │ ...st sampled = this.sampleImage(image, targetWidth, targetHeight, {
+          ╵                                                                    ^
+
+
+- Changes detected. Rebuilding...
+
+X [ERROR] TS2551: Property 'loadImageUrl' does not exist on type 'AppComponent'. Did you mean 'loadImage'? [plugin angular-compiler]
+
+    src/app/app.component.ts:226:31:
+      226 │ ...const image = await this.loadImageUrl('assets/idle-preset.webp');
+          ╵                             ~~~~~~~~~~~~
+
+  'loadImage' is declared here.
+
+    src/app/app.component.ts:1264:10:
+      1264 │   private loadImage(file: File): Promise<HTMLImageElement> {
+           ╵           ~~~~~~~~~
+
+
+- Changes detected. Rebuilding...
+
+- Changes detected. Rebuilding...
+
+- Changes detected. Rebuilding...
+
+- Changes detected. Rebuilding...
+
+- Changes detected. Rebuilding...
+
+X [ERROR] TS2339: Property 'shouldPanCanvas' does not exist on type 'AppComponent'. [plugin angular-compiler]
+
+    src/app/app.component.ts:398:13:
+      398 │     if (this.shouldPanCanvas(event)) {
+          ╵              ~~~~~~~~~~~~~~~
+
+
+X [ERROR] TS2339: Property 'beginPan' does not exist on type 'AppComponent'. [plugin angular-compiler]
+
+    src/app/app.component.ts:399:11:
+      399 │       this.beginPan(event);
+          ╵            ~~~~~~~~
+
+
+X [ERROR] TS2339: Property 'beginPan' does not exist on type 'AppComponent'. [plugin angular-compiler]
+
+    src/app/app.component.ts:433:11:
+      433 │       this.beginPan(event);
+          ╵            ~~~~~~~~
+
+
+- Changes detected. Rebuilding...
+
+- Changes detected. Rebuilding...
+
+- Changes detected. Rebuilding...
+
+- Changes detected. Rebuilding...
+
+- Changes detected. Rebuilding...
+
+- Changes detected. Rebuilding...
+
+- Changes detected. Rebuilding...
+
+- Changes detected. Rebuilding...
+
+X [ERROR] TS2551: Property 'cloneWorkspace' does not exist on type 'AppComponent'. Did you mean 'closeWorkspace'? [plugin angular-compiler]
+
+    src/app/app.component.ts:783:56:
+      783 │ ...this.workspaces.map(workspace => this.cloneWorkspace(workspace)),
+          ╵                                          ~~~~~~~~~~~~~~
+
+  'closeWorkspace' is declared here.
+
+    src/app/app.component.ts:243:2:
+      243 │   closeWorkspace(index: number, event?: MouseEvent): void {
+          ╵   ~~~~~~~~~~~~~~
+
+
+X [ERROR] TS2339: Property 'loadProject' does not exist on type 'AppComponent'. [plugin angular-compiler]
+
+    src/app/app.component.ts:820:11:
+      820 │       this.loadProject(project);
+          ╵            ~~~~~~~~~~~
+
+
+- Changes detected. Rebuilding...
+
+X [ERROR] TS2322: Type 'Pixel' is not assignable to type 'string'.
+  Type 'null' is not assignable to type 'string'. [plugin angular-compiler]
+
+    src/app/app.component.ts:1018:6:
+      1018 │       primaryColor: this.normalizeColor(workspace.primaryColor, ...
+           ╵       ~~~~~~~~~~~~
+
+  The expected type comes from property 'primaryColor' which is declared here on type 'WorkspaceState'
+
+    src/app/app.component.ts:72:2:
+      72 │   primaryColor: string;
+         ╵   ~~~~~~~~~~~~
+
+
+X [ERROR] TS2322: Type 'Pixel' is not assignable to type 'string'.
+  Type 'null' is not assignable to type 'string'. [plugin angular-compiler]
+
+    src/app/app.component.ts:1019:6:
+      1019 │       secondaryColor: this.normalizeColor(workspace.secondaryCol...
+           ╵       ~~~~~~~~~~~~~~
+
+  The expected type comes from property 'secondaryColor' which is declared here on type 'WorkspaceState'
+
+    src/app/app.component.ts:73:2:
+      73 │   secondaryColor: string;
+         ╵   ~~~~~~~~~~~~~~
+
+
+- Changes detected. Rebuilding...
+
+X [ERROR] TS2322: Type 'Pixel' is not assignable to type 'string'.
+  Type 'null' is not assignable to type 'string'. [plugin angular-compiler]
+
+    src/app/app.component.ts:1018:6:
+      1018 │       primaryColor: this.normalizeColor(workspace.primaryColor, ...
+           ╵       ~~~~~~~~~~~~
+
+  The expected type comes from property 'primaryColor' which is declared here on type 'WorkspaceState'
+
+    src/app/app.component.ts:72:2:
+      72 │   primaryColor: string;
+         ╵   ~~~~~~~~~~~~
+
+
+X [ERROR] TS2322: Type 'Pixel' is not assignable to type 'string'.
+  Type 'null' is not assignable to type 'string'. [plugin angular-compiler]
+
+    src/app/app.component.ts:1019:6:
+      1019 │       secondaryColor: this.normalizeColor(workspace.secondaryCol...
+           ╵       ~~~~~~~~~~~~~~
+
+  The expected type comes from property 'secondaryColor' which is declared here on type 'WorkspaceState'
+
+    src/app/app.component.ts:73:2:
+      73 │   secondaryColor: string;
+         ╵   ~~~~~~~~~~~~~~
+
+
+- Changes detected. Rebuilding...
+
+- Changes detected. Rebuilding...
+
+X [ERROR] TS2339: Property 'createKitsuneIdlePixels' does not exist on type 'AppComponent'. [plugin angular-compiler]
+
+    src/app/app.component.ts:291:28:
+      291 │ ...const pixels = this.createKitsuneIdlePixels(baseSample.pixels,...
+          ╵                        ~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] TS7006: Parameter 'color' implicitly has an 'any' type. [plugin angular-compiler]
+
+    src/app/app.component.ts:292:23:
+      292 │         pixels.forEach(color => {
+          ╵                        ~~~~~
+
+
+- Changes detected. Rebuilding...
+
+- Changes detected. Rebuilding...
+
+- Changes detected. Rebuilding...
+
+X [ERROR] TS2339: Property 'extractSpriteFromSheet' does not exist on type 'AppComponent'. [plugin angular-compiler]
+
+    src/app/app.component.ts:293:59:
+      293 │ ...ourceRects.map(rect => this.extractSpriteFromSheet(image, rect));
+          ╵                                ~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] TS2339: Property 'sampleAlignedSpriteFrame' does not exist on type 'AppComponent'. [plugin angular-compiler]
+
+    src/app/app.component.ts:299:29:
+      299 │ ...nst sampled = this.sampleAlignedSpriteFrame(extractedFrames[i]...
+          ╵                       ~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] TS7006: Parameter 'color' implicitly has an 'any' type. [plugin angular-compiler]
+
+    src/app/app.component.ts:300:32:
+      300 │         sampled.palette.forEach(color => colors.set(color, (color...
+          ╵                                 ~~~~~
+
+
+- Changes detected. Rebuilding...
+
+X [ERROR] TS2339: Property 'imageDataToPixels' does not exist on type 'AppComponent'. [plugin angular-compiler]
+
+    src/app/app.component.ts:364:16:
+      364 │     return this.imageDataToPixels(imageData, width, height);
+          ╵                 ~~~~~~~~~~~~~~~~~
+
+
+- Changes detected. Rebuilding...
+
+- Changes detected. Rebuilding...
+
+- Changes detected. Rebuilding...
+
+- Changes detected. Rebuilding...
+
+- Changes detected. Rebuilding...
+
+- Changes detected. Rebuilding...
+
+- Changes detected. Rebuilding...
+
+- Changes detected. Rebuilding...
+
+- Changes detected. Rebuilding...
+
+- Changes detected. Rebuilding...
+
+- Changes detected. Rebuilding...
+
+- Changes detected. Rebuilding...
+
+- Changes detected. Rebuilding...
+
+- Changes detected. Rebuilding...
+
+- Changes detected. Rebuilding...
+
