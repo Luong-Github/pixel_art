@@ -8,7 +8,12 @@
       </div>
     </div>
 
-    <section class="panel tools">
+    <section class="panel">
+      <div class="panel-title">
+        <h2>Tools</h2>
+        <span>{{ activeTool }}</span>
+      </div>
+      <div class="tools">
       <button
         *ngFor="let tool of tools"
         type="button"
@@ -19,9 +24,14 @@
         <span>{{ tool.label }}</span>
         <kbd>{{ tool.key }}</kbd>
       </button>
+      </div>
     </section>
 
     <section class="panel color-panel">
+      <div class="panel-title">
+        <h2>Color</h2>
+        <span>{{ palette.length }} swatches</span>
+      </div>
       <div class="swatches-large">
         <label>
           <span>Primary</span>
@@ -31,7 +41,7 @@
           <span>Secondary</span>
           <input type="color" [(ngModel)]="secondaryColor" />
         </label>
-        <button type="button" class="icon-action" title="Swap colors" (click)="swapColors()">Swap</button>
+        <button type="button" class="icon-action" title="Swap colors" (click)="swapColors()">Swap Colors</button>
         <button type="button" class="icon-action" title="Pick primary color from screen" (click)="pickFromScreen(false)">Pick Primary</button>
         <button type="button" class="icon-action" title="Pick secondary color from screen" (click)="pickFromScreen(true)">Pick Secondary</button>
       </div>
@@ -77,21 +87,22 @@
     </nav>
 
     <header class="topbar">
-      <div class="control-group">
+      <div class="control-group topbar-primary">
         <input
           class="workspace-name"
           type="text"
           [ngModel]="activeWorkspace.name"
           (ngModelChange)="renameActiveWorkspace($event)"
           aria-label="Workspace name" />
-        <button type="button" (click)="duplicateWorkspace()">Duplicate Workspace</button>
+        <button type="button" class="quiet-action" (click)="duplicateWorkspace()">Duplicate</button>
         <button type="button" (click)="undo()">Undo</button>
         <button type="button" (click)="redo()">Redo</button>
-        <button type="button" (click)="clearLayer()">Clear</button>
+        <button type="button" class="danger-action" (click)="clearLayer()">Clear</button>
       </div>
-      <div class="control-group">
-        <button type="button" (click)="triggerImport()">Import</button>
+      <div class="control-group topbar-secondary">
+        <button type="button" class="primary-action" (click)="triggerImport()">Import</button>
         <button type="button" (click)="loadIdlePresetExample()">Idle Example</button>
+        <button type="button" (click)="loadTreeExample()">Tree Example</button>
         <button type="button" (click)="extractPaletteOnly()">Palette</button>
         <button type="button" (click)="exportPng()">PNG 1x</button>
         <button type="button" (click)="exportScaledPng()">PNG Zoom</button>
@@ -126,10 +137,11 @@
     </div>
 
     <footer class="statusbar">
-      <span>Tool: {{ activeTool }}</span>
-      <span>Selection: {{ selectionLabel }}</span>
-      <span>Layer: {{ activeLayer.name }}</span>
-      <span>Frame: {{ activeFrameIndex + 1 }} / {{ frames.length }}</span>
+      <span><strong>Tool</strong>{{ activeTool }}</span>
+      <span><strong>Selection</strong>{{ selectionLabel }}</span>
+      <span><strong>Layer</strong>{{ activeLayer.name }}</span>
+      <span><strong>Frame</strong>{{ activeFrameIndex + 1 }} / {{ frames.length }}</span>
+      <span *ngIf="mirrorX" class="status-accent"><strong>Mirror</strong>X</span>
     </footer>
 
     <div
@@ -349,6 +361,7 @@
         <button type="button" (click)="newSprite()">New</button>
         <label class="check"><input type="checkbox" [(ngModel)]="showGrid" (change)="render()" /> Grid</label>
         <label class="check"><input type="checkbox" [(ngModel)]="onionSkin" (change)="render()" /> Onion</label>
+        <label class="check"><input type="checkbox" [(ngModel)]="mirrorX" (change)="render()" /> Mirror X</label>
       </div>
     </section>
 

@@ -1,8 +1,23 @@
-import { AfterViewInit, Component, ElementRef, HostListener, ViewChild } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  ElementRef,
+  HostListener,
+  ViewChild,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
-type Tool = 'pen' | 'eraser' | 'fill' | 'picker' | 'line' | 'rect' | 'ellipse' | 'select' | 'move';
+type Tool =
+  | 'pen'
+  | 'eraser'
+  | 'fill'
+  | 'picker'
+  | 'line'
+  | 'rect'
+  | 'ellipse'
+  | 'select'
+  | 'move';
 type Pixel = string | null;
 type ImportFit = 'contain' | 'cover' | 'stretch';
 
@@ -105,6 +120,7 @@ interface PixelArtProjectFile {
     displayZoom: number;
     showGrid: boolean;
     onionSkin: boolean;
+    mirrorX?: boolean;
     brushSize: number;
     importResizeCanvas: boolean;
     importLongSide: number;
@@ -121,14 +137,19 @@ interface PixelArtProjectFile {
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './app.component.html',
-  styleUrl: './app.component.scss'
+  styleUrl: './app.component.scss',
 })
 export class AppComponent implements AfterViewInit {
-  @ViewChild('stage', { static: true }) stageRef!: ElementRef<HTMLCanvasElement>;
-  @ViewChild('display', { static: true }) displayRef!: ElementRef<HTMLCanvasElement>;
-  @ViewChild('canvasWrap', { static: true }) canvasWrapRef!: ElementRef<HTMLDivElement>;
-  @ViewChild('importInput', { static: true }) importInputRef!: ElementRef<HTMLInputElement>;
-  @ViewChild('projectInput', { static: true }) projectInputRef!: ElementRef<HTMLInputElement>;
+  @ViewChild('stage', { static: true })
+  stageRef!: ElementRef<HTMLCanvasElement>;
+  @ViewChild('display', { static: true })
+  displayRef!: ElementRef<HTMLCanvasElement>;
+  @ViewChild('canvasWrap', { static: true })
+  canvasWrapRef!: ElementRef<HTMLDivElement>;
+  @ViewChild('importInput', { static: true })
+  importInputRef!: ElementRef<HTMLInputElement>;
+  @ViewChild('projectInput', { static: true })
+  projectInputRef!: ElementRef<HTMLInputElement>;
 
   readonly tools: { id: Tool; label: string; key: string }[] = [
     { id: 'pen', label: 'Pen', key: 'P' },
@@ -139,7 +160,7 @@ export class AppComponent implements AfterViewInit {
     { id: 'rect', label: 'Rect', key: 'R' },
     { id: 'ellipse', label: 'Oval', key: 'O' },
     { id: 'select', label: 'Select', key: 'S' },
-    { id: 'move', label: 'Move', key: 'M' }
+    { id: 'move', label: 'Move', key: 'M' },
   ];
 
   width = 32;
@@ -160,11 +181,21 @@ export class AppComponent implements AfterViewInit {
   importContrast = 1.08;
   showGrid = true;
   onionSkin = false;
+  mirrorX = false;
   activeTool: Tool = 'pen';
   primaryColor = '#222831';
   secondaryColor = '#f6f1de';
   brushSize = 1;
-  palette = ['#222831', '#393e46', '#00adb5', '#eeeeee', '#f05454', '#f9d923', '#7dce82', '#5c7cfa'];
+  palette = [
+    '#222831',
+    '#393e46',
+    '#00adb5',
+    '#eeeeee',
+    '#f05454',
+    '#f9d923',
+    '#7dce82',
+    '#5c7cfa',
+  ];
 
   frames: Frame[] = [this.createFrame('Frame 1')];
   activeFrameIndex = 0;
@@ -197,7 +228,10 @@ export class AppComponent implements AfterViewInit {
   }
 
   get activeLayer(): Layer {
-    return this.activeFrame.layers[this.activeLayerIndex] ?? this.activeFrame.layers[0];
+    return (
+      this.activeFrame.layers[this.activeLayerIndex] ??
+      this.activeFrame.layers[0]
+    );
   }
 
   get activeWorkspace(): WorkspaceState {
@@ -225,7 +259,10 @@ export class AppComponent implements AfterViewInit {
   }
 
   get timelineLayerCount(): number {
-    return this.frames.reduce((max, frame) => Math.max(max, frame.layers.length), 0);
+    return this.frames.reduce(
+      (max, frame) => Math.max(max, frame.layers.length),
+      0,
+    );
   }
 
   get timelineLayerIndices(): number[] {
@@ -249,7 +286,9 @@ export class AppComponent implements AfterViewInit {
   }
 
   get selectionLabel(): string {
-    return this.selection ? `${this.selection.w} x ${this.selection.h} at ${this.selection.x}, ${this.selection.y}` : 'None';
+    return this.selection
+      ? `${this.selection.w} x ${this.selection.h} at ${this.selection.x}, ${this.selection.y}`
+      : 'None';
   }
 
   ngAfterViewInit(): void {
@@ -305,7 +344,10 @@ export class AppComponent implements AfterViewInit {
     }
     this.saveCurrentWorkspace();
     this.workspaces.splice(index, 1);
-    this.activeWorkspaceIndex = Math.min(this.activeWorkspaceIndex, this.workspaces.length - 1);
+    this.activeWorkspaceIndex = Math.min(
+      this.activeWorkspaceIndex,
+      this.workspaces.length - 1,
+    );
     this.applyWorkspace(this.activeWorkspace);
   }
 
@@ -322,7 +364,11 @@ export class AppComponent implements AfterViewInit {
       const colors = new Map<string, number>();
       const cacheBust = Date.now();
       const idleImages = await Promise.all(
-        Array.from({ length: frameCount }, (_, i) => this.loadImageUrl(`assets/idle-frames/idle_${String(i + 1).padStart(2, '0')}.png?v=${cacheBust}`))
+        Array.from({ length: frameCount }, (_, i) =>
+          this.loadImageUrl(
+            `assets/idle-frames/idle_${String(i + 1).padStart(2, '0')}.png?v=${cacheBust}`,
+          ),
+        ),
       );
 
       this.width = targetWidth;
@@ -334,20 +380,29 @@ export class AppComponent implements AfterViewInit {
       this.importFit = 'contain';
 
       for (let i = 0; i < frameCount; i += 1) {
-        const sampled = this.sampleImage(idleImages[i], targetWidth, targetHeight, {
-          transparentWhite: true
-        });
-        sampled.palette.forEach(color => colors.set(color, (colors.get(color) ?? 0) + 1));
+        const sampled = this.sampleImage(
+          idleImages[i],
+          targetWidth,
+          targetHeight,
+          {
+            transparentWhite: true,
+          },
+        );
+        sampled.palette.forEach((color) =>
+          colors.set(color, (colors.get(color) ?? 0) + 1),
+        );
         frames.push({
           name: `Idle ${String(i + 1).padStart(2, '0')}`,
           duration: 140,
           visible: true,
-          layers: [{
-            name: 'Character',
-            visible: true,
-            opacity: 1,
-            pixels: sampled.pixels
-          }]
+          layers: [
+            {
+              name: 'Character',
+              visible: true,
+              opacity: 1,
+              pixels: sampled.pixels,
+            },
+          ],
         });
       }
 
@@ -356,17 +411,38 @@ export class AppComponent implements AfterViewInit {
       this.previewFrameIndex = 0;
       this.activeLayerIndex = 0;
       this.palette = [
-        '#ffe7d6', '#ffcdb8', '#ff6b6b', '#7a1e1e',
-        '#1e1b2e', '#302d44', '#5e5873',
-        '#ffffff', '#f8e9e6', '#b71c1c', '#8e0e0e', '#ff3b3b',
-        '#ffd54f', '#d4ac0d', '#8b6f00', '#9e9e9e',
-        '#fff1f1', '#ffb3b3', '#ff4646',
-        ...[...colors.entries()].sort((a, b) => b[1] - a[1]).map(([color]) => color)
-      ].filter((color, index, list) => list.indexOf(color) === index).slice(0, 32);
+        '#ffe7d6',
+        '#ffcdb8',
+        '#ff6b6b',
+        '#7a1e1e',
+        '#1e1b2e',
+        '#302d44',
+        '#5e5873',
+        '#ffffff',
+        '#f8e9e6',
+        '#b71c1c',
+        '#8e0e0e',
+        '#ff3b3b',
+        '#ffd54f',
+        '#d4ac0d',
+        '#8b6f00',
+        '#9e9e9e',
+        '#fff1f1',
+        '#ffb3b3',
+        '#ff4646',
+        ...[...colors.entries()]
+          .sort((a, b) => b[1] - a[1])
+          .map(([color]) => color),
+      ]
+        .filter((color, index, list) => list.indexOf(color) === index)
+        .slice(0, 32);
       this.primaryColor = '#1e1b2e';
       this.secondaryColor = '#ff4646';
       this.activeWorkspaceIndex = 0;
-      this.workspaces[0] = this.captureWorkspace('Kitsune Idle Example', this.workspaces[0].id);
+      this.workspaces[0] = this.captureWorkspace(
+        'Kitsune Idle Example',
+        this.workspaces[0].id,
+      );
       this.refreshAllFrameThumbnails();
       this.render();
     } catch {
@@ -374,23 +450,807 @@ export class AppComponent implements AfterViewInit {
     }
   }
 
-  private extractSpriteFromSheet(image: HTMLImageElement, rect: SourceRect): { canvas: HTMLCanvasElement; bounds: PixelBounds } {
+  loadTreeExample(): void {
+    const nextWidth = 96;
+    const nextHeight = 96;
+    const pixelCount = nextWidth * nextHeight;
+    const shadow = new Array<Pixel>(pixelCount).fill(null);
+    const ground = new Array<Pixel>(pixelCount).fill(null);
+    const trunk = new Array<Pixel>(pixelCount).fill(null);
+    const leaves = new Array<Pixel>(pixelCount).fill(null);
+    const colors = {
+      outline: '#102326',
+      shadow: '#1b211a',
+
+      barkBlack: '#1e100d',
+      barkDark: '#3a1713',
+      barkShadow: '#502216',
+      barkRed: '#642918',
+      barkRust: '#7b3519',
+      barkMid: '#9b4f1c',
+      barkOrange: '#c06f24',
+      barkGold: '#df9b32',
+      barkLight: '#f2c75a',
+
+      rootGreen: '#1b6b35',
+
+      rockBlack: '#24251f',
+      rockDark: '#45483d',
+      rockShadow: '#5f6353',
+      rockMid: '#7b806d',
+      rockWarm: '#91866b',
+      rockLight: '#c1c2a2',
+
+      leafBlack: '#0d2b2f',
+      leafBlueShadow: '#123f48',
+      leafDeep: '#173f2b',
+      leafDeep2: '#1d5230',
+      leafDark: '#286432',
+      leafMoss: '#39742f',
+      leafMid: '#4f8830',
+      leafOlive: '#6f9d32',
+      leafBright: '#88ad35',
+      leafGold: '#a4bd3f',
+      leafLight: '#bdd35d',
+
+      rimDark: '#1d6f7a',
+      rim: '#38aebe',
+      rimLight: '#67d5df',
+    };
+    const index = (x: number, y: number) => y * nextWidth + x;
+    const inside = (x: number, y: number) =>
+      x >= 0 && y >= 0 && x < nextWidth && y < nextHeight;
+    const put = (buffer: Pixel[], x: number, y: number, color: Pixel) => {
+      if (inside(x, y)) {
+        buffer[index(x, y)] = color;
+      }
+    };
+    const fillEllipse = (
+      buffer: Pixel[],
+      cx: number,
+      cy: number,
+      rx: number,
+      ry: number,
+      color: Pixel,
+    ) => {
+      for (let y = Math.floor(cy - ry); y <= Math.ceil(cy + ry); y += 1) {
+        for (let x = Math.floor(cx - rx); x <= Math.ceil(cx + rx); x += 1) {
+          const dx = (x - cx) / rx;
+          const dy = (y - cy) / ry;
+          if (dx * dx + dy * dy <= 1) {
+            put(buffer, x, y, color);
+          }
+        }
+      }
+    };
+    const drawLine = (
+      buffer: Pixel[],
+      x0: number,
+      y0: number,
+      x1: number,
+      y1: number,
+      color: Pixel,
+      thickness = 1,
+    ) => {
+      const steps = Math.max(Math.abs(x1 - x0), Math.abs(y1 - y0));
+      for (let i = 0; i <= steps; i += 1) {
+        const x = Math.round(x0 + (x1 - x0) * (i / Math.max(1, steps)));
+        const y = Math.round(y0 + (y1 - y0) * (i / Math.max(1, steps)));
+        for (let oy = 0; oy < thickness; oy += 1) {
+          for (let ox = 0; ox < thickness; ox += 1) {
+            put(buffer, x + ox, y + oy, color);
+          }
+        }
+      }
+    };
+    const fillRect = (
+      buffer: Pixel[],
+      x: number,
+      y: number,
+      w: number,
+      h: number,
+      color: Pixel,
+    ) => {
+      for (let yy = y; yy < y + h; yy += 1) {
+        for (let xx = x; xx < x + w; xx += 1) {
+          put(buffer, xx, yy, color);
+        }
+      }
+    };
+    const pixelBlocks = (
+      buffer: Pixel[],
+      blocks: [number, number, number, number, Pixel][],
+    ) => {
+      blocks.forEach(([x, y, w, h, color]) =>
+        fillRect(buffer, x, y, w, h, color),
+      );
+    };
+
+    this.width = nextWidth;
+    this.height = nextHeight;
+
+    const createPixelSharpness = (): Pixel[] => {
+      const sharp = new Array<Pixel>(pixelCount).fill(null);
+
+      pixelBlocks(sharp, [
+        // leaf crisp highlights
+        [20, 15, 3, 2, colors.leafLight],
+        [28, 13, 4, 2, colors.leafLight],
+        [44, 31, 5, 2, colors.leafLight],
+        [52, 34, 4, 2, colors.leafGold],
+        [35, 41, 5, 2, colors.leafBright],
+
+        // deep cuts inside canopy
+        [13, 35, 5, 3, colors.leafBlack],
+        [31, 56, 6, 3, colors.leafBlack],
+        [80, 42, 5, 3, colors.leafBlack],
+        [70, 63, 5, 3, colors.leafDeep],
+
+        // cyan rim accents
+        [83, 48, 2, 8, colors.rim],
+        [86, 54, 2, 7, colors.rimLight],
+        [64, 58, 8, 2, colors.rim],
+        [73, 61, 6, 2, colors.rimLight],
+
+        // trunk sharper lights
+        [47, 50, 4, 1, colors.barkLight],
+        [43, 72, 4, 2, colors.barkGold],
+        [24, 77, 6, 2, colors.barkLight],
+        [62, 77, 9, 2, colors.barkOrange],
+
+        // trunk dark cracks
+        [53, 56, 2, 6, colors.barkBlack],
+        [57, 66, 2, 7, colors.barkBlack],
+        [72, 76, 10, 2, colors.barkBlack],
+      ]);
+
+      return sharp;
+    };
+
+    fillEllipse(shadow, 48, 83, 37, 7, colors.shadow);
+    fillEllipse(shadow, 32, 80, 18, 4, colors.shadow);
+    fillEllipse(shadow, 69, 80, 21, 4, colors.shadow);
+    pixelBlocks(shadow, [
+      [16, 82, 10, 3, colors.outline],
+      [27, 84, 20, 4, colors.outline],
+      [50, 85, 24, 4, colors.outline],
+      [73, 82, 18, 3, colors.outline],
+      [22, 88, 7, 2, colors.shadow],
+      [62, 89, 10, 2, colors.shadow],
+    ]);
+
+    [
+      [18, 77, 9, 6],
+      [29, 82, 8, 7],
+      [44, 83, 9, 7],
+      [58, 83, 8, 6],
+      [73, 81, 11, 6],
+      [86, 80, 6, 5],
+      [24, 86, 5, 3],
+      [67, 87, 5, 3],
+    ].forEach(([cx, cy, rx, ry]) =>
+      fillEllipse(ground, cx, cy, rx, ry, colors.rockBlack),
+    );
+    [
+      [17, 78, 8, 5],
+      [28, 83, 7, 6],
+      [43, 84, 8, 6],
+      [58, 84, 7, 5],
+      [73, 82, 10, 5],
+      [86, 81, 5, 4],
+    ].forEach(([cx, cy, rx, ry]) =>
+      fillEllipse(ground, cx, cy, rx, ry, colors.rockDark),
+    );
+    [
+      [18, 76, 7, 4],
+      [30, 81, 6, 5],
+      [45, 82, 7, 5],
+      [60, 82, 6, 4],
+      [74, 80, 8, 4],
+      [87, 79, 4, 3],
+    ].forEach(([cx, cy, rx, ry]) =>
+      fillEllipse(ground, cx, cy, rx, ry, colors.rockMid),
+    );
+    [
+      [17, 74, 3, 2],
+      [31, 78, 4, 2],
+      [43, 79, 4, 2],
+      [61, 79, 3, 2],
+      [74, 77, 4, 2],
+    ].forEach(([cx, cy, rx, ry]) =>
+      fillEllipse(ground, cx, cy, rx, ry, colors.rockLight),
+    );
+    pixelBlocks(ground, [
+      [13, 81, 6, 3, colors.rockShadow],
+      [20, 78, 4, 2, colors.rockWarm],
+      [24, 84, 6, 3, colors.rockBlack],
+      [31, 83, 5, 3, colors.rockLight],
+      [37, 86, 6, 3, colors.rockDark],
+      [45, 84, 5, 3, colors.rockShadow],
+      [51, 86, 5, 3, colors.rockLight],
+      [63, 83, 6, 3, colors.rockDark],
+      [70, 82, 8, 3, colors.rockLight],
+      [78, 84, 7, 3, colors.rockShadow],
+      [87, 80, 5, 3, colors.rockDark],
+    ]);
+    [
+      [12, 83],
+      [27, 88],
+      [50, 87],
+      [79, 85],
+      [91, 82],
+    ].forEach(([x, y]) => fillRect(ground, x, y, 3, 3, colors.rootGreen));
+
+    [
+      [44, 38, 53, 51, 6],
+      [50, 48, 59, 63, 7],
+      [58, 61, 57, 76, 7],
+      [43, 51, 36, 63, 6],
+      [37, 62, 27, 74, 5],
+      [52, 72, 42, 84, 6],
+      [56, 72, 70, 81, 5],
+      [47, 73, 21, 79, 4],
+      [57, 76, 85, 78, 4],
+    ].forEach(([x0, y0, x1, y1, size]) =>
+      drawLine(trunk, x0, y0, x1, y1, colors.outline, size),
+    );
+    [
+      [45, 39, 53, 51, 4],
+      [51, 49, 58, 63, 5],
+      [56, 62, 56, 75, 5],
+      [43, 52, 37, 63, 4],
+      [37, 64, 29, 73, 3],
+      [52, 73, 43, 83, 4],
+      [56, 73, 70, 80, 3],
+      [47, 75, 22, 79, 3],
+      [57, 77, 84, 78, 3],
+    ].forEach(([x0, y0, x1, y1, size]) =>
+      drawLine(trunk, x0, y0, x1, y1, colors.barkDark, size),
+    );
+    [
+      [48, 40, 55, 53, 3],
+      [54, 52, 61, 65, 4],
+      [57, 65, 53, 77, 3],
+      [39, 54, 34, 64, 3],
+      [55, 73, 72, 81, 2],
+      [33, 73, 21, 78, 2],
+    ].forEach(([x0, y0, x1, y1, size]) =>
+      drawLine(trunk, x0, y0, x1, y1, colors.barkShadow, size),
+    );
+    [
+      [43, 42, 51, 52, 2],
+      [48, 55, 55, 64, 2],
+      [45, 72, 38, 80, 3],
+      [52, 75, 27, 79, 2],
+      [58, 77, 77, 78, 2],
+    ].forEach(([x0, y0, x1, y1, size]) =>
+      drawLine(trunk, x0, y0, x1, y1, colors.barkRust, size),
+    );
+    [
+      [45, 43, 50, 51, 2],
+      [50, 51, 55, 62, 3],
+      [36, 65, 28, 73, 2],
+      [44, 77, 34, 83, 2],
+      [48, 75, 42, 83, 2],
+      [51, 74, 24, 79, 2],
+    ].forEach(([x0, y0, x1, y1, size]) =>
+      drawLine(trunk, x0, y0, x1, y1, colors.barkMid, size),
+    );
+    [
+      [44, 51, 50, 52, 2],
+      [47, 68, 43, 76, 2],
+      [30, 72, 24, 78, 2],
+      [48, 75, 42, 81, 2],
+    ].forEach(([x0, y0, x1, y1, size]) =>
+      drawLine(trunk, x0, y0, x1, y1, colors.barkGold, size),
+    );
+    [
+      [48, 50, 52, 51, 1],
+      [44, 73, 40, 77, 1],
+      [27, 76, 23, 78, 1],
+    ].forEach(([x0, y0, x1, y1, size]) =>
+      drawLine(trunk, x0, y0, x1, y1, colors.barkLight, size),
+    );
+    [
+      [60, 48, 66, 38, 3],
+      [42, 45, 33, 35, 3],
+      [50, 42, 50, 31, 2],
+      [39, 50, 25, 45, 2],
+    ].forEach(([x0, y0, x1, y1, size]) =>
+      drawLine(trunk, x0, y0, x1, y1, colors.barkDark, size),
+    );
+    [
+      [61, 49, 67, 39, 1],
+      [42, 46, 34, 36, 1],
+      [51, 42, 51, 32, 1],
+    ].forEach(([x0, y0, x1, y1]) =>
+      drawLine(trunk, x0, y0, x1, y1, colors.barkMid, 1),
+    );
+    pixelBlocks(trunk, [
+      [44, 47, 4, 3, colors.barkRed],
+      [52, 56, 5, 4, colors.barkBlack],
+      [47, 62, 6, 3, colors.barkOrange],
+      [54, 67, 5, 6, colors.barkBlack],
+      [37, 75, 7, 4, colors.barkGold],
+      [24, 78, 8, 3, colors.barkLight],
+      [62, 78, 10, 3, colors.barkRed],
+      [71, 76, 12, 2, colors.barkBlack],
+    ]);
+    drawLine(trunk, 61, 53, 63, 66, colors.rimDark, 1);
+    drawLine(trunk, 58, 66, 59, 76, colors.rim, 1);
+    drawLine(trunk, 72, 77, 85, 77, colors.rim, 1);
+    drawLine(trunk, 82, 76, 89, 79, colors.rimDark, 1);
+
+    [
+      [24, 29, 18, 13],
+      [36, 22, 20, 15],
+      [51, 22, 23, 16],
+      [68, 27, 20, 14],
+      [77, 39, 18, 13],
+      [28, 43, 23, 15],
+      [48, 40, 25, 17],
+      [64, 45, 22, 15],
+      [82, 53, 15, 13],
+      [38, 55, 22, 13],
+      [57, 55, 22, 14],
+      [72, 59, 17, 12],
+    ].forEach(([cx, cy, rx, ry]) =>
+      fillEllipse(leaves, cx, cy, rx, ry, colors.leafBlack),
+    );
+    [
+      [22, 28, 16, 11],
+      [35, 20, 17, 12],
+      [51, 22, 20, 13],
+      [67, 28, 17, 12],
+      [76, 40, 15, 11],
+      [27, 42, 20, 13],
+      [47, 39, 22, 15],
+      [63, 45, 19, 13],
+      [81, 53, 12, 10],
+      [37, 55, 19, 11],
+      [57, 54, 19, 12],
+      [72, 58, 14, 10],
+    ].forEach(([cx, cy, rx, ry]) =>
+      fillEllipse(leaves, cx, cy, rx, ry, colors.leafDeep),
+    );
+    [
+      [15, 30, 8, 7],
+      [26, 17, 10, 8],
+      [43, 14, 12, 7],
+      [60, 18, 10, 8],
+      [74, 31, 9, 8],
+      [20, 48, 12, 8],
+      [50, 47, 14, 8],
+      [68, 55, 11, 8],
+      [82, 58, 8, 7],
+    ].forEach(([cx, cy, rx, ry]) =>
+      fillEllipse(leaves, cx, cy, rx, ry, colors.leafBlueShadow),
+    );
+    [
+      [23, 31, 11, 7],
+      [36, 23, 12, 8],
+      [52, 26, 12, 8],
+      [68, 31, 10, 8],
+      [31, 47, 14, 8],
+      [48, 46, 14, 9],
+      [62, 50, 12, 8],
+      [76, 51, 9, 7],
+    ].forEach(([cx, cy, rx, ry]) =>
+      fillEllipse(leaves, cx, cy, rx, ry, colors.leafDeep2),
+    );
+    [
+      [22, 25, 11, 8],
+      [34, 18, 12, 9],
+      [47, 20, 15, 10],
+      [62, 25, 13, 9],
+      [29, 40, 16, 9],
+      [44, 36, 17, 11],
+      [61, 43, 14, 10],
+      [76, 51, 10, 8],
+      [38, 53, 14, 8],
+      [55, 52, 14, 9],
+    ].forEach(([cx, cy, rx, ry]) =>
+      fillEllipse(leaves, cx, cy, rx, ry, colors.leafDark),
+    );
+    [
+      [18, 22, 7, 5],
+      [31, 17, 9, 6],
+      [40, 27, 8, 6],
+      [50, 33, 11, 7],
+      [58, 22, 8, 5],
+      [25, 38, 10, 6],
+      [37, 43, 9, 7],
+      [58, 42, 9, 6],
+      [70, 35, 8, 5],
+      [31, 54, 8, 5],
+    ].forEach(([cx, cy, rx, ry]) =>
+      fillEllipse(leaves, cx, cy, rx, ry, colors.leafMid),
+    );
+    [
+      [20, 25, 5, 4],
+      [28, 27, 6, 4],
+      [37, 19, 6, 4],
+      [46, 25, 8, 5],
+      [56, 27, 6, 4],
+      [64, 36, 6, 4],
+      [23, 46, 8, 5],
+      [44, 41, 8, 5],
+      [59, 48, 6, 4],
+      [72, 47, 5, 4],
+    ].forEach(([cx, cy, rx, ry]) =>
+      fillEllipse(leaves, cx, cy, rx, ry, colors.leafMoss),
+    );
+    [
+      [17, 20, 5, 3],
+      [25, 17, 5, 4],
+      [35, 28, 5, 3],
+      [45, 35, 7, 4],
+      [54, 34, 5, 3],
+      [28, 40, 6, 4],
+      [38, 48, 5, 3],
+    ].forEach(([cx, cy, rx, ry]) =>
+      fillEllipse(leaves, cx, cy, rx, ry, colors.leafOlive),
+    );
+    [
+      [18, 18, 5, 4],
+      [28, 15, 6, 4],
+      [37, 24, 5, 4],
+      [44, 32, 8, 5],
+      [52, 31, 6, 4],
+      [25, 36, 5, 3],
+      [34, 40, 5, 4],
+    ].forEach(([cx, cy, rx, ry]) =>
+      fillEllipse(leaves, cx, cy, rx, ry, colors.leafBright),
+    );
+    [
+      [17, 16, 3, 2],
+      [25, 13, 4, 2],
+      [42, 31, 4, 2],
+      [49, 34, 3, 2],
+      [31, 39, 3, 2],
+    ].forEach(([cx, cy, rx, ry]) =>
+      fillEllipse(leaves, cx, cy, rx, ry, colors.leafLight),
+    );
+    pixelBlocks(leaves, [
+      [12, 24, 5, 4, colors.leafDeep],
+      [16, 17, 4, 3, colors.leafGold],
+      [21, 14, 4, 4, colors.leafLight],
+      [27, 12, 5, 3, colors.leafBright],
+      [32, 16, 6, 4, colors.leafGold],
+      [39, 20, 5, 4, colors.leafMoss],
+      [45, 29, 8, 5, colors.leafLight],
+      [53, 32, 6, 4, colors.leafGold],
+      [59, 23, 8, 4, colors.leafDark],
+      [66, 27, 5, 5, colors.leafMoss],
+      [74, 36, 6, 5, colors.leafDeep],
+      [80, 43, 5, 4, colors.leafBlack],
+      [18, 38, 8, 4, colors.leafOlive],
+      [25, 43, 7, 5, colors.leafDeep2],
+      [34, 40, 8, 5, colors.leafBright],
+      [43, 43, 7, 6, colors.leafDark],
+      [52, 44, 8, 5, colors.leafDeep2],
+      [61, 45, 7, 5, colors.leafMoss],
+      [71, 49, 6, 5, colors.leafDeep],
+      [79, 55, 5, 5, colors.leafBlueShadow],
+      [26, 55, 9, 5, colors.leafDeep],
+      [37, 57, 9, 4, colors.leafBlack],
+      [50, 58, 8, 5, colors.leafDeep],
+      [62, 60, 8, 5, colors.leafBlueShadow],
+      [72, 63, 7, 4, colors.leafDeep],
+    ]);
+    [
+      [84, 44, 88, 52],
+      [73, 55, 84, 57],
+      [63, 55, 70, 55],
+      [76, 63, 83, 65],
+      [57, 59, 62, 61],
+      [41, 57, 46, 58],
+    ].forEach(([x0, y0, x1, y1]) =>
+      drawLine(leaves, x0, y0, x1, y1, colors.rim, 1),
+    );
+    [
+      [84, 47, 90, 55],
+      [74, 60, 86, 62],
+      [65, 60, 72, 61],
+      [78, 66, 85, 68],
+    ].forEach(([x0, y0, x1, y1]) =>
+      drawLine(leaves, x0, y0, x1, y1, colors.rimLight, 1),
+    );
+    pixelBlocks(leaves, [
+      [16, 40, 3, 3, colors.leafDeep2],
+      [20, 50, 3, 3, colors.leafDeep],
+      [33, 31, 3, 3, colors.leafMoss],
+      [46, 23, 3, 3, colors.leafDark],
+      [56, 36, 3, 3, colors.leafMoss],
+      [70, 30, 3, 3, colors.leafDeep2],
+      [82, 40, 3, 3, colors.leafBlueShadow],
+      [85, 56, 3, 3, colors.leafDeep],
+      [71, 63, 3, 3, colors.leafDeep],
+      [49, 61, 3, 3, colors.leafBlack],
+      [28, 57, 3, 3, colors.leafDeep],
+      [13, 31, 3, 3, colors.leafDeep2],
+    ]);
+    [
+      [11, 35],
+      [18, 14],
+      [31, 8],
+      [47, 9],
+      [66, 14],
+      [82, 29],
+      [92, 50],
+      [76, 69],
+      [55, 66],
+      [34, 67],
+      [14, 53],
+      [7, 39],
+    ].forEach(([x, y]) => fillRect(leaves, x, y, 4, 4, colors.leafBlack));
+    pixelBlocks(trunk, [
+      [39, 66, 8, 6, colors.barkDark],
+      [44, 65, 5, 5, colors.barkGold],
+      [51, 68, 8, 6, colors.barkShadow],
+      [62, 70, 17, 5, colors.barkDark],
+      [69, 72, 16, 3, colors.barkRed],
+      [32, 69, 8, 4, colors.barkMid],
+      [36, 72, 8, 4, colors.barkGold],
+    ]);
+
+    const frameTotal = 12;
+
+    const windStep = (frameIndex: number) => {
+      const steps = [0, 1, 2, 1, 0, -1, -2, -1, 0, 1, 1, 0];
+      return steps[frameIndex % steps.length];
+    };
+
+    const copyRegion = (
+      source: Pixel[],
+      target: Pixel[],
+      x: number,
+      y: number,
+      w: number,
+      h: number,
+      dx: number,
+      dy: number,
+    ) => {
+      for (let yy = y; yy < y + h; yy += 1) {
+        for (let xx = x; xx < x + w; xx += 1) {
+          if (!inside(xx, yy)) continue;
+
+          const color = source[index(xx, yy)];
+          if (!color) continue;
+
+          const tx = xx + dx;
+          const ty = yy + dy;
+
+          if (inside(tx, ty)) {
+            target[index(tx, ty)] = color;
+          }
+        }
+      }
+    };
+
+    const createWeightedLeaves = (frameIndex: number): Pixel[] => {
+      const result = new Array<Pixel>(pixelCount).fill(null);
+
+      const w = windStep(frameIndex);
+      const slow = windStep((frameIndex + 2) % frameTotal);
+      const delayed = windStep((frameIndex + 4) % frameTotal);
+
+      // lõi tán gần thân: gần như đứng yên
+      copyRegion(leaves, result, 24, 30, 46, 38, 0, 0);
+
+      // đỉnh cây: rung rõ hơn
+      copyRegion(leaves, result, 15, 8, 58, 24, w, w === 2 ? -1 : 0);
+
+      // mép trái: nhẹ hơn
+      copyRegion(
+        leaves,
+        result,
+        5,
+        22,
+        34,
+        42,
+        slow > 0 ? 1 : slow < 0 ? -1 : 0,
+        0,
+      );
+
+      // mép phải: rõ nhất để thấy gió
+      copyRegion(leaves, result, 62, 22, 31, 48, w, 0);
+
+      // phần dưới tán nặng, chỉ nhích nhẹ
+      copyRegion(
+        leaves,
+        result,
+        20,
+        52,
+        66,
+        22,
+        delayed > 0 ? 1 : delayed < 0 ? -1 : 0,
+        0,
+      );
+
+      return result;
+    };
+
+    const createOuterWindSilhouette = (frameIndex: number): Pixel[] => {
+      const overlay = new Array<Pixel>(pixelCount).fill(null);
+      const w = windStep(frameIndex);
+
+      const dxRight = w > 0 ? 1 : w < 0 ? -1 : 0;
+      const dxStrong = w > 0 ? 2 : w < 0 ? -2 : 0;
+
+      // mép phải tán cây — giúp gió rõ hơn
+      pixelBlocks(overlay, [
+        [86 + dxStrong, 28, 4, 9, colors.leafBlack],
+        [89 + dxStrong, 38, 4, 10, colors.leafDeep],
+        [90 + dxStrong, 49, 3, 12, colors.leafBlack],
+        [84 + dxRight, 60, 5, 6, colors.leafDeep2],
+
+        // mép trái chuyển động nhẹ
+        [7 + dxRight, 35, 4, 9, colors.leafBlack],
+        [9 + dxRight, 48, 5, 8, colors.leafDeep],
+
+        // đỉnh cây rung nhẹ
+        [31 + dxRight, 8, 5, 4, colors.leafBlack],
+        [47 + dxRight, 9, 4, 4, colors.leafDeep],
+      ]);
+
+      return overlay;
+    };
+
+    const createBetterLeafTexture = (): Pixel[] => {
+      const tex = new Array<Pixel>(pixelCount).fill(null);
+
+      pixelBlocks(tex, [
+        // phá các mảng vàng lớn bằng mid-tone
+        [24, 17, 6, 3, colors.leafBright],
+        [31, 22, 7, 3, colors.leafMid],
+        [44, 33, 8, 3, colors.leafGold],
+        [55, 35, 8, 3, colors.leafBright],
+        [35, 41, 7, 3, colors.leafMid],
+
+        // highlight nhỏ, không tạo mảng trắng lớn
+        [19, 15, 3, 2, colors.leafLight],
+        [27, 13, 4, 2, colors.leafGold],
+        [47, 31, 5, 2, colors.leafLight],
+        [54, 33, 4, 2, colors.leafGold],
+
+        // cut shadow để tán sắc hơn
+        [13, 35, 5, 3, colors.leafBlack],
+        [30, 56, 6, 3, colors.leafBlack],
+        [79, 42, 5, 3, colors.leafBlack],
+        [70, 63, 5, 3, colors.leafDeep],
+
+        // rim xanh nhưng giảm diện tích
+        [84, 48, 2, 7, colors.rim],
+        [87, 55, 2, 6, colors.rimLight],
+        [65, 58, 7, 2, colors.rim],
+        [74, 61, 5, 2, colors.rimLight],
+      ]);
+
+      return tex;
+    };
+
+    const createMovingBranches = (frameIndex: number): Pixel[] => {
+      const overlay = new Array<Pixel>(pixelCount).fill(null);
+      const w = windStep(frameIndex);
+      const tip = w > 0 ? 1 : w < 0 ? -1 : 0;
+
+      drawLine(overlay, 60, 48, 66 + tip, 38, colors.barkDark, 2);
+      drawLine(overlay, 42, 45, 33 + tip, 35, colors.barkDark, 2);
+      drawLine(overlay, 50, 42, 50 + tip, 31, colors.barkRust, 1);
+      drawLine(overlay, 39, 50, 25 + tip, 45, colors.barkMid, 1);
+
+      return overlay;
+    };
+
+    const animatedFrames = Array.from(
+      { length: frameTotal },
+      (_, frameIndex): Frame => ({
+        name: `Ancient Tree Clear Wind ${frameIndex + 1}`,
+        duration: 95,
+        visible: true,
+        layers: [
+          { name: 'Shadow', visible: true, opacity: 0.55, pixels: [...shadow] },
+          { name: 'Rocks', visible: true, opacity: 1, pixels: [...ground] },
+          {
+            name: 'Stable trunk and roots',
+            visible: true,
+            opacity: 1,
+            pixels: [...trunk],
+          },
+          {
+            name: 'Moving branches',
+            visible: true,
+            opacity: 1,
+            pixels: createMovingBranches(frameIndex),
+          },
+          {
+            name: 'Weighted leaf canopy',
+            visible: true,
+            opacity: 1,
+            pixels: createWeightedLeaves(frameIndex),
+          },
+          {
+            name: 'Outer wind silhouette',
+            visible: true,
+            opacity: 1,
+            pixels: createOuterWindSilhouette(frameIndex),
+          },
+          {
+            name: 'Better leaf texture',
+            visible: true,
+            opacity: 1,
+            pixels: createBetterLeafTexture(),
+          },
+        ],
+      }),
+    );
+    this.frames = animatedFrames;
+    this.activeFrameIndex = 0;
+    this.previewFrameIndex = 0;
+    this.activeLayerIndex = 4;
+    this.selection = null;
+    this.previewPixels = null;
+    this.moveStartSelection = null;
+    this.palette = Object.values(colors);
+    this.primaryColor = colors.leafBright;
+    this.secondaryColor = colors.barkMid;
+    this.zoom = 8;
+    this.displayZoom = 3;
+    if (this.isPlaying) {
+      window.clearTimeout(this.animationTimer);
+    }
+    this.isPlaying = true;
+    this.workspaces[this.activeWorkspaceIndex] = this.captureWorkspace(
+      'Tree Example',
+      this.workspaces[this.activeWorkspaceIndex]?.id ?? 1,
+    );
+    this.refreshAllFrameThumbnails();
+    this.render();
+    this.playNextFrame();
+  }
+
+  private extractSpriteFromSheet(
+    image: HTMLImageElement,
+    rect: SourceRect,
+  ): { canvas: HTMLCanvasElement; bounds: PixelBounds } {
     const canvas = document.createElement('canvas');
     canvas.width = Math.round(rect.w);
     canvas.height = Math.round(rect.h);
     const ctx = canvas.getContext('2d', { willReadFrequently: true })!;
     ctx.imageSmoothingEnabled = true;
-    ctx.drawImage(image, rect.x, rect.y, rect.w, rect.h, 0, 0, canvas.width, canvas.height);
+    ctx.drawImage(
+      image,
+      rect.x,
+      rect.y,
+      rect.w,
+      rect.h,
+      0,
+      0,
+      canvas.width,
+      canvas.height,
+    );
     const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
     this.removeWhiteBackground(imageData);
     ctx.putImageData(imageData, 0, 0);
     return {
       canvas,
-      bounds: this.findLargestOpaqueBounds(imageData) ?? { x: 0, y: 0, w: canvas.width, h: canvas.height }
+      bounds: this.findLargestOpaqueBounds(imageData) ?? {
+        x: 0,
+        y: 0,
+        w: canvas.width,
+        h: canvas.height,
+      },
     };
   }
 
-  private sampleAlignedSpriteFrame(sourceCanvas: HTMLCanvasElement, bounds: PixelBounds, width: number, height: number, scale: number): { pixels: Pixel[]; palette: string[] } {
+  private sampleAlignedSpriteFrame(
+    sourceCanvas: HTMLCanvasElement,
+    bounds: PixelBounds,
+    width: number,
+    height: number,
+    scale: number,
+  ): { pixels: Pixel[]; palette: string[] } {
     const canvas = document.createElement('canvas');
     canvas.width = width;
     canvas.height = height;
@@ -400,7 +1260,17 @@ export class AppComponent implements AfterViewInit {
     const drawHeight = Math.round(bounds.h * scale);
     const drawX = Math.round((width - drawWidth) / 2);
     const drawY = Math.round(height - drawHeight - 7);
-    ctx.drawImage(sourceCanvas, bounds.x, bounds.y, bounds.w, bounds.h, drawX, drawY, drawWidth, drawHeight);
+    ctx.drawImage(
+      sourceCanvas,
+      bounds.x,
+      bounds.y,
+      bounds.w,
+      bounds.h,
+      drawX,
+      drawY,
+      drawWidth,
+      drawHeight,
+    );
     const imageData = ctx.getImageData(0, 0, width, height);
     this.enhanceImageData(imageData, width, height);
     return this.imageDataToPixels(imageData, width, height);
@@ -438,10 +1308,15 @@ export class AppComponent implements AfterViewInit {
             { x: point.x + 1, y: point.y },
             { x: point.x - 1, y: point.y },
             { x: point.x, y: point.y + 1 },
-            { x: point.x, y: point.y - 1 }
+            { x: point.x, y: point.y - 1 },
           ];
           for (const neighbor of neighbors) {
-            if (neighbor.x < 0 || neighbor.y < 0 || neighbor.x >= width || neighbor.y >= height) {
+            if (
+              neighbor.x < 0 ||
+              neighbor.y < 0 ||
+              neighbor.x >= width ||
+              neighbor.y >= height
+            ) {
               continue;
             }
             const index = neighbor.y * width + neighbor.x;
@@ -459,7 +1334,7 @@ export class AppComponent implements AfterViewInit {
             y: minY,
             w: maxX - minX + 1,
             h: maxY - minY + 1,
-            area
+            area,
           };
         }
       }
@@ -500,12 +1375,14 @@ export class AppComponent implements AfterViewInit {
   duplicateLayer(): void {
     this.pushUndo();
     for (const frame of this.frames) {
-      const source = frame.layers[this.activeLayerIndex] ?? this.createLayer(`Layer ${this.activeLayerIndex + 1}`);
+      const source =
+        frame.layers[this.activeLayerIndex] ??
+        this.createLayer(`Layer ${this.activeLayerIndex + 1}`);
       frame.layers.splice(this.activeLayerIndex + 1, 0, {
         name: `${source.name} copy`,
         visible: source.visible,
         opacity: source.opacity,
-        pixels: [...source.pixels]
+        pixels: [...source.pixels],
       });
     }
     this.activeLayerIndex += 1;
@@ -529,7 +1406,11 @@ export class AppComponent implements AfterViewInit {
 
   addFrame(): void {
     this.pushUndo();
-    this.frames.splice(this.activeFrameIndex + 1, 0, this.createFrame(`Frame ${this.frames.length + 1}`));
+    this.frames.splice(
+      this.activeFrameIndex + 1,
+      0,
+      this.createFrame(`Frame ${this.frames.length + 1}`),
+    );
     this.activeFrameIndex += 1;
     this.activeLayerIndex = 0;
     this.refreshAllFrameThumbnails();
@@ -538,7 +1419,10 @@ export class AppComponent implements AfterViewInit {
 
   duplicateFrame(): void {
     this.pushUndo();
-    const copy = this.cloneFrame(this.activeFrame, `${this.activeFrame.name} copy`);
+    const copy = this.cloneFrame(
+      this.activeFrame,
+      `${this.activeFrame.name} copy`,
+    );
     this.frames.splice(this.activeFrameIndex + 1, 0, copy);
     this.activeFrameIndex += 1;
     this.refreshAllFrameThumbnails();
@@ -553,7 +1437,10 @@ export class AppComponent implements AfterViewInit {
     this.pushUndo();
     this.frames.splice(this.activeFrameIndex, 1);
     this.activeFrameIndex = Math.max(0, this.activeFrameIndex - 1);
-    this.activeLayerIndex = Math.min(this.activeLayerIndex, this.activeFrame.layers.length - 1);
+    this.activeLayerIndex = Math.min(
+      this.activeLayerIndex,
+      this.activeFrame.layers.length - 1,
+    );
     this.refreshAllFrameThumbnails();
     this.render();
   }
@@ -581,7 +1468,10 @@ export class AppComponent implements AfterViewInit {
       this.beginPan(event);
       return;
     }
-    const point = this.eventToPixel(event);
+    const point =
+      this.activeTool === 'move' && this.selection && this.previewPixels
+        ? this.eventToCanvasPixel(event)
+        : this.eventToPixel(event);
     if (!point) {
       return;
     }
@@ -600,18 +1490,24 @@ export class AppComponent implements AfterViewInit {
     if (this.activeTool === 'pen' || this.activeTool === 'eraser') {
       this.paint(point.x, point.y);
     } else if (this.activeTool === 'fill') {
-      this.floodFill(point.x, point.y, this.activeLayer.pixels[this.index(point.x, point.y)], this.primaryColor);
+      this.fillMirrored(point.x, point.y, this.primaryColor);
     } else if (this.activeTool === 'select') {
       this.selection = { x: point.x, y: point.y, w: 1, h: 1, pixels: [] };
     } else if (this.activeTool === 'move' && this.selection) {
       this.previewPixels = [...this.activeLayer.pixels];
-      this.moveStartSelection = { ...this.selection, pixels: [...this.selection.pixels] };
+      this.moveStartSelection = {
+        ...this.selection,
+        pixels: [...this.selection.pixels],
+      };
     }
     this.render();
   }
 
   onCanvasWrapPointerDown(event: PointerEvent): void {
-    if (event.target === this.canvasWrapRef.nativeElement || event.button === 1) {
+    if (
+      event.target === this.canvasWrapRef.nativeElement ||
+      event.button === 1
+    ) {
       this.beginPan(event);
     }
   }
@@ -621,8 +1517,10 @@ export class AppComponent implements AfterViewInit {
       return;
     }
     const wrap = this.canvasWrapRef.nativeElement;
-    wrap.scrollLeft = this.panState.scrollLeft - (event.clientX - this.panState.clientX);
-    wrap.scrollTop = this.panState.scrollTop - (event.clientY - this.panState.clientY);
+    wrap.scrollLeft =
+      this.panState.scrollLeft - (event.clientX - this.panState.clientX);
+    wrap.scrollTop =
+      this.panState.scrollTop - (event.clientY - this.panState.clientY);
   }
 
   onCanvasWrapPointerUp(event: PointerEvent): void {
@@ -657,28 +1555,46 @@ export class AppComponent implements AfterViewInit {
       clientY: event.clientY,
       startLeftWidth: this.leftPanelWidth,
       startRightWidth: this.rightPanelWidth,
-      startBottomHeight: this.bottomPanelHeight
+      startBottomHeight: this.bottomPanelHeight,
     };
     this.isResizingPane = true;
   }
 
   resizePane(event: PointerEvent): void {
-    if (!this.paneResizeState || this.paneResizeState.pointerId !== event.pointerId) {
+    if (
+      !this.paneResizeState ||
+      this.paneResizeState.pointerId !== event.pointerId
+    ) {
       return;
     }
     const dx = event.clientX - this.paneResizeState.clientX;
     if (this.paneResizeState.pane === 'left') {
-      this.leftPanelWidth = this.clamp(this.paneResizeState.startLeftWidth + dx, 150, 360);
+      this.leftPanelWidth = this.clamp(
+        this.paneResizeState.startLeftWidth + dx,
+        150,
+        360,
+      );
     } else if (this.paneResizeState.pane === 'right') {
-      this.rightPanelWidth = this.clamp(this.paneResizeState.startRightWidth - dx, 240, 520);
+      this.rightPanelWidth = this.clamp(
+        this.paneResizeState.startRightWidth - dx,
+        240,
+        520,
+      );
     } else {
       const dy = event.clientY - this.paneResizeState.clientY;
-      this.bottomPanelHeight = this.clamp(this.paneResizeState.startBottomHeight - dy, 120, 420);
+      this.bottomPanelHeight = this.clamp(
+        this.paneResizeState.startBottomHeight - dy,
+        120,
+        420,
+      );
     }
   }
 
   endPaneResize(event: PointerEvent): void {
-    if (!this.paneResizeState || this.paneResizeState.pointerId !== event.pointerId) {
+    if (
+      !this.paneResizeState ||
+      this.paneResizeState.pointerId !== event.pointerId
+    ) {
       return;
     }
     this.paneResizeState = null;
@@ -716,18 +1632,36 @@ export class AppComponent implements AfterViewInit {
     }
 
     if (this.activeTool === 'pen' || this.activeTool === 'eraser') {
-      this.drawLine(this.pointer.x, this.pointer.y, point.x, point.y, (x, y) => this.paint(x, y));
+      this.drawLine(this.pointer.x, this.pointer.y, point.x, point.y, (x, y) =>
+        this.paint(x, y),
+      );
       this.pointer.x = point.x;
       this.pointer.y = point.y;
     } else if (this.activeTool === 'select') {
-      this.selection = this.rectFromPoints(this.pointer.startX, this.pointer.startY, point.x, point.y);
-    } else if (this.activeTool === 'move' && this.selection && this.previewPixels) {
+      this.selection = this.rectFromPoints(
+        this.pointer.startX,
+        this.pointer.startY,
+        point.x,
+        point.y,
+      );
+    } else if (
+      this.activeTool === 'move' &&
+      this.selection &&
+      this.previewPixels
+    ) {
       const dx = point.x - this.pointer.startX;
       const dy = point.y - this.pointer.startY;
       this.moveSelectionPreview(dx, dy);
     } else if (['line', 'rect', 'ellipse'].includes(this.activeTool)) {
       this.previewPixels = [...this.activeLayer.pixels];
-      this.drawShape(this.previewPixels, this.pointer.startX, this.pointer.startY, point.x, point.y, this.activeTool);
+      this.drawShape(
+        this.previewPixels,
+        this.pointer.startX,
+        this.pointer.startY,
+        point.x,
+        point.y,
+        this.activeTool,
+      );
     }
     this.render();
   }
@@ -736,17 +1670,35 @@ export class AppComponent implements AfterViewInit {
     if (!this.pointer) {
       return;
     }
-    const point = this.eventToPixel(event) ?? { x: this.pointer.x, y: this.pointer.y };
+    const point = this.eventToPixel(event) ?? {
+      x: this.pointer.x,
+      y: this.pointer.y,
+    };
 
-    if (this.activeTool === 'line' || this.activeTool === 'rect' || this.activeTool === 'ellipse') {
-      this.drawShape(this.activeLayer.pixels, this.pointer.startX, this.pointer.startY, point.x, point.y, this.activeTool);
+    if (
+      this.activeTool === 'line' ||
+      this.activeTool === 'rect' ||
+      this.activeTool === 'ellipse'
+    ) {
+      this.drawShape(
+        this.activeLayer.pixels,
+        this.pointer.startX,
+        this.pointer.startY,
+        point.x,
+        point.y,
+        this.activeTool,
+      );
       this.previewPixels = null;
     } else if (this.activeTool === 'select' && this.selection) {
       this.selection = this.normalizeSelection(this.selection);
       this.selection.pixels = this.copyPixels(this.selection);
-    } else if (this.activeTool === 'move' && this.selection && this.previewPixels) {
+    } else if (
+      this.activeTool === 'move' &&
+      this.selection &&
+      this.previewPixels
+    ) {
       this.activeLayer.pixels = [...this.previewPixels];
-      this.selection.pixels = this.copyPixels(this.selection);
+      this.selection.pixels = this.selectionPixels(this.selection);
       this.previewPixels = null;
       this.moveStartSelection = null;
     }
@@ -759,7 +1711,10 @@ export class AppComponent implements AfterViewInit {
     if (!this.selection) {
       return;
     }
-    this.clipboard = { ...this.selection, pixels: this.copyPixels(this.selection) };
+    this.clipboard = {
+      ...this.selection,
+      pixels: this.selectionPixels(this.selection),
+    };
   }
 
   cutSelection(): void {
@@ -768,7 +1723,9 @@ export class AppComponent implements AfterViewInit {
     }
     this.pushUndo();
     this.copySelection();
-    this.eachSelectionPixel(this.selection, (x, y) => this.setPixel(this.activeLayer.pixels, x, y, null));
+    this.eachSelectionPixel(this.selection, (x, y) =>
+      this.setPixel(this.activeLayer.pixels, x, y, null),
+    );
     this.render();
   }
 
@@ -777,9 +1734,20 @@ export class AppComponent implements AfterViewInit {
       return;
     }
     this.pushUndo();
-    const x = Math.min(this.width - this.clipboard.w, Math.max(0, this.selection?.x ?? 0));
-    const y = Math.min(this.height - this.clipboard.h, Math.max(0, this.selection?.y ?? 0));
-    this.selection = { ...this.clipboard, x, y, pixels: [...this.clipboard.pixels] };
+    const x = Math.min(
+      this.width - this.clipboard.w,
+      Math.max(0, this.selection?.x ?? 0),
+    );
+    const y = Math.min(
+      this.height - this.clipboard.h,
+      Math.max(0, this.selection?.y ?? 0),
+    );
+    this.selection = {
+      ...this.clipboard,
+      x,
+      y,
+      pixels: [...this.clipboard.pixels],
+    };
     this.stampSelection(this.selection);
     this.render();
   }
@@ -799,13 +1767,15 @@ export class AppComponent implements AfterViewInit {
         next[ny * this.selection.h + nx] = source[y * this.selection.w + x];
       }
     }
-    this.eachSelectionPixel(this.selection, (x, y) => this.setPixel(this.activeLayer.pixels, x, y, null));
+    this.eachSelectionPixel(this.selection, (x, y) =>
+      this.setPixel(this.activeLayer.pixels, x, y, null),
+    );
     this.selection = {
       x: this.selection.x,
       y: this.selection.y,
       w: this.selection.h,
       h: this.selection.w,
-      pixels: next
+      pixels: next,
     };
     this.stampSelection(this.selection);
     this.render();
@@ -827,7 +1797,9 @@ export class AppComponent implements AfterViewInit {
         next[ny * target.w + nx] = source[y * target.w + x];
       }
     }
-    this.eachSelectionPixel(target, (x, y) => this.setPixel(this.activeLayer.pixels, x, y, null));
+    this.eachSelectionPixel(target, (x, y) =>
+      this.setPixel(this.activeLayer.pixels, x, y, null),
+    );
     target.pixels = next;
     this.stampSelection(target);
     this.render();
@@ -985,12 +1957,15 @@ export class AppComponent implements AfterViewInit {
       exportedAt: new Date().toISOString(),
       activeWorkspaceIndex: this.activeWorkspaceIndex,
       workspaceIdSeed: this.workspaceIdSeed,
-      workspaces: this.workspaces.map(workspace => this.cloneWorkspace(workspace)),
+      workspaces: this.workspaces.map((workspace) =>
+        this.cloneWorkspace(workspace),
+      ),
       settings: {
         zoom: this.zoom,
         displayZoom: this.displayZoom,
         showGrid: this.showGrid,
         onionSkin: this.onionSkin,
+        mirrorX: this.mirrorX,
         brushSize: this.brushSize,
         importResizeCanvas: this.importResizeCanvas,
         importLongSide: this.importLongSide,
@@ -998,12 +1973,18 @@ export class AppComponent implements AfterViewInit {
         importPaletteSize: this.importPaletteSize,
         importDither: this.importDither,
         importSharpen: this.importSharpen,
-        importContrast: this.importContrast
-      }
+        importContrast: this.importContrast,
+      },
     };
-    const blob = new Blob([JSON.stringify(project, null, 2)], { type: 'application/json' });
+    const blob = new Blob([JSON.stringify(project, null, 2)], {
+      type: 'application/json',
+    });
     const link = document.createElement('a');
-    const activeName = this.activeWorkspace.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || 'pixel-art';
+    const activeName =
+      this.activeWorkspace.name
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/(^-|-$)/g, '') || 'pixel-art';
     link.download = `${activeName}.pixelart.json`;
     link.href = URL.createObjectURL(blob);
     link.click();
@@ -1031,7 +2012,10 @@ export class AppComponent implements AfterViewInit {
   selectFrame(index: number): void {
     this.activeFrameIndex = index;
     this.previewFrameIndex = index;
-    this.activeLayerIndex = Math.min(this.activeLayerIndex, this.activeFrame.layers.length - 1);
+    this.activeLayerIndex = Math.min(
+      this.activeLayerIndex,
+      this.activeFrame.layers.length - 1,
+    );
     this.render();
   }
 
@@ -1072,7 +2056,7 @@ export class AppComponent implements AfterViewInit {
       return;
     }
     frame.visible = !frame.visible;
-    if (this.isPlaying && !this.frames.some(item => item.visible)) {
+    if (this.isPlaying && !this.frames.some((item) => item.visible)) {
       this.isPlaying = false;
       window.clearTimeout(this.animationTimer);
     }
@@ -1114,7 +2098,11 @@ export class AppComponent implements AfterViewInit {
     this.render();
   }
 
-  toggleCellVisibility(frameIndex: number, layerIndex: number, event?: Event): void {
+  toggleCellVisibility(
+    frameIndex: number,
+    layerIndex: number,
+    event?: Event,
+  ): void {
     event?.stopPropagation();
     const layer = this.layerAt(frameIndex, layerIndex);
     if (!layer) {
@@ -1127,7 +2115,10 @@ export class AppComponent implements AfterViewInit {
 
   addPaletteColor(color = this.primaryColor): void {
     const normalized = color.toLowerCase();
-    this.palette = [normalized, ...this.palette.filter(item => item.toLowerCase() !== normalized)].slice(0, 32);
+    this.palette = [
+      normalized,
+      ...this.palette.filter((item) => item.toLowerCase() !== normalized),
+    ].slice(0, 32);
   }
 
   setImportPreset(longSide: number): void {
@@ -1141,7 +2132,10 @@ export class AppComponent implements AfterViewInit {
   }
 
   swapColors(): void {
-    [this.primaryColor, this.secondaryColor] = [this.secondaryColor, this.primaryColor];
+    [this.primaryColor, this.secondaryColor] = [
+      this.secondaryColor,
+      this.primaryColor,
+    ];
   }
 
   async pickFromScreen(useSecondary = false): Promise<void> {
@@ -1163,7 +2157,7 @@ export class AppComponent implements AfterViewInit {
       return;
     }
     const key = event.key.toLowerCase();
-    const tool = this.tools.find(item => item.key.toLowerCase() === key);
+    const tool = this.tools.find((item) => item.key.toLowerCase() === key);
     if (tool) {
       this.setTool(tool.id);
     } else if (event.ctrlKey && key === 'z') {
@@ -1193,18 +2187,21 @@ export class AppComponent implements AfterViewInit {
     }
   }
 
-  private captureWorkspace(name = this.activeWorkspace?.name ?? 'Workspace', id = this.activeWorkspace?.id ?? 1): WorkspaceState {
+  private captureWorkspace(
+    name = this.activeWorkspace?.name ?? 'Workspace',
+    id = this.activeWorkspace?.id ?? 1,
+  ): WorkspaceState {
     return {
       id,
       name,
       width: this.width,
       height: this.height,
-      frames: this.frames.map(frame => this.cloneFrame(frame, frame.name)),
+      frames: this.frames.map((frame) => this.cloneFrame(frame, frame.name)),
       activeFrameIndex: this.activeFrameIndex,
       activeLayerIndex: this.activeLayerIndex,
       palette: [...this.palette],
       primaryColor: this.primaryColor,
-      secondaryColor: this.secondaryColor
+      secondaryColor: this.secondaryColor,
     };
   }
 
@@ -1213,7 +2210,10 @@ export class AppComponent implements AfterViewInit {
       return;
     }
     const current = this.workspaces[this.activeWorkspaceIndex];
-    this.workspaces[this.activeWorkspaceIndex] = this.captureWorkspace(current.name, current.id);
+    this.workspaces[this.activeWorkspaceIndex] = this.captureWorkspace(
+      current.name,
+      current.id,
+    );
   }
 
   private applyWorkspace(workspace: WorkspaceState): void {
@@ -1221,9 +2221,17 @@ export class AppComponent implements AfterViewInit {
     this.isPlaying = false;
     this.width = workspace.width;
     this.height = workspace.height;
-    this.frames = workspace.frames.map(frame => this.cloneFrame(frame, frame.name));
-    this.activeFrameIndex = Math.min(workspace.activeFrameIndex, this.frames.length - 1);
-    this.activeLayerIndex = Math.min(workspace.activeLayerIndex, this.activeFrame.layers.length - 1);
+    this.frames = workspace.frames.map((frame) =>
+      this.cloneFrame(frame, frame.name),
+    );
+    this.activeFrameIndex = Math.min(
+      workspace.activeFrameIndex,
+      this.frames.length - 1,
+    );
+    this.activeLayerIndex = Math.min(
+      workspace.activeLayerIndex,
+      this.activeFrame.layers.length - 1,
+    );
     this.palette = [...workspace.palette];
     this.primaryColor = workspace.primaryColor;
     this.secondaryColor = workspace.secondaryColor;
@@ -1249,33 +2257,69 @@ export class AppComponent implements AfterViewInit {
       activeLayerIndex: 0,
       palette: [...this.palette],
       primaryColor: this.primaryColor,
-      secondaryColor: this.secondaryColor
+      secondaryColor: this.secondaryColor,
     };
   }
 
   private loadProject(project: PixelArtProjectFile): void {
-    if (project.app !== 'Pixel Studio' || project.version !== 1 || !Array.isArray(project.workspaces) || project.workspaces.length === 0) {
+    if (
+      project.app !== 'Pixel Studio' ||
+      project.version !== 1 ||
+      !Array.isArray(project.workspaces) ||
+      project.workspaces.length === 0
+    ) {
       throw new Error('Unsupported Pixel Studio project file.');
     }
-    const workspaces = project.workspaces.map(workspace => this.normalizeWorkspace(workspace));
+    const workspaces = project.workspaces.map((workspace) =>
+      this.normalizeWorkspace(workspace),
+    );
     this.workspaces = workspaces;
-    this.activeWorkspaceIndex = this.clamp(project.activeWorkspaceIndex ?? 0, 0, workspaces.length - 1);
-    this.workspaceIdSeed = Math.max(project.workspaceIdSeed ?? workspaces.length + 1, ...workspaces.map(workspace => workspace.id + 1));
+    this.activeWorkspaceIndex = this.clamp(
+      project.activeWorkspaceIndex ?? 0,
+      0,
+      workspaces.length - 1,
+    );
+    this.workspaceIdSeed = Math.max(
+      project.workspaceIdSeed ?? workspaces.length + 1,
+      ...workspaces.map((workspace) => workspace.id + 1),
+    );
 
     const settings = project.settings;
     if (settings) {
       this.zoom = this.clamp(settings.zoom ?? this.zoom, 6, 32);
-      this.displayZoom = this.clamp(settings.displayZoom ?? this.displayZoom, 2, 12);
+      this.displayZoom = this.clamp(
+        settings.displayZoom ?? this.displayZoom,
+        2,
+        12,
+      );
       this.showGrid = settings.showGrid ?? this.showGrid;
       this.onionSkin = settings.onionSkin ?? this.onionSkin;
+      this.mirrorX = settings.mirrorX ?? this.mirrorX;
       this.brushSize = this.clamp(settings.brushSize ?? this.brushSize, 1, 8);
-      this.importResizeCanvas = settings.importResizeCanvas ?? this.importResizeCanvas;
-      this.importLongSide = this.clamp(settings.importLongSide ?? this.importLongSide, 16, 128);
+      this.importResizeCanvas =
+        settings.importResizeCanvas ?? this.importResizeCanvas;
+      this.importLongSide = this.clamp(
+        settings.importLongSide ?? this.importLongSide,
+        16,
+        128,
+      );
       this.importFit = settings.importFit ?? this.importFit;
-      this.importPaletteSize = this.clamp(settings.importPaletteSize ?? this.importPaletteSize, 4, 64);
+      this.importPaletteSize = this.clamp(
+        settings.importPaletteSize ?? this.importPaletteSize,
+        4,
+        64,
+      );
       this.importDither = settings.importDither ?? this.importDither;
-      this.importSharpen = this.clamp(settings.importSharpen ?? this.importSharpen, 0, 1);
-      this.importContrast = this.clamp(settings.importContrast ?? this.importContrast, 0.8, 1.4);
+      this.importSharpen = this.clamp(
+        settings.importSharpen ?? this.importSharpen,
+        0,
+        1,
+      );
+      this.importContrast = this.clamp(
+        settings.importContrast ?? this.importContrast,
+        0.8,
+        1.4,
+      );
     }
 
     this.applyWorkspace(this.activeWorkspace);
@@ -1285,19 +2329,34 @@ export class AppComponent implements AfterViewInit {
     const width = this.clamp(Math.floor(workspace.width), 8, 128);
     const height = this.clamp(Math.floor(workspace.height), 8, 128);
     const pixelCount = width * height;
-    const frames = (workspace.frames?.length ? workspace.frames : [this.createFrame('Frame 1')]).map((frame, frameIndex) => ({
+    const frames = (
+      workspace.frames?.length
+        ? workspace.frames
+        : [this.createFrame('Frame 1')]
+    ).map((frame, frameIndex) => ({
       name: frame.name || `Frame ${frameIndex + 1}`,
       duration: this.clamp(Math.floor(frame.duration ?? 160), 40, 5000),
       visible: frame.visible ?? true,
-      layers: (frame.layers?.length ? frame.layers : [this.createLayer('Layer 1')]).map((layer, layerIndex) => ({
+      layers: (frame.layers?.length
+        ? frame.layers
+        : [this.createLayer('Layer 1')]
+      ).map((layer, layerIndex) => ({
         name: layer.name || `Layer ${layerIndex + 1}`,
         visible: layer.visible ?? true,
         opacity: this.clamp(layer.opacity ?? 1, 0, 1),
-        pixels: this.normalizePixels(layer.pixels, pixelCount)
-      }))
+        pixels: this.normalizePixels(layer.pixels, pixelCount),
+      })),
     }));
-    const activeFrameIndex = this.clamp(workspace.activeFrameIndex ?? 0, 0, frames.length - 1);
-    const activeLayerIndex = this.clamp(workspace.activeLayerIndex ?? 0, 0, frames[activeFrameIndex].layers.length - 1);
+    const activeFrameIndex = this.clamp(
+      workspace.activeFrameIndex ?? 0,
+      0,
+      frames.length - 1,
+    );
+    const activeLayerIndex = this.clamp(
+      workspace.activeLayerIndex ?? 0,
+      0,
+      frames[activeFrameIndex].layers.length - 1,
+    );
     return {
       id: workspace.id || this.workspaceIdSeed++,
       name: workspace.name || 'Imported Workspace',
@@ -1307,20 +2366,31 @@ export class AppComponent implements AfterViewInit {
       activeFrameIndex,
       activeLayerIndex,
       palette: this.normalizePalette(workspace.palette),
-      primaryColor: this.normalizeRequiredColor(workspace.primaryColor, '#222831'),
-      secondaryColor: this.normalizeRequiredColor(workspace.secondaryColor, '#f6f1de')
+      primaryColor: this.normalizeRequiredColor(
+        workspace.primaryColor,
+        '#222831',
+      ),
+      secondaryColor: this.normalizeRequiredColor(
+        workspace.secondaryColor,
+        '#f6f1de',
+      ),
     };
   }
 
   private cloneWorkspace(workspace: WorkspaceState): WorkspaceState {
     return {
       ...workspace,
-      frames: workspace.frames.map(frame => this.cloneFrame(frame, frame.name)),
-      palette: [...workspace.palette]
+      frames: workspace.frames.map((frame) =>
+        this.cloneFrame(frame, frame.name),
+      ),
+      palette: [...workspace.palette],
     };
   }
 
-  private normalizePixels(pixels: Pixel[] | undefined, pixelCount: number): Pixel[] {
+  private normalizePixels(
+    pixels: Pixel[] | undefined,
+    pixelCount: number,
+  ): Pixel[] {
     const normalized = new Array<Pixel>(pixelCount).fill(null);
     for (let i = 0; i < Math.min(pixelCount, pixels?.length ?? 0); i += 1) {
       normalized[i] = this.normalizeColor(pixels![i], null);
@@ -1330,13 +2400,17 @@ export class AppComponent implements AfterViewInit {
 
   private normalizePalette(palette: string[] | undefined): string[] {
     const colors = (palette ?? [])
-      .map(color => this.normalizeColor(color, null))
+      .map((color) => this.normalizeColor(color, null))
       .filter((color): color is string => Boolean(color));
-    return (colors.length ? colors : ['#222831', '#393e46', '#00adb5', '#eeeeee']).slice(0, 64);
+    return (
+      colors.length ? colors : ['#222831', '#393e46', '#00adb5', '#eeeeee']
+    ).slice(0, 64);
   }
 
   private normalizeColor(color: unknown, fallback: string | null): Pixel {
-    return typeof color === 'string' && /^#[0-9a-f]{6}$/i.test(color) ? color.toLowerCase() : fallback;
+    return typeof color === 'string' && /^#[0-9a-f]{6}$/i.test(color)
+      ? color.toLowerCase()
+      : fallback;
   }
 
   private normalizeRequiredColor(color: unknown, fallback: string): string {
@@ -1348,7 +2422,7 @@ export class AppComponent implements AfterViewInit {
       name,
       duration: 160,
       visible: true,
-      layers: [this.createLayer('Layer 1')]
+      layers: [this.createLayer('Layer 1')],
     };
   }
 
@@ -1357,7 +2431,7 @@ export class AppComponent implements AfterViewInit {
       name,
       visible: true,
       opacity: 1,
-      pixels: new Array<Pixel>(this.width * this.height).fill(null)
+      pixels: new Array<Pixel>(this.width * this.height).fill(null),
     };
   }
 
@@ -1366,22 +2440,27 @@ export class AppComponent implements AfterViewInit {
       name,
       duration: frame.duration,
       visible: frame.visible,
-      layers: frame.layers.map(layer => ({
+      layers: frame.layers.map((layer) => ({
         name: layer.name,
         visible: layer.visible,
         opacity: layer.opacity,
-        pixels: [...layer.pixels]
-      }))
+        pixels: [...layer.pixels],
+      })),
     };
   }
 
   private eventToPixel(event: PointerEvent): { x: number; y: number } | null {
+    const point = this.eventToCanvasPixel(event);
+    if (!this.inside(point.x, point.y)) {
+      return null;
+    }
+    return point;
+  }
+
+  private eventToCanvasPixel(event: PointerEvent): { x: number; y: number } {
     const rect = this.stageRef.nativeElement.getBoundingClientRect();
     const x = Math.floor((event.clientX - rect.left) / this.zoom);
     const y = Math.floor((event.clientY - rect.top) / this.zoom);
-    if (!this.inside(x, y)) {
-      return null;
-    }
     return { x, y };
   }
 
@@ -1389,38 +2468,96 @@ export class AppComponent implements AfterViewInit {
     const radius = Math.max(1, this.brushSize);
     for (let oy = 0; oy < radius; oy += 1) {
       for (let ox = 0; ox < radius; ox += 1) {
-        this.setPixel(this.activeLayer.pixels, x + ox, y + oy, this.activeTool === 'eraser' ? null : this.primaryColor);
+        this.setMirroredPixel(
+          this.activeLayer.pixels,
+          x + ox,
+          y + oy,
+          this.activeTool === 'eraser' ? null : this.primaryColor,
+        );
       }
     }
   }
 
-  private floodFill(x: number, y: number, target: Pixel, replacement: Pixel): void {
+  private fillMirrored(x: number, y: number, replacement: Pixel): void {
+    this.floodFill(
+      x,
+      y,
+      this.activeLayer.pixels[this.index(x, y)],
+      replacement,
+    );
+    if (!this.mirrorX) {
+      return;
+    }
+    const mirrorX = this.mirrorPixelX(x);
+    if (mirrorX !== x) {
+      this.floodFill(
+        mirrorX,
+        y,
+        this.activeLayer.pixels[this.index(mirrorX, y)],
+        replacement,
+      );
+    }
+  }
+
+  private floodFill(
+    x: number,
+    y: number,
+    target: Pixel,
+    replacement: Pixel,
+  ): void {
     if (target === replacement) {
       return;
     }
     const queue = [{ x, y }];
     while (queue.length) {
       const point = queue.shift()!;
-      if (!this.inside(point.x, point.y) || this.activeLayer.pixels[this.index(point.x, point.y)] !== target) {
+      if (
+        !this.inside(point.x, point.y) ||
+        this.activeLayer.pixels[this.index(point.x, point.y)] !== target
+      ) {
         continue;
       }
       this.setPixel(this.activeLayer.pixels, point.x, point.y, replacement);
-      queue.push({ x: point.x + 1, y: point.y }, { x: point.x - 1, y: point.y }, { x: point.x, y: point.y + 1 }, { x: point.x, y: point.y - 1 });
+      queue.push(
+        { x: point.x + 1, y: point.y },
+        { x: point.x - 1, y: point.y },
+        { x: point.x, y: point.y + 1 },
+        { x: point.x, y: point.y - 1 },
+      );
     }
   }
 
-  private drawShape(buffer: Pixel[], x0: number, y0: number, x1: number, y1: number, tool: Tool): void {
+  private drawShape(
+    buffer: Pixel[],
+    x0: number,
+    y0: number,
+    x1: number,
+    y1: number,
+    tool: Tool,
+  ): void {
     if (tool === 'line') {
-      this.drawLine(x0, y0, x1, y1, (x, y) => this.setPixel(buffer, x, y, this.primaryColor));
+      this.drawLine(x0, y0, x1, y1, (x, y) =>
+        this.setMirroredPixel(buffer, x, y, this.primaryColor),
+      );
     } else if (tool === 'rect') {
       const rect = this.normalizeSelection(this.rectFromPoints(x0, y0, x1, y1));
       for (let x = rect.x; x < rect.x + rect.w; x += 1) {
-        this.setPixel(buffer, x, rect.y, this.primaryColor);
-        this.setPixel(buffer, x, rect.y + rect.h - 1, this.primaryColor);
+        this.setMirroredPixel(buffer, x, rect.y, this.primaryColor);
+        this.setMirroredPixel(
+          buffer,
+          x,
+          rect.y + rect.h - 1,
+          this.primaryColor,
+        );
       }
       for (let y = rect.y; y < rect.y + rect.h; y += 1) {
-        this.setPixel(buffer, rect.x, y, this.primaryColor);
-        this.setPixel(buffer, rect.x + rect.w - 1, y, this.primaryColor);
+        this.setMirroredPixel(buffer, rect.x, y, this.primaryColor);
+        this.setMirroredPixel(
+          buffer,
+          rect.x + rect.w - 1,
+          y,
+          this.primaryColor,
+        );
       }
     } else if (tool === 'ellipse') {
       const rect = this.normalizeSelection(this.rectFromPoints(x0, y0, x1, y1));
@@ -1432,14 +2569,20 @@ export class AppComponent implements AfterViewInit {
         for (let x = rect.x; x < rect.x + rect.w; x += 1) {
           const value = Math.pow((x - cx) / rx, 2) + Math.pow((y - cy) / ry, 2);
           if (value > 0.72 && value < 1.28) {
-            this.setPixel(buffer, x, y, this.primaryColor);
+            this.setMirroredPixel(buffer, x, y, this.primaryColor);
           }
         }
       }
     }
   }
 
-  private drawLine(x0: number, y0: number, x1: number, y1: number, plot: (x: number, y: number) => void): void {
+  private drawLine(
+    x0: number,
+    y0: number,
+    x1: number,
+    y1: number,
+    plot: (x: number, y: number) => void,
+  ): void {
     let dx = Math.abs(x1 - x0);
     let sx = x0 < x1 ? 1 : -1;
     let dy = -Math.abs(y1 - y0);
@@ -1484,7 +2627,7 @@ export class AppComponent implements AfterViewInit {
       clientX: event.clientX,
       clientY: event.clientY,
       scrollLeft: wrap.scrollLeft,
-      scrollTop: wrap.scrollTop
+      scrollTop: wrap.scrollTop,
     };
     this.isPanning = true;
     this.pointer = null;
@@ -1508,12 +2651,25 @@ export class AppComponent implements AfterViewInit {
       this.ctx.globalAlpha = 1;
     }
 
-    this.drawComposite(this.ctx, this.isPlaying ? this.previewFrameIndex : this.activeFrameIndex, this.zoom, true);
+    this.drawComposite(
+      this.ctx,
+      this.isPlaying ? this.previewFrameIndex : this.activeFrameIndex,
+      this.zoom,
+      true,
+    );
     if (this.previewPixels) {
-      this.drawPixels(this.ctx, this.previewPixels, this.zoom, this.activeLayer.opacity);
+      this.drawPixels(
+        this.ctx,
+        this.previewPixels,
+        this.zoom,
+        this.activeLayer.opacity,
+      );
     }
     if (this.showGrid) {
       this.drawGrid();
+    }
+    if (this.mirrorX) {
+      this.drawMirrorGuide();
     }
     if (this.selection) {
       this.drawSelection();
@@ -1531,9 +2687,19 @@ export class AppComponent implements AfterViewInit {
     canvas.height = this.displayCanvasHeight;
     this.displayCtx.imageSmoothingEnabled = false;
     this.drawCheckerboardTo(this.displayCtx, this.displayZoom);
-    this.drawComposite(this.displayCtx, this.isPlaying ? this.previewFrameIndex : this.activeFrameIndex, this.displayZoom, true);
+    this.drawComposite(
+      this.displayCtx,
+      this.isPlaying ? this.previewFrameIndex : this.activeFrameIndex,
+      this.displayZoom,
+      true,
+    );
     if (this.previewPixels) {
-      this.drawPixels(this.displayCtx, this.previewPixels, this.displayZoom, this.activeLayer.opacity);
+      this.drawPixels(
+        this.displayCtx,
+        this.previewPixels,
+        this.displayZoom,
+        this.activeLayer.opacity,
+      );
     }
   }
 
@@ -1563,15 +2729,23 @@ export class AppComponent implements AfterViewInit {
       return;
     }
     ctx.imageSmoothingEnabled = false;
-    this.drawCheckerboardTo(ctx, Math.max(4, Math.floor(previewWidth / Math.max(this.width, this.height))));
-    const scale = Math.max(1, Math.floor(Math.min(previewWidth / this.width, previewHeight / this.height)));
+    this.drawCheckerboardTo(
+      ctx,
+      Math.max(4, Math.floor(previewWidth / Math.max(this.width, this.height))),
+    );
+    const scale = Math.max(
+      1,
+      Math.floor(
+        Math.min(previewWidth / this.width, previewHeight / this.height),
+      ),
+    );
     const drawWidth = this.width * scale;
     const drawHeight = this.height * scale;
     const offsetX = Math.floor((previewWidth - drawWidth) / 2);
     const offsetY = Math.floor((previewHeight - drawHeight) / 2);
     ctx.save();
     ctx.translate(offsetX, offsetY);
-    frame.layers.forEach(layer => {
+    frame.layers.forEach((layer) => {
       if (layer.visible) {
         this.drawPixels(ctx, layer.pixels, scale, layer.opacity);
       }
@@ -1588,20 +2762,35 @@ export class AppComponent implements AfterViewInit {
     return `${this.frames[frameIndex]?.duration ?? 0} ms`;
   }
 
-  private drawComposite(ctx: CanvasRenderingContext2D, frameIndex: number, scale: number, skipActivePreview: boolean): void {
+  private drawComposite(
+    ctx: CanvasRenderingContext2D,
+    frameIndex: number,
+    scale: number,
+    skipActivePreview: boolean,
+  ): void {
     const frame = this.frames[frameIndex];
     if (!frame || !frame.visible) {
       return;
     }
     frame.layers.forEach((layer, index) => {
-      if (!layer.visible || (skipActivePreview && this.previewPixels && index === this.activeLayerIndex)) {
+      if (
+        !layer.visible ||
+        (skipActivePreview &&
+          this.previewPixels &&
+          index === this.activeLayerIndex)
+      ) {
         return;
       }
       this.drawPixels(ctx, layer.pixels, scale, layer.opacity);
     });
   }
 
-  private drawPixels(ctx: CanvasRenderingContext2D, pixels: Pixel[], scale: number, opacity: number): void {
+  private drawPixels(
+    ctx: CanvasRenderingContext2D,
+    pixels: Pixel[],
+    scale: number,
+    opacity: number,
+  ): void {
     ctx.globalAlpha = opacity;
     for (let y = 0; y < this.height; y += 1) {
       for (let x = 0; x < this.width; x += 1) {
@@ -1620,7 +2809,10 @@ export class AppComponent implements AfterViewInit {
     this.drawCheckerboardTo(this.ctx, this.zoom);
   }
 
-  private drawCheckerboardTo(ctx: CanvasRenderingContext2D, cell: number): void {
+  private drawCheckerboardTo(
+    ctx: CanvasRenderingContext2D,
+    cell: number,
+  ): void {
     for (let y = 0; y < this.height; y += 1) {
       for (let x = 0; x < this.width; x += 1) {
         ctx.fillStyle = (x + y) % 2 === 0 ? '#ffffff' : '#e8ecef';
@@ -1646,6 +2838,30 @@ export class AppComponent implements AfterViewInit {
     }
   }
 
+  private drawMirrorGuide(): void {
+    const centerX = this.canvasWidth / 2;
+
+    this.ctx.save();
+    this.ctx.lineWidth = 3;
+    this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)';
+    this.ctx.beginPath();
+    this.ctx.moveTo(centerX, 0);
+    this.ctx.lineTo(centerX, this.canvasHeight);
+    this.ctx.stroke();
+
+    this.ctx.lineWidth = 1;
+    this.ctx.setLineDash([
+      Math.max(4, Math.floor(this.zoom * 0.45)),
+      Math.max(3, Math.floor(this.zoom * 0.3)),
+    ]);
+    this.ctx.strokeStyle = '#e85d75';
+    this.ctx.beginPath();
+    this.ctx.moveTo(centerX + 0.5, 0);
+    this.ctx.lineTo(centerX + 0.5, this.canvasHeight);
+    this.ctx.stroke();
+    this.ctx.restore();
+  }
+
   private drawSelection(): void {
     if (!this.selection) {
       return;
@@ -1653,7 +2869,12 @@ export class AppComponent implements AfterViewInit {
     this.ctx.strokeStyle = '#111827';
     this.ctx.lineWidth = 2;
     this.ctx.setLineDash([5, 4]);
-    this.ctx.strokeRect(this.selection.x * this.zoom + 1, this.selection.y * this.zoom + 1, this.selection.w * this.zoom - 2, this.selection.h * this.zoom - 2);
+    this.ctx.strokeRect(
+      this.selection.x * this.zoom + 1,
+      this.selection.y * this.zoom + 1,
+      this.selection.w * this.zoom - 2,
+      this.selection.h * this.zoom - 2,
+    );
     this.ctx.setLineDash([]);
   }
 
@@ -1669,16 +2890,36 @@ export class AppComponent implements AfterViewInit {
     }
   }
 
-  private sampleImage(image: HTMLImageElement, width: number, height: number, options: SampleOptions = {}): { pixels: Pixel[]; palette: string[] } {
+  private sampleImage(
+    image: HTMLImageElement,
+    width: number,
+    height: number,
+    options: SampleOptions = {},
+  ): { pixels: Pixel[]; palette: string[] } {
     const canvas = document.createElement('canvas');
     canvas.width = width;
     canvas.height = height;
     const ctx = canvas.getContext('2d', { willReadFrequently: true })!;
     ctx.imageSmoothingEnabled = true;
     ctx.clearRect(0, 0, width, height);
-    const source = options.sourceRect ?? { x: 0, y: 0, w: image.width, h: image.height };
+    const source = options.sourceRect ?? {
+      x: 0,
+      y: 0,
+      w: image.width,
+      h: image.height,
+    };
     const target = this.getImportTargetRect(source.w, source.h, width, height);
-    ctx.drawImage(image, source.x, source.y, source.w, source.h, target.x, target.y, target.w, target.h);
+    ctx.drawImage(
+      image,
+      source.x,
+      source.y,
+      source.w,
+      source.h,
+      target.x,
+      target.y,
+      target.w,
+      target.h,
+    );
     const imageData = ctx.getImageData(0, 0, width, height);
     if (options.transparentWhite) {
       this.removeWhiteBackground(imageData);
@@ -1687,7 +2928,11 @@ export class AppComponent implements AfterViewInit {
     return this.imageDataToPixels(imageData, width, height);
   }
 
-  private imageDataToPixels(imageData: ImageData, width: number, height: number): { pixels: Pixel[]; palette: string[] } {
+  private imageDataToPixels(
+    imageData: ImageData,
+    width: number,
+    height: number,
+  ): { pixels: Pixel[]; palette: string[] } {
     const data = new Float32Array(imageData.data.length);
     for (let i = 0; i < imageData.data.length; i += 1) {
       data[i] = imageData.data[i];
@@ -1702,7 +2947,12 @@ export class AppComponent implements AfterViewInit {
           pixels.push(null);
           continue;
         }
-        const nearest = this.nearestPaletteColor(data[i], data[i + 1], data[i + 2], palette);
+        const nearest = this.nearestPaletteColor(
+          data[i],
+          data[i + 1],
+          data[i + 2],
+          palette,
+        );
         const color = this.rgbToHex(nearest[0], nearest[1], nearest[2]);
         pixels.push(color);
         counts.set(color, (counts.get(color) ?? 0) + 1);
@@ -1710,31 +2960,40 @@ export class AppComponent implements AfterViewInit {
           this.spreadDitherError(data, width, height, x, y, [
             data[i] - nearest[0],
             data[i + 1] - nearest[1],
-            data[i + 2] - nearest[2]
+            data[i + 2] - nearest[2],
           ]);
         }
       }
     }
     return {
       pixels,
-      palette: [...counts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 32).map(([color]) => color)
+      palette: [...counts.entries()]
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 32)
+        .map(([color]) => color),
     };
   }
 
-  private getImportTargetRect(sourceWidth: number, sourceHeight: number, width: number, height: number): { x: number; y: number; w: number; h: number } {
+  private getImportTargetRect(
+    sourceWidth: number,
+    sourceHeight: number,
+    width: number,
+    height: number,
+  ): { x: number; y: number; w: number; h: number } {
     if (this.importFit === 'stretch') {
       return { x: 0, y: 0, w: width, h: height };
     }
-    const scale = this.importFit === 'cover'
-      ? Math.max(width / sourceWidth, height / sourceHeight)
-      : Math.min(width / sourceWidth, height / sourceHeight);
+    const scale =
+      this.importFit === 'cover'
+        ? Math.max(width / sourceWidth, height / sourceHeight)
+        : Math.min(width / sourceWidth, height / sourceHeight);
     const w = sourceWidth * scale;
     const h = sourceHeight * scale;
     return {
       x: (width - w) / 2,
       y: (height - h) / 2,
       w,
-      h
+      h,
     };
   }
 
@@ -1763,7 +3022,12 @@ export class AppComponent implements AfterViewInit {
       const r = imageData.data[dataIndex];
       const g = imageData.data[dataIndex + 1];
       const b = imageData.data[dataIndex + 2];
-      const isBackdrop = imageData.data[dataIndex + 3] < 20 || (r > 238 && g > 238 && b > 238 && Math.max(r, g, b) - Math.min(r, g, b) < 16);
+      const isBackdrop =
+        imageData.data[dataIndex + 3] < 20 ||
+        (r > 238 &&
+          g > 238 &&
+          b > 238 &&
+          Math.max(r, g, b) - Math.min(r, g, b) < 16);
       if (!isBackdrop) {
         continue;
       }
@@ -1772,12 +3036,16 @@ export class AppComponent implements AfterViewInit {
         { x: point.x + 1, y: point.y },
         { x: point.x - 1, y: point.y },
         { x: point.x, y: point.y + 1 },
-        { x: point.x, y: point.y - 1 }
+        { x: point.x, y: point.y - 1 },
       );
     }
   }
 
-  private enhanceImageData(imageData: ImageData, width: number, height: number): void {
+  private enhanceImageData(
+    imageData: ImageData,
+    width: number,
+    height: number,
+  ): void {
     const source = new Uint8ClampedArray(imageData.data);
     for (let y = 0; y < height; y += 1) {
       for (let x = 0; x < width; x += 1) {
@@ -1796,8 +3064,14 @@ export class AppComponent implements AfterViewInit {
               count += 1;
             }
           }
-          const sharpened = source[i + channel] + this.importSharpen * (source[i + channel] - sum / count);
-          imageData.data[i + channel] = this.clamp(Math.round((sharpened - 128) * this.importContrast + 128), 0, 255);
+          const sharpened =
+            source[i + channel] +
+            this.importSharpen * (source[i + channel] - sum / count);
+          imageData.data[i + channel] = this.clamp(
+            Math.round((sharpened - 128) * this.importContrast + 128),
+            0,
+            255,
+          );
         }
       }
     }
@@ -1823,32 +3097,58 @@ export class AppComponent implements AfterViewInit {
     let colors = [...buckets.values()]
       .sort((a, b) => b.count - a.count)
       .slice(0, Math.max(size * 8, size))
-      .map(item => ({ rgb: item.rgb, cluster: 0 }));
+      .map((item) => ({ rgb: item.rgb, cluster: 0 }));
     if (colors.length <= size) {
-      return colors.map(item => item.rgb);
+      return colors.map((item) => item.rgb);
     }
     let centers = colors
-      .filter((_, index) => index % Math.max(1, Math.floor(colors.length / size)) === 0)
+      .filter(
+        (_, index) =>
+          index % Math.max(1, Math.floor(colors.length / size)) === 0,
+      )
       .slice(0, size)
-      .map(item => [...item.rgb]);
+      .map((item) => [...item.rgb]);
     for (let iteration = 0; iteration < 8; iteration += 1) {
-      colors = colors.map(color => ({ ...color, cluster: this.nearestPaletteIndex(color.rgb[0], color.rgb[1], color.rgb[2], centers) }));
+      colors = colors.map((color) => ({
+        ...color,
+        cluster: this.nearestPaletteIndex(
+          color.rgb[0],
+          color.rgb[1],
+          color.rgb[2],
+          centers,
+        ),
+      }));
       centers = centers.map((center, index) => {
-        const group = colors.filter(color => color.cluster === index);
+        const group = colors.filter((color) => color.cluster === index);
         if (!group.length) {
           return center;
         }
-        return [0, 1, 2].map(channel => Math.round(group.reduce((sum, color) => sum + color.rgb[channel], 0) / group.length));
+        return [0, 1, 2].map((channel) =>
+          Math.round(
+            group.reduce((sum, color) => sum + color.rgb[channel], 0) /
+              group.length,
+          ),
+        );
       });
     }
     return centers;
   }
 
-  private nearestPaletteColor(r: number, g: number, b: number, palette: number[][]): number[] {
+  private nearestPaletteColor(
+    r: number,
+    g: number,
+    b: number,
+    palette: number[][],
+  ): number[] {
     return palette[this.nearestPaletteIndex(r, g, b, palette)];
   }
 
-  private nearestPaletteIndex(r: number, g: number, b: number, palette: number[][]): number {
+  private nearestPaletteIndex(
+    r: number,
+    g: number,
+    b: number,
+    palette: number[][],
+  ): number {
     let best = 0;
     let bestDistance = Number.POSITIVE_INFINITY;
     palette.forEach((color, index) => {
@@ -1864,26 +3164,42 @@ export class AppComponent implements AfterViewInit {
     return best;
   }
 
-  private spreadDitherError(data: Float32Array, width: number, height: number, x: number, y: number, error: number[]): void {
+  private spreadDitherError(
+    data: Float32Array,
+    width: number,
+    height: number,
+    x: number,
+    y: number,
+    error: number[],
+  ): void {
     const targets = [
       { x: x + 1, y, factor: 7 / 16 },
       { x: x - 1, y: y + 1, factor: 3 / 16 },
       { x, y: y + 1, factor: 5 / 16 },
-      { x: x + 1, y: y + 1, factor: 1 / 16 }
+      { x: x + 1, y: y + 1, factor: 1 / 16 },
     ];
     for (const target of targets) {
-      if (target.x < 0 || target.y < 0 || target.x >= width || target.y >= height) {
+      if (
+        target.x < 0 ||
+        target.y < 0 ||
+        target.x >= width ||
+        target.y >= height
+      ) {
         continue;
       }
       const i = (target.y * width + target.x) * 4;
       for (let channel = 0; channel < 3; channel += 1) {
-        data[i + channel] = this.clamp(data[i + channel] + error[channel] * target.factor, 0, 255);
+        data[i + channel] = this.clamp(
+          data[i + channel] + error[channel] * target.factor,
+          0,
+          255,
+        );
       }
     }
   }
 
   private rgbToHex(r: number, g: number, b: number): string {
-    return `#${[r, g, b].map(value => this.clamp(Math.round(value), 0, 255).toString(16).padStart(2, '0')).join('')}`;
+    return `#${[r, g, b].map((value) => this.clamp(Math.round(value), 0, 255).toString(16).padStart(2, '0')).join('')}`;
   }
 
   private loadImage(file: File): Promise<HTMLImageElement> {
@@ -1913,19 +3229,30 @@ export class AppComponent implements AfterViewInit {
     }
     const moved = {
       ...this.moveStartSelection,
-      x: this.clamp(this.moveStartSelection.x + dx, 0, this.width - this.moveStartSelection.w),
-      y: this.clamp(this.moveStartSelection.y + dy, 0, this.height - this.moveStartSelection.h)
+      x: this.moveStartSelection.x + dx,
+      y: this.moveStartSelection.y + dy,
+      pixels: [...this.moveStartSelection.pixels],
     };
     this.previewPixels = [...this.activeLayer.pixels];
-    this.eachSelectionPixel(this.moveStartSelection, (x, y) => this.setPixel(this.previewPixels!, x, y, null));
+    this.eachSelectionPixel(this.moveStartSelection, (x, y) =>
+      this.setPixel(this.previewPixels!, x, y, null),
+    );
     this.selection = moved;
     this.stampSelection(moved, this.previewPixels);
   }
 
-  private stampSelection(selection: Selection, buffer = this.activeLayer.pixels): void {
+  private stampSelection(
+    selection: Selection,
+    buffer = this.activeLayer.pixels,
+  ): void {
     for (let y = 0; y < selection.h; y += 1) {
       for (let x = 0; x < selection.w; x += 1) {
-        this.setPixel(buffer, selection.x + x, selection.y + y, selection.pixels[y * selection.w + x]);
+        this.setPixel(
+          buffer,
+          selection.x + x,
+          selection.y + y,
+          selection.pixels[y * selection.w + x],
+        );
       }
     }
   }
@@ -1934,13 +3261,28 @@ export class AppComponent implements AfterViewInit {
     const pixels: Pixel[] = [];
     for (let y = 0; y < selection.h; y += 1) {
       for (let x = 0; x < selection.w; x += 1) {
-        pixels.push(this.activeLayer.pixels[this.index(selection.x + x, selection.y + y)] ?? null);
+        const sourceX = selection.x + x;
+        const sourceY = selection.y + y;
+        pixels.push(
+          this.inside(sourceX, sourceY)
+            ? (this.activeLayer.pixels[this.index(sourceX, sourceY)] ?? null)
+            : null,
+        );
       }
     }
     return pixels;
   }
 
-  private eachSelectionPixel(selection: Selection, fn: (x: number, y: number) => void): void {
+  private selectionPixels(selection: Selection): Pixel[] {
+    return selection.pixels.length === selection.w * selection.h
+      ? [...selection.pixels]
+      : this.copyPixels(selection);
+  }
+
+  private eachSelectionPixel(
+    selection: Selection,
+    fn: (x: number, y: number) => void,
+  ): void {
     for (let y = selection.y; y < selection.y + selection.h; y += 1) {
       for (let x = selection.x; x < selection.x + selection.w; x += 1) {
         fn(x, y);
@@ -1948,13 +3290,18 @@ export class AppComponent implements AfterViewInit {
     }
   }
 
-  private rectFromPoints(x0: number, y0: number, x1: number, y1: number): Selection {
+  private rectFromPoints(
+    x0: number,
+    y0: number,
+    x1: number,
+    y1: number,
+  ): Selection {
     return this.normalizeSelection({
       x: Math.min(x0, x1),
       y: Math.min(y0, y1),
       w: Math.abs(x1 - x0) + 1,
       h: Math.abs(y1 - y0) + 1,
-      pixels: []
+      pixels: [],
     });
   }
 
@@ -1966,7 +3313,7 @@ export class AppComponent implements AfterViewInit {
       x,
       y,
       w: this.clamp(selection.w, 1, this.width - x),
-      h: this.clamp(selection.h, 1, this.height - y)
+      h: this.clamp(selection.h, 1, this.height - y),
     };
   }
 
@@ -1985,7 +3332,8 @@ export class AppComponent implements AfterViewInit {
       activeLayerIndex: this.activeLayerIndex,
       palette: this.palette,
       primaryColor: this.primaryColor,
-      secondaryColor: this.secondaryColor
+      secondaryColor: this.secondaryColor,
+      mirrorX: this.mirrorX,
     });
   }
 
@@ -1999,6 +3347,7 @@ export class AppComponent implements AfterViewInit {
     this.palette = state.palette;
     this.primaryColor = state.primaryColor;
     this.secondaryColor = state.secondaryColor;
+    this.mirrorX = state.mirrorX ?? this.mirrorX;
     this.selection = null;
     this.previewPixels = null;
     this.refreshAllFrameThumbnails();
@@ -2009,13 +3358,18 @@ export class AppComponent implements AfterViewInit {
     if (!this.isPlaying) {
       return;
     }
-    if (!this.frames.some(frame => frame.visible)) {
+    if (!this.frames.some((frame) => frame.visible)) {
       this.isPlaying = false;
       return;
     }
-    this.previewFrameIndex = this.findNextVisibleFrameIndex(this.previewFrameIndex);
+    this.previewFrameIndex = this.findNextVisibleFrameIndex(
+      this.previewFrameIndex,
+    );
     this.render();
-    this.animationTimer = window.setTimeout(() => this.playNextFrame(), this.frames[this.previewFrameIndex].duration);
+    this.animationTimer = window.setTimeout(
+      () => this.playNextFrame(),
+      this.frames[this.previewFrameIndex].duration,
+    );
   }
 
   private findNextVisibleFrameIndex(currentIndex: number): number {
@@ -2046,6 +3400,22 @@ export class AppComponent implements AfterViewInit {
     if (this.inside(x, y)) {
       buffer[this.index(x, y)] = color;
     }
+  }
+
+  private setMirroredPixel(
+    buffer: Pixel[],
+    x: number,
+    y: number,
+    color: Pixel,
+  ): void {
+    this.setPixel(buffer, x, y, color);
+    if (this.mirrorX) {
+      this.setPixel(buffer, this.mirrorPixelX(x), y, color);
+    }
+  }
+
+  private mirrorPixelX(x: number): number {
+    return this.width - 1 - x;
   }
 
   private index(x: number, y: number): number {
