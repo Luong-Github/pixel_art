@@ -1,0 +1,30 @@
+<header class="hdr">
+  <div class="bar">
+    <a routerLink="/" class="logo" (click)="close()" aria-label="Pixel Art Studio home">
+      <span class="mark" aria-hidden="true"></span>
+      <span class="name">Pixel<strong>Studio</strong></span>
+    </a>
+
+    <button
+      type="button"
+      class="burger"
+      [class.is-open]="open"
+      (click)="toggle()"
+      [attr.aria-expanded]="open"
+      aria-label="Toggle navigation"
+    >
+      <span></span><span></span><span></span>
+    </button>
+
+    <nav class="nav" [class.is-open]="open" aria-label="Primary">
+      <a
+        *ngFor="let item of nav"
+        [routerLink]="item.path"
+        routerLinkActive="active"
+        (click)="close()"
+        >{{ item.label }}</a
+      >
+      <a routerLink="/editor" class="cta" (click)="close()">Launch App</a>
+    </nav>
+  </div>
+</header>

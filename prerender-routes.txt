@@ -1,0 +1,10 @@
+/
+/features
+/pricing
+/about
+/faq
+/contact
+/blog
+/blog/getting-started-with-pixel-art
+/blog/animating-sprites-frame-by-frame
+/blog/turn-photos-into-pixel-art

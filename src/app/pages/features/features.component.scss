@@ -1,0 +1,79 @@
+.page-hero {
+  padding-top: 56px;
+  background: radial-gradient(60% 70% at 80% 0%, rgba(31, 138, 124, 0.16), transparent 60%);
+}
+.page-hero h1 {
+  margin: 6px 0 16px;
+}
+.page-hero .lead {
+  max-width: 640px;
+  margin-bottom: 26px;
+}
+
+.group h2 {
+  font-size: 18px;
+  color: var(--brand);
+  margin-bottom: 14px;
+}
+.group ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.group li {
+  position: relative;
+  padding: 7px 0 7px 22px;
+  color: var(--text-muted);
+  font-size: 14.5px;
+  border-top: 1px solid var(--border);
+}
+.group li:first-child {
+  border-top: 0;
+}
+.group li::before {
+  content: "▸";
+  position: absolute;
+  left: 0;
+  color: var(--brand);
+}
+
+.sec-head {
+  text-align: center;
+  margin-bottom: 36px;
+}
+.keys {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+.key {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  padding: 12px 14px;
+}
+.key span {
+  color: var(--text-muted);
+  font-size: 14px;
+}
+kbd {
+  min-width: 42px;
+  text-align: center;
+  padding: 5px 9px;
+  border-radius: 7px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-bottom-width: 2px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 12.5px;
+  color: var(--text);
+}
+
+@media (max-width: 860px) {
+  .keys {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

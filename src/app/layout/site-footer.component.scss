@@ -1,0 +1,83 @@
+.ftr {
+  border-top: 1px solid var(--border);
+  background: var(--bg-elevated);
+  margin-top: 80px;
+}
+
+.inner {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: 56px 24px 40px;
+  display: grid;
+  grid-template-columns: 1.4fr 2fr;
+  gap: 40px;
+}
+
+.brand .logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 18px;
+}
+.brand .name strong {
+  color: var(--brand);
+  font-weight: 800;
+}
+.brand p {
+  color: var(--text-muted);
+  font-size: 14px;
+  line-height: 1.6;
+  max-width: 320px;
+  margin: 14px 0 0;
+}
+.mark {
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  background: conic-gradient(from 45deg, var(--brand), #2bd6c0, var(--brand-strong), var(--brand));
+}
+
+.cols {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+.col h3 {
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-dim);
+  margin: 0 0 14px;
+}
+.col a {
+  display: block;
+  color: var(--text-muted);
+  font-size: 14px;
+  padding: 6px 0;
+  transition: color 0.15s;
+}
+.col a:hover {
+  color: var(--text);
+}
+
+.legal {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: 22px 24px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  color: var(--text-dim);
+  font-size: 13px;
+}
+
+@media (max-width: 760px) {
+  .inner {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+  .legal {
+    flex-direction: column;
+  }
+}

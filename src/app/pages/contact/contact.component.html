@@ -1,0 +1,43 @@
+<section class="section-tight page-hero">
+  <div class="container narrow">
+    <span class="eyebrow">Contact</span>
+    <h1 class="h-xl">Get in touch</h1>
+    <p class="lead">
+      Questions, feedback or a feature request? Send a message and we’ll get back to you.
+    </p>
+  </div>
+</section>
+
+<section class="section-tight">
+  <div class="container narrow grid two">
+    <form class="card form" (ngSubmit)="submit()" #f="ngForm">
+      <label>
+        <span>Name</span>
+        <input name="name" [(ngModel)]="model.name" required autocomplete="name" />
+      </label>
+      <label>
+        <span>Email</span>
+        <input name="email" type="email" [(ngModel)]="model.email" required autocomplete="email" />
+      </label>
+      <label>
+        <span>Message</span>
+        <textarea name="message" rows="5" [(ngModel)]="model.message" required></textarea>
+      </label>
+      <button type="submit" class="btn btn-primary" [disabled]="f.invalid">Send message</button>
+      <p class="ok" *ngIf="sent">Thanks! Your mail client should now be open.</p>
+    </form>
+
+    <aside class="info">
+      <h2>Other ways to reach us</h2>
+      <p>
+        Prefer email? Write to
+        <a [href]="'mailto:' + email">{{ email }}</a> directly.
+      </p>
+      <p>
+        Looking for answers first? The <a routerLink="/faq">FAQ</a> covers the most common
+        questions.
+      </p>
+      <p class="muted">We’re a small team and read every message.</p>
+    </aside>
+  </div>
+</section>

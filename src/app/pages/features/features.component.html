@@ -1,0 +1,39 @@
+<section class="section-tight page-hero">
+  <div class="container">
+    <span class="eyebrow">Features</span>
+    <h1 class="h-xl">Everything in the studio</h1>
+    <p class="lead">
+      A production-style workspace: a left tool rail, a center canvas, a bottom timeline for
+      layers and frames, and a right inspector for preview, conversion and transforms.
+    </p>
+    <a routerLink="/editor" class="btn btn-primary btn-lg">Try it now →</a>
+  </div>
+</section>
+
+<section class="section-tight">
+  <div class="container">
+    <div class="grid grid-3">
+      <article class="card group" *ngFor="let g of groups">
+        <h2>{{ g.area }}</h2>
+        <ul>
+          <li *ngFor="let i of g.items">{{ i }}</li>
+        </ul>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="sec-head">
+      <span class="eyebrow">Keyboard-first</span>
+      <h2 class="h-lg">Fast shortcuts for every tool</h2>
+    </div>
+    <div class="keys">
+      <div class="key" *ngFor="let k of shortcuts">
+        <kbd>{{ k[0] }}</kbd>
+        <span>{{ k[1] }}</span>
+      </div>
+    </div>
+  </div>
+</section>
