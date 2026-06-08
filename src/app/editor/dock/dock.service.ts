@@ -19,6 +19,8 @@ import {
 export class DockService {
   state: DockState = defaultDockState();
   private zCounter = 10;
+  /** Last dock zone a panel occupied before being hidden (for restore). */
+  private lastZone: Partial<Record<PanelId, Zone>> = {};
 
   constructor() {
     this.load();
@@ -164,15 +166,26 @@ export class DockService {
   }
 
   hide(id: PanelId): void {
+    // Remember where it lived so re-showing restores it to the same zone.
+    this.lastZone[id] = this.zoneOf(id) ?? this.lastZone[id] ?? this.homeZoneOf(id);
     this.detach(id);
     this.state.hidden.push(id);
     this.save();
   }
 
-  /** Show a hidden panel by docking it back into a zone (default: right). */
-  show(id: PanelId, zone: Zone = 'right'): void {
+  /** The zone a panel belongs to in the default layout. */
+  private homeZoneOf(id: PanelId): Zone {
+    const def = defaultDockState();
+    for (const zone of ZONES) {
+      if (def.zones[zone].includes(id)) return zone;
+    }
+    return 'right';
+  }
+
+  /** Show a hidden panel, restoring it to its previous (or home) zone. */
+  show(id: PanelId, zone?: Zone): void {
     if (!this.isHidden(id)) return;
-    this.dock(id, zone);
+    this.dock(id, zone ?? this.lastZone[id] ?? this.homeZoneOf(id));
   }
 
   toggleHidden(id: PanelId): void {

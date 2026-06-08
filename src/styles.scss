@@ -1,35 +1,49 @@
 /* ============================================================
-   Global styles
+   Global styles & design system
    - Editor (<app-editor>) owns its own full-screen layout.
    - Marketing pages live inside the site layout and scroll.
    ============================================================ */
 
 :root {
-  /* Brand palette (shared with the editor accent #1f8a7c) */
-  --brand: #1f8a7c;
-  --brand-strong: #14675d;
-  --brand-soft: #d7f0ed;
+  /* ---- Brand ---- */
+  --brand: #1f9e8d;
+  --brand-bright: #34e0c6;
+  --brand-strong: #11675d;
+  --brand-soft: #103b37;
+  --accent-2: #ff8a5b; /* warm spark, used sparingly */
+  --grad: linear-gradient(135deg, var(--brand-bright), var(--brand) 55%, #1487a8);
 
-  /* Marketing surface palette (dark product look) */
-  --bg: #0c1015;
-  --bg-elevated: #11171f;
-  --surface: #161d27;
-  --surface-2: #1c2531;
-  --border: #25303d;
-  --text: #e8eef3;
-  --text-muted: #9fb0bf;
-  --text-dim: #6b7c8b;
+  /* ---- Surfaces (dark product look) ---- */
+  --bg: #090c11;
+  --bg-elevated: #0e131a;
+  --surface: #141b24;
+  --surface-2: #1a2230;
+  --border: #212b38;
+  --border-strong: #2d3a49;
 
-  --radius: 14px;
-  --radius-sm: 9px;
-  --shadow: 0 18px 50px -24px rgba(0, 0, 0, 0.75);
-  --maxw: 1120px;
-  --font: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+  /* ---- Text ---- */
+  --text: #eef3f8;
+  --text-muted: #9aabbb;
+  --text-dim: #647688;
+
+  /* ---- Shape & motion ---- */
+  --radius: 16px;
+  --radius-sm: 10px;
+  --shadow: 0 24px 60px -28px rgba(0, 0, 0, 0.8);
+  --shadow-glow: 0 20px 60px -22px rgba(31, 158, 141, 0.55);
+  --maxw: 1140px;
+  --font: "Inter", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
     "Segoe UI", Roboto, sans-serif;
+  --font-pixel: "Pixelify Sans", var(--font);
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
 }
 
 * {
   box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 html,
@@ -58,7 +72,12 @@ img {
   display: block;
 }
 
-/* ---------- Shared marketing utilities (global, used across pages) ---------- */
+::selection {
+  background: rgba(52, 224, 198, 0.28);
+  color: #fff;
+}
+
+/* ---------- Layout primitives ---------- */
 .container {
   width: 100%;
   max-width: var(--maxw);
@@ -67,20 +86,31 @@ img {
 }
 
 .section {
-  padding: 80px 0;
+  padding: 92px 0;
 }
 .section-tight {
-  padding: 48px 0;
+  padding: 52px 0;
 }
 
+/* ---------- Typography ---------- */
 .eyebrow {
-  display: inline-block;
-  font-size: 13px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-size: 12.5px;
   font-weight: 600;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--brand);
-  margin: 0 0 14px;
+  color: var(--brand-bright);
+  margin: 0 0 16px;
+}
+.eyebrow::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  background: var(--brand-bright);
+  box-shadow: 0 0 10px var(--brand-bright);
 }
 
 h1,
@@ -88,67 +118,111 @@ h2,
 h3,
 h4 {
   color: var(--text);
-  letter-spacing: -0.02em;
-  line-height: 1.12;
+  letter-spacing: -0.025em;
+  line-height: 1.1;
   margin: 0;
 }
 .h-xl {
-  font-size: clamp(2.2rem, 5vw, 3.6rem);
+  font-size: clamp(2.4rem, 5.2vw, 4rem);
   font-weight: 800;
+  letter-spacing: -0.035em;
 }
 .h-lg {
-  font-size: clamp(1.7rem, 3.5vw, 2.4rem);
-  font-weight: 700;
+  font-size: clamp(1.8rem, 3.6vw, 2.6rem);
+  font-weight: 750;
+}
+
+.gradient-text {
+  background: var(--grad);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
 }
 
 .lead {
   color: var(--text-muted);
-  font-size: clamp(1rem, 1.6vw, 1.18rem);
-  line-height: 1.65;
+  font-size: clamp(1.02rem, 1.5vw, 1.2rem);
+  line-height: 1.7;
 }
 
+/* ---------- Buttons ---------- */
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
   padding: 12px 22px;
-  border-radius: 11px;
+  border-radius: 12px;
   font-size: 15px;
-  font-weight: 600;
+  font-weight: 650;
   cursor: pointer;
   border: 1px solid transparent;
-  transition: transform 0.12s, background 0.15s, border-color 0.15s;
+  transition: transform 0.12s ease, background 0.18s ease, border-color 0.18s ease,
+    box-shadow 0.18s ease, filter 0.18s ease;
 }
 .btn:active {
   transform: translateY(1px);
 }
 .btn-primary {
-  background: var(--brand);
-  color: #fff;
-  box-shadow: 0 12px 28px -14px var(--brand);
+  background: var(--grad);
+  color: #04201c;
+  font-weight: 700;
+  box-shadow: var(--shadow-glow);
 }
 .btn-primary:hover {
-  background: #23a08f;
+  filter: brightness(1.07);
+  box-shadow: 0 24px 64px -20px rgba(52, 224, 198, 0.7);
 }
 .btn-ghost {
-  background: transparent;
+  background: rgba(255, 255, 255, 0.02);
   color: var(--text);
-  border-color: var(--border);
+  border-color: var(--border-strong);
 }
 .btn-ghost:hover {
   background: var(--surface);
+  border-color: var(--brand);
 }
 .btn-lg {
-  padding: 15px 28px;
+  padding: 15px 30px;
   font-size: 16px;
 }
 
+/* ---------- Cards ---------- */
 .card {
-  background: var(--surface);
+  position: relative;
+  background: linear-gradient(180deg, var(--surface), var(--bg-elevated));
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 26px;
+  padding: 28px;
+  transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+}
+.card-hover:hover {
+  transform: translateY(-3px);
+  border-color: var(--brand);
+  box-shadow: 0 26px 60px -34px rgba(31, 158, 141, 0.6);
+}
+
+/* ---------- Misc utilities ---------- */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 11px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--brand-bright);
+  background: rgba(52, 224, 198, 0.1);
+  border: 1px solid rgba(52, 224, 198, 0.28);
+}
+
+/* Faint pixel grid background — on-brand texture for sections/heroes */
+.pixel-grid {
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+  background-size: 26px 26px;
 }
 
 .grid {
@@ -162,14 +236,12 @@ h4 {
   grid-template-columns: repeat(2, 1fr);
 }
 @media (max-width: 860px) {
-  .grid-3 {
-    grid-template-columns: 1fr;
-  }
+  .grid-3,
   .grid-2 {
     grid-template-columns: 1fr;
   }
   .section {
-    padding: 56px 0;
+    padding: 60px 0;
   }
 }
 

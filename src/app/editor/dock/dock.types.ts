@@ -3,18 +3,14 @@ export type PanelId =
   | 'tools'
   | 'color'
   | 'display'
-  | 'convert'
   | 'canvas'
-  | 'transform'
   | 'timeline';
 
 export const PANEL_IDS: PanelId[] = [
   'tools',
   'color',
   'display',
-  'convert',
   'canvas',
-  'transform',
   'timeline',
 ];
 
@@ -48,11 +44,9 @@ export interface DockState {
 
 export const PANEL_TITLES: Record<PanelId, string> = {
   tools: 'Tools',
-  color: 'Color',
+  color: 'Color & Palette',
   display: 'Display',
-  convert: 'Image Convert',
   canvas: 'Canvas',
-  transform: 'Transform',
   timeline: 'Timeline',
 };
 
@@ -60,7 +54,7 @@ export function defaultDockState(): DockState {
   return {
     zones: {
       left: ['tools', 'color'],
-      right: ['display', 'convert', 'canvas', 'transform'],
+      right: ['display', 'canvas'],
       bottom: ['timeline'],
     },
     floating: [],
@@ -69,4 +63,5 @@ export function defaultDockState(): DockState {
   };
 }
 
-export const DOCK_STORAGE_KEY = 'pixelart.dock.v1';
+// Bump this when the default layout changes so stale saved layouts are discarded.
+export const DOCK_STORAGE_KEY = 'pixelart.dock.v8';

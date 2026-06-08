@@ -20,7 +20,7 @@ import { POSTS } from './posts.data';
       <div class="container narrow">
         <ul class="posts">
           <li *ngFor="let p of posts">
-            <a class="card post" [routerLink]="['/blog', p.slug]">
+            <a class="card card-hover post" [routerLink]="['/blog', p.slug]">
               <div class="meta">
                 <time [attr.datetime]="p.date">{{ p.date | date: 'mediumDate' }}</time>
                 <span>·</span>

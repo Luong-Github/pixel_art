@@ -5,8 +5,8 @@
 }
 
 .hdr {
-  background: rgba(12, 16, 21, 0.82);
-  backdrop-filter: blur(12px);
+  background: rgba(9, 12, 17, 0.7);
+  backdrop-filter: blur(14px) saturate(1.4);
   border-bottom: 1px solid var(--border);
 }
 
@@ -14,7 +14,7 @@
   max-width: var(--maxw);
   margin: 0 auto;
   padding: 0 24px;
-  height: 64px;
+  height: 66px;
   display: flex;
   align-items: center;
   gap: 24px;
@@ -23,34 +23,50 @@
 .logo {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
-  font-size: 18px;
-  letter-spacing: -0.02em;
+  gap: 11px;
+  font-family: var(--font-pixel);
+  font-size: 19px;
+  letter-spacing: 0.01em;
 }
 .logo .name strong {
-  color: var(--brand);
-  font-weight: 800;
+  color: var(--brand-bright);
+  font-weight: 700;
 }
 .mark {
-  width: 22px;
-  height: 22px;
-  border-radius: 6px;
-  background: conic-gradient(from 45deg, var(--brand), #2bd6c0, var(--brand-strong), var(--brand));
-  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.06) inset;
+  width: 26px;
+  height: 26px;
+  border-radius: 7px;
+  background:
+    linear-gradient(var(--bg) 0 0) padding-box,
+    var(--grad) border-box;
+  border: 2px solid transparent;
+  box-shadow: 0 0 18px -2px rgba(52, 224, 198, 0.55);
+  position: relative;
+  image-rendering: pixelated;
+}
+.mark::after {
+  /* tiny pixel cluster */
+  content: "";
+  position: absolute;
+  inset: 5px;
+  background:
+    linear-gradient(90deg, var(--brand-bright) 50%, transparent 0) 0 0 / 6px 6px,
+    linear-gradient(90deg, transparent 50%, var(--accent-2) 0) 0 6px / 6px 6px;
+  opacity: 0.9;
 }
 
 .nav {
   margin-left: auto;
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
 }
 .nav a {
-  padding: 8px 12px;
-  border-radius: 8px;
+  padding: 8px 13px;
+  border-radius: 9px;
   color: var(--text-muted);
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 550;
   transition: color 0.15s, background 0.15s;
 }
 .nav a:hover {
@@ -58,15 +74,18 @@
   background: var(--surface);
 }
 .nav a.active {
-  color: var(--text);
+  color: var(--brand-bright);
 }
 .nav a.cta,
 .nav a.cta:hover {
-  margin-left: 8px;
-  background: var(--brand);
-  color: #fff;
-  font-weight: 600;
-  box-shadow: 0 8px 20px -10px var(--brand);
+  margin-left: 10px;
+  background: var(--grad);
+  color: #04201c;
+  font-weight: 700;
+  box-shadow: var(--shadow-glow);
+}
+.nav a.cta:hover {
+  filter: brightness(1.08);
 }
 
 .burger {

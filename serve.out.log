@@ -1,0 +1,4097 @@
+
+> pixel-art-studio@0.0.0 start
+> ng serve --port 4321
+
+- Building...
+
+Browser bundles        
+Initial chunk files     | Names               |  Raw size
+polyfills.js            | polyfills           |  88.09 kB | 
+main.js                 | main                |  21.16 kB | 
+styles.css              | styles              |   4.81 kB | 
+chunk-NJ5HVBCL.js       | -                   |   3.17 kB | 
+chunk-4WXVOEFY.js       | -                   |   1.46 kB | 
+chunk-3OSS3HON.js       | -                   | 652 bytes | 
+
+                        | Initial total       | 119.32 kB
+
+Lazy chunk files        | Names               |  Raw size
+chunk-EOUMIYNF.js       | editor-component    | 220.27 kB | 
+chunk-W5CCP3ZS.js       | landing-component   |  16.89 kB | 
+chunk-EWQNQPX5.js       | contact-component   |   9.10 kB | 
+chunk-CIVRPHXR.js       | pricing-component   |   8.03 kB | 
+chunk-GIECJVF4.js       | features-component  |   7.82 kB | 
+chunk-LTE4XX4C.js       | blog-post-component |   6.55 kB | 
+chunk-DOZPUEIV.js       | faq-component       |   5.99 kB | 
+chunk-XP5ZG5Q4.js       | blog-list-component |   5.46 kB | 
+chunk-5C2M5NFJ.js       | about-component     |   4.67 kB | 
+chunk-UVVVIIEP.js       | -                   |   3.47 kB | 
+chunk-C6JU3WVH.js       | not-found-component |   2.47 kB | 
+
+
+Server bundles         
+Initial chunk files     | Names               |  Raw size
+chunk-U4IZTEFH.mjs      | -                   |   1.08 MB | 
+chunk-76LFIDFN.mjs      | -                   | 663.58 kB | 
+polyfills.server.mjs    | polyfills.server    | 559.49 kB | 
+chunk-KTAMTG2A.mjs      | -                   | 194.65 kB | 
+main.server.mjs         | main.server         |  20.69 kB | 
+chunk-PVGON7NJ.mjs      | -                   |   3.11 kB | 
+chunk-VPSODEBW.mjs      | -                   |   2.51 kB | 
+chunk-C42IF335.mjs      | -                   | 687 bytes | 
+render-utils.server.mjs | render-utils.server | 462 bytes | 
+
+Lazy chunk files        | Names               |  Raw size
+chunk-IBJUFDEF.mjs      | editor-component    | 495.72 kB | 
+chunk-UYVNQNDV.mjs      | -                   | 193.75 kB | 
+chunk-P3UOPGAK.mjs      | xhr2                |  39.09 kB | 
+chunk-WBBL3LGG.mjs      | landing-component   |  16.63 kB | 
+chunk-74KEPNUY.mjs      | contact-component   |   9.22 kB | 
+chunk-45X4WO2O.mjs      | pricing-component   |   7.98 kB | 
+chunk-72UU5XW3.mjs      | features-component  |   7.78 kB | 
+chunk-SRNJH2JJ.mjs      | blog-post-component |   6.65 kB | 
+chunk-CMBI7WM7.mjs      | faq-component       |   6.01 kB | 
+chunk-YDODZJPS.mjs      | blog-list-component |   5.52 kB | 
+chunk-PISE47IT.mjs      | about-component     |   4.67 kB | 
+chunk-ROHT27OW.mjs      | -                   |   3.50 kB | 
+chunk-WS3VORDV.mjs      | not-found-component |   2.54 kB | 
+
+Application bundle generation complete. [5.033 seconds]
+
+Watch mode enabled. Watching for file changes...
+Re-optimizing dependencies because lockfile has changed
+  ➜  Local:   http://localhost:4321/
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.16 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-6YO4XCQI.js   | editor-component | 220.63 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  20.69 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-UGNTHG3G.mjs  | editor-component | 496.08 kB | 
+
+Application bundle generation complete. [2.467 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.16 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-JP6HHLDB.js   | editor-component | 220.64 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  20.69 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-2AIOHGWR.mjs  | editor-component | 496.10 kB | 
+
+Application bundle generation complete. [1.073 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Application bundle generation failed. [1.993 seconds]
+
+X [ERROR] TS2339: Property 'minZoom' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:1802:73:
+      1802 │ ...zoom + (event.deltaY < 0 ? 1 : -1), this.minZoom, this.maxZoom);
+           ╵                                             ~~~~~~~
+
+
+X [ERROR] TS2339: Property 'maxZoom' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:1802:87:
+      1802 │ ...zoom + (event.deltaY < 0 ? 1 : -1), this.minZoom, this.maxZoom);
+           ╵                                                           ~~~~~~~
+
+
+X [ERROR] TS2339: Property 'minZoom' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:1816:50:
+      1816 │ ...zoom = this.clamp(Math.min(zw, zh), this.minZoom, this.maxZoom);
+           ╵                                             ~~~~~~~
+
+
+X [ERROR] TS2339: Property 'maxZoom' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:1816:64:
+      1816 │ ...zoom = this.clamp(Math.min(zw, zh), this.minZoom, this.maxZoom);
+           ╵                                                           ~~~~~~~
+
+
+- Changes detected. Rebuilding...
+
+Browser bundles        
+Initial chunk files     | Names               |  Raw size
+polyfills.js            | polyfills           |  88.09 kB | 
+main.js                 | main                |  21.16 kB | 
+styles.css              | styles              |   4.81 kB | 
+chunk-NJ5HVBCL.js       | -                   |   3.17 kB | 
+chunk-4WXVOEFY.js       | -                   |   1.46 kB | 
+chunk-3OSS3HON.js       | -                   | 652 bytes | 
+
+                        | Initial total       | 119.32 kB
+
+Lazy chunk files        | Names               |  Raw size
+chunk-DNR476M3.js       | editor-component    | 221.10 kB | 
+chunk-W5CCP3ZS.js       | landing-component   |  16.89 kB | 
+chunk-EWQNQPX5.js       | contact-component   |   9.10 kB | 
+chunk-CIVRPHXR.js       | pricing-component   |   8.03 kB | 
+chunk-GIECJVF4.js       | features-component  |   7.82 kB | 
+chunk-LTE4XX4C.js       | blog-post-component |   6.55 kB | 
+chunk-DOZPUEIV.js       | faq-component       |   5.99 kB | 
+chunk-XP5ZG5Q4.js       | blog-list-component |   5.46 kB | 
+chunk-5C2M5NFJ.js       | about-component     |   4.67 kB | 
+chunk-UVVVIIEP.js       | -                   |   3.47 kB | 
+chunk-C6JU3WVH.js       | not-found-component |   2.47 kB | 
+
+
+Server bundles         
+Initial chunk files     | Names               |  Raw size
+chunk-U4IZTEFH.mjs      | -                   |   1.08 MB | 
+chunk-76LFIDFN.mjs      | -                   | 663.58 kB | 
+polyfills.server.mjs    | polyfills.server    | 559.49 kB | 
+chunk-KTAMTG2A.mjs      | -                   | 194.65 kB | 
+main.server.mjs         | main.server         |  20.69 kB | 
+chunk-PVGON7NJ.mjs      | -                   |   3.11 kB | 
+chunk-VPSODEBW.mjs      | -                   |   2.51 kB | 
+chunk-C42IF335.mjs      | -                   | 687 bytes | 
+render-utils.server.mjs | render-utils.server | 462 bytes | 
+
+Lazy chunk files        | Names               |  Raw size
+chunk-QHFBIATA.mjs      | editor-component    | 496.55 kB | 
+chunk-UYVNQNDV.mjs      | -                   | 193.75 kB | 
+chunk-P3UOPGAK.mjs      | xhr2                |  39.09 kB | 
+chunk-WBBL3LGG.mjs      | landing-component   |  16.63 kB | 
+chunk-74KEPNUY.mjs      | contact-component   |   9.22 kB | 
+chunk-45X4WO2O.mjs      | pricing-component   |   7.98 kB | 
+chunk-72UU5XW3.mjs      | features-component  |   7.78 kB | 
+chunk-SRNJH2JJ.mjs      | blog-post-component |   6.65 kB | 
+chunk-CMBI7WM7.mjs      | faq-component       |   6.01 kB | 
+chunk-YDODZJPS.mjs      | blog-list-component |   5.52 kB | 
+chunk-PISE47IT.mjs      | about-component     |   4.67 kB | 
+chunk-ROHT27OW.mjs      | -                   |   3.50 kB | 
+chunk-WS3VORDV.mjs      | not-found-component |   2.54 kB | 
+
+Application bundle generation complete. [1.947 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.16 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-DCVKEVWT.js   | editor-component | 221.14 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  20.69 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-7KL77DTL.mjs  | editor-component | 496.60 kB | 
+
+Application bundle generation complete. [1.295 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.16 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-HRFZY3HW.js   | editor-component | 221.17 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  20.69 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-NM2LVNJW.mjs  | editor-component | 496.62 kB | 
+
+Application bundle generation complete. [1.412 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.16 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-BTX46UCN.js   | editor-component | 221.71 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  20.69 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-544OAHPT.mjs  | editor-component | 497.13 kB | 
+
+Application bundle generation complete. [0.936 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.16 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-3XOQ6VOK.js   | editor-component | 221.71 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  20.69 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-6EYASM5M.mjs  | editor-component | 497.13 kB | 
+
+Application bundle generation complete. [1.419 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.16 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-UMABKDKB.js   | editor-component | 221.89 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  20.69 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-5YIQ76WJ.mjs  | editor-component | 497.31 kB | 
+
+Application bundle generation complete. [1.182 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.16 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-TI6BQNPO.js   | editor-component | 221.89 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  20.69 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-QWN2F4F3.mjs  | editor-component | 497.31 kB | 
+
+Application bundle generation complete. [1.601 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles        
+Initial chunk files     | Names               |  Raw size
+main.js                 | main                |  21.16 kB | 
+
+Lazy chunk files        | Names               |  Raw size
+chunk-TKQ642SG.js       | editor-component    | 223.70 kB | 
+
+
+Server bundles         
+Initial chunk files     | Names               |  Raw size
+chunk-2IVDQ5PT.mjs      | -                   |   1.08 MB | 
+chunk-FNRRSCE3.mjs      | -                   | 663.58 kB | 
+chunk-WNHLDXI2.mjs      | -                   | 194.65 kB | 
+main.server.mjs         | main.server         |  20.69 kB | 
+chunk-GLX2V3SM.mjs      | -                   |   3.11 kB | 
+render-utils.server.mjs | render-utils.server | 462 bytes | 
+
+Lazy chunk files        | Names               |  Raw size
+chunk-IIDO4IAA.mjs      | editor-component    | 499.07 kB | 
+chunk-P2DWMLB6.mjs      | -                   | 193.75 kB | 
+chunk-LSSCZEDQ.mjs      | landing-component   |  16.63 kB | 
+chunk-U2SNJCDC.mjs      | contact-component   |   9.22 kB | 
+chunk-PJZ43I6W.mjs      | pricing-component   |   7.98 kB | 
+chunk-X7J4HCVP.mjs      | features-component  |   7.78 kB | 
+chunk-6EYRZQH6.mjs      | blog-post-component |   6.65 kB | 
+chunk-YL3DOW4F.mjs      | faq-component       |   6.01 kB | 
+chunk-CTGYJRMM.mjs      | blog-list-component |   5.52 kB | 
+chunk-KV6QP5EI.mjs      | about-component     |   4.67 kB | 
+chunk-E7D5XWG3.mjs      | not-found-component |   2.54 kB | 
+
+Application bundle generation complete. [2.001 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.16 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-HAZ4X4QJ.js   | editor-component | 224.98 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  20.69 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-FUFCQEL3.mjs  | editor-component | 500.28 kB | 
+
+Application bundle generation complete. [1.229 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.16 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-YUN5Z3T3.js   | editor-component | 225.20 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  20.69 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-OZA4DTDA.mjs  | editor-component | 500.50 kB | 
+
+Application bundle generation complete. [1.450 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.16 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-4O3Q2SRY.js   | editor-component | 225.60 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  20.69 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-WB7S6JVL.mjs  | editor-component | 500.90 kB | 
+
+Application bundle generation complete. [1.308 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.16 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-ET5KP5WE.js   | editor-component | 225.41 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  20.69 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-EBBXQXJL.mjs  | editor-component | 500.73 kB | 
+
+Application bundle generation complete. [1.198 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.16 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-2N2NV4F4.js   | editor-component | 225.41 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  20.69 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-FDMIJOPG.mjs  | editor-component | 500.73 kB | 
+
+Application bundle generation complete. [1.134 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.16 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-MIAC3RHK.js   | editor-component | 225.37 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  20.69 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-A2SDNV35.mjs  | editor-component | 500.69 kB | 
+
+Application bundle generation complete. [0.883 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.16 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-TY3IJDUG.js   | editor-component | 225.37 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  20.69 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-BEPASGZH.mjs  | editor-component | 500.69 kB | 
+
+Application bundle generation complete. [0.870 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.16 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-CXRGM5VL.js   | editor-component | 225.37 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  20.69 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-2IUO5F7B.mjs  | editor-component | 500.69 kB | 
+
+Application bundle generation complete. [1.095 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.16 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-V2BWA3FZ.js   | editor-component | 225.35 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  20.69 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-2SKSEYGF.mjs  | editor-component | 500.67 kB | 
+
+Application bundle generation complete. [1.007 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.16 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-OFVLPU7J.js   | editor-component | 225.44 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  20.69 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-UX2EL4V6.mjs  | editor-component | 500.76 kB | 
+
+Application bundle generation complete. [2.030 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.16 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-GKAHROWN.js   | editor-component | 225.48 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  20.69 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-A3VFCOWH.mjs  | editor-component | 500.80 kB | 
+
+Application bundle generation complete. [1.545 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Application bundle generation failed. [0.995 seconds]
+
+X [ERROR] TS2339: Property 'drawOnionFrame' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:3117:11:
+      3117 │       this.drawOnionFrame(
+           ╵            ~~~~~~~~~~~~~~
+
+
+X [ERROR] TS2339: Property 'drawOnionFrame' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:3122:11:
+      3122 │       this.drawOnionFrame(
+           ╵            ~~~~~~~~~~~~~~
+
+
+- Changes detected. Rebuilding...
+
+Browser bundles        
+Initial chunk files     | Names               |  Raw size
+polyfills.js            | polyfills           |  88.09 kB | 
+main.js                 | main                |  21.16 kB | 
+styles.css              | styles              |   4.81 kB | 
+chunk-NJ5HVBCL.js       | -                   |   3.17 kB | 
+chunk-4WXVOEFY.js       | -                   |   1.46 kB | 
+chunk-3OSS3HON.js       | -                   | 652 bytes | 
+
+                        | Initial total       | 119.32 kB
+
+Lazy chunk files        | Names               |  Raw size
+chunk-BORSRNOT.js       | editor-component    | 226.41 kB | 
+chunk-W5CCP3ZS.js       | landing-component   |  16.89 kB | 
+chunk-EWQNQPX5.js       | contact-component   |   9.10 kB | 
+chunk-CIVRPHXR.js       | pricing-component   |   8.03 kB | 
+chunk-GIECJVF4.js       | features-component  |   7.82 kB | 
+chunk-LTE4XX4C.js       | blog-post-component |   6.55 kB | 
+chunk-DOZPUEIV.js       | faq-component       |   5.99 kB | 
+chunk-XP5ZG5Q4.js       | blog-list-component |   5.46 kB | 
+chunk-5C2M5NFJ.js       | about-component     |   4.67 kB | 
+chunk-UVVVIIEP.js       | -                   |   3.47 kB | 
+chunk-C6JU3WVH.js       | not-found-component |   2.47 kB | 
+
+
+Server bundles         
+Initial chunk files     | Names               |  Raw size
+chunk-2IVDQ5PT.mjs      | -                   |   1.08 MB | 
+chunk-FNRRSCE3.mjs      | -                   | 663.58 kB | 
+polyfills.server.mjs    | polyfills.server    | 559.49 kB | 
+chunk-WNHLDXI2.mjs      | -                   | 194.65 kB | 
+main.server.mjs         | main.server         |  20.69 kB | 
+chunk-GLX2V3SM.mjs      | -                   |   3.11 kB | 
+chunk-VPSODEBW.mjs      | -                   |   2.51 kB | 
+chunk-C42IF335.mjs      | -                   | 687 bytes | 
+render-utils.server.mjs | render-utils.server | 462 bytes | 
+
+Lazy chunk files        | Names               |  Raw size
+chunk-EJWB3LHM.mjs      | editor-component    | 501.73 kB | 
+chunk-P2DWMLB6.mjs      | -                   | 193.75 kB | 
+chunk-P3UOPGAK.mjs      | xhr2                |  39.09 kB | 
+chunk-LSSCZEDQ.mjs      | landing-component   |  16.63 kB | 
+chunk-U2SNJCDC.mjs      | contact-component   |   9.22 kB | 
+chunk-PJZ43I6W.mjs      | pricing-component   |   7.98 kB | 
+chunk-X7J4HCVP.mjs      | features-component  |   7.78 kB | 
+chunk-6EYRZQH6.mjs      | blog-post-component |   6.65 kB | 
+chunk-YL3DOW4F.mjs      | faq-component       |   6.01 kB | 
+chunk-CTGYJRMM.mjs      | blog-list-component |   5.52 kB | 
+chunk-KV6QP5EI.mjs      | about-component     |   4.67 kB | 
+chunk-ROHT27OW.mjs      | -                   |   3.50 kB | 
+chunk-E7D5XWG3.mjs      | not-found-component |   2.54 kB | 
+
+Application bundle generation complete. [1.489 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.16 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-47OHY2S7.js   | editor-component | 227.22 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  20.69 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-UNAMOQZP.mjs  | editor-component | 502.54 kB | 
+
+Application bundle generation complete. [2.370 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.16 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-JO3VJ3D6.js   | editor-component | 227.99 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  20.69 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-TWOLOPWZ.mjs  | editor-component | 503.31 kB | 
+
+Application bundle generation complete. [1.556 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.16 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-7JZJKWJE.js   | editor-component | 232.86 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  20.69 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-KYTHCV3F.mjs  | editor-component | 507.91 kB | 
+
+Application bundle generation complete. [1.515 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.16 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-UPTZW467.js   | editor-component | 236.35 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  20.69 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-SZSWWWNQ.mjs  | editor-component | 511.19 kB | 
+
+Application bundle generation complete. [1.412 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.16 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-W2JHIBIG.js   | editor-component | 237.89 kB | 
+
+Application bundle generation complete. [1.368 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Application bundle generation failed. [1.091 seconds]
+
+X [ERROR] TS2741: Property 'layers' is missing in type '{ tools: string; color: string; display: string; convert: string; canvas: string; transform: string; timeline: string; }' but required in type 'Record<PanelId, string>'. [plugin angular-compiler]
+
+    src/app/editor/dock/dock.types.ts:51:13:
+      51 │ export const PANEL_TITLES: Record<PanelId, string> = {
+         ╵              ~~~~~~~~~~~~
+
+
+- Changes detected. Rebuilding...
+
+Browser bundles        
+Initial chunk files     | Names               |  Raw size
+polyfills.js            | polyfills           |  88.09 kB | 
+main.js                 | main                |  21.16 kB | 
+styles.css              | styles              |   4.81 kB | 
+chunk-NJ5HVBCL.js       | -                   |   3.17 kB | 
+chunk-4WXVOEFY.js       | -                   |   1.46 kB | 
+chunk-3OSS3HON.js       | -                   | 652 bytes | 
+
+                        | Initial total       | 119.32 kB
+
+Lazy chunk files        | Names               |  Raw size
+chunk-YFBDQZAX.js       | editor-component    | 237.92 kB | 
+chunk-W5CCP3ZS.js       | landing-component   |  16.89 kB | 
+chunk-EWQNQPX5.js       | contact-component   |   9.10 kB | 
+chunk-CIVRPHXR.js       | pricing-component   |   8.03 kB | 
+chunk-GIECJVF4.js       | features-component  |   7.82 kB | 
+chunk-LTE4XX4C.js       | blog-post-component |   6.55 kB | 
+chunk-DOZPUEIV.js       | faq-component       |   5.99 kB | 
+chunk-XP5ZG5Q4.js       | blog-list-component |   5.46 kB | 
+chunk-5C2M5NFJ.js       | about-component     |   4.67 kB | 
+chunk-UVVVIIEP.js       | -                   |   3.47 kB | 
+chunk-C6JU3WVH.js       | not-found-component |   2.47 kB | 
+
+
+Server bundles         
+Initial chunk files     | Names               |  Raw size
+chunk-2IVDQ5PT.mjs      | -                   |   1.08 MB | 
+chunk-FNRRSCE3.mjs      | -                   | 663.58 kB | 
+polyfills.server.mjs    | polyfills.server    | 559.49 kB | 
+chunk-WNHLDXI2.mjs      | -                   | 194.65 kB | 
+main.server.mjs         | main.server         |  20.69 kB | 
+chunk-GLX2V3SM.mjs      | -                   |   3.11 kB | 
+chunk-VPSODEBW.mjs      | -                   |   2.51 kB | 
+chunk-C42IF335.mjs      | -                   | 687 bytes | 
+render-utils.server.mjs | render-utils.server | 462 bytes | 
+
+Lazy chunk files        | Names               |  Raw size
+chunk-D7GSFGPQ.mjs      | editor-component    | 512.77 kB | 
+chunk-P2DWMLB6.mjs      | -                   | 193.75 kB | 
+chunk-P3UOPGAK.mjs      | xhr2                |  39.09 kB | 
+chunk-LSSCZEDQ.mjs      | landing-component   |  16.63 kB | 
+chunk-U2SNJCDC.mjs      | contact-component   |   9.22 kB | 
+chunk-PJZ43I6W.mjs      | pricing-component   |   7.98 kB | 
+chunk-X7J4HCVP.mjs      | features-component  |   7.78 kB | 
+chunk-6EYRZQH6.mjs      | blog-post-component |   6.65 kB | 
+chunk-YL3DOW4F.mjs      | faq-component       |   6.01 kB | 
+chunk-CTGYJRMM.mjs      | blog-list-component |   5.52 kB | 
+chunk-KV6QP5EI.mjs      | about-component     |   4.67 kB | 
+chunk-ROHT27OW.mjs      | -                   |   3.50 kB | 
+chunk-E7D5XWG3.mjs      | not-found-component |   2.54 kB | 
+
+Application bundle generation complete. [0.320 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.16 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-DJJK6TDY.js   | editor-component | 237.93 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  20.69 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-PWCKJICB.mjs  | editor-component | 512.78 kB | 
+
+Application bundle generation complete. [1.060 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.16 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-AHT2OQWD.js   | editor-component | 237.93 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  20.69 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-52E2U3OE.mjs  | editor-component | 512.78 kB | 
+
+Application bundle generation complete. [1.684 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.16 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-EAPW5S26.js   | editor-component | 237.95 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  20.69 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-NROAMLXC.mjs  | editor-component | 512.80 kB | 
+
+Application bundle generation complete. [1.059 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.16 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-BB32PX7O.js   | editor-component | 237.99 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  20.69 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-FSP37X2U.mjs  | editor-component | 512.83 kB | 
+
+Application bundle generation complete. [0.934 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.16 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-4ZU7M6SQ.js   | editor-component | 238.03 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  20.69 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-CTUDMVRP.mjs  | editor-component | 512.87 kB | 
+
+Application bundle generation complete. [0.977 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.16 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-BOYYBWXH.js   | editor-component | 239.81 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  20.69 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-YUJZR3SR.mjs  | editor-component | 514.65 kB | 
+
+Application bundle generation complete. [1.704 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.16 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-FGA2ZWUH.js   | editor-component | 239.86 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  20.69 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-TVRKY2GN.mjs  | editor-component | 514.71 kB | 
+
+Application bundle generation complete. [1.005 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.16 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-Z437PAVB.js   | editor-component | 239.91 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  20.69 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-CLYUOXHP.mjs  | editor-component | 514.75 kB | 
+
+Application bundle generation complete. [1.130 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.16 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-7ARIPIRZ.js   | editor-component | 239.93 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  20.69 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-IRP7ACYQ.mjs  | editor-component | 514.78 kB | 
+
+Application bundle generation complete. [1.141 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.16 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-TCQLYT2F.js   | editor-component | 239.99 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  20.69 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-FZES2VJI.mjs  | editor-component | 514.83 kB | 
+
+Application bundle generation complete. [0.942 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.16 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-7U3Z4RG6.js   | editor-component | 240.04 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  20.69 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-RGIK2PZY.mjs  | editor-component | 514.88 kB | 
+
+Application bundle generation complete. [1.130 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.16 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-I25RN4JU.js   | editor-component | 240.09 kB | 
+
+Application bundle generation complete. [0.827 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.16 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-7I3KVKXC.js   | editor-component | 240.14 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  20.69 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-4ZOWUUJU.mjs  | editor-component | 514.99 kB | 
+
+Application bundle generation complete. [0.997 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles        
+Initial chunk files     | Names               |  Raw size
+main.js                 | main                |  21.16 kB | 
+
+Lazy chunk files        | Names               |  Raw size
+chunk-WA2UF6CW.js       | editor-component    | 247.18 kB | 
+
+
+Server bundles         
+Initial chunk files     | Names               |  Raw size
+chunk-EZQGZ44X.mjs      | -                   |   1.08 MB | 
+chunk-5F6OY7OG.mjs      | -                   | 663.58 kB | 
+chunk-UZUSMYHV.mjs      | -                   | 194.65 kB | 
+main.server.mjs         | main.server         |  20.69 kB | 
+chunk-5G55EGLR.mjs      | -                   |   3.11 kB | 
+render-utils.server.mjs | render-utils.server | 462 bytes | 
+
+Lazy chunk files        | Names               |  Raw size
+chunk-IOKECEKJ.mjs      | editor-component    | 521.67 kB | 
+chunk-BYICQ6T6.mjs      | -                   | 193.75 kB | 
+chunk-MMTD3WXU.mjs      | landing-component   |  16.63 kB | 
+chunk-SGVRWMOK.mjs      | contact-component   |   9.22 kB | 
+chunk-UQVSVQGH.mjs      | pricing-component   |   7.98 kB | 
+chunk-5Y3SHNMH.mjs      | features-component  |   7.78 kB | 
+chunk-MYAZJE3V.mjs      | blog-post-component |   6.65 kB | 
+chunk-6WYM6X67.mjs      | faq-component       |   6.01 kB | 
+chunk-6MHDVW5A.mjs      | blog-list-component |   5.52 kB | 
+chunk-KVWSICDQ.mjs      | about-component     |   4.67 kB | 
+chunk-3DEKIRMO.mjs      | not-found-component |   2.54 kB | 
+
+Application bundle generation complete. [1.090 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.16 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-CSKGV4E3.js   | editor-component | 248.47 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  20.69 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-362BZAQI.mjs  | editor-component | 522.97 kB | 
+
+Application bundle generation complete. [1.158 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.16 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-VIQM3AVG.js   | editor-component | 248.47 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  20.69 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-VHBNAE4A.mjs  | editor-component | 522.97 kB | 
+
+Application bundle generation complete. [1.010 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.16 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-IHCN3SDY.js   | editor-component | 250.99 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  20.69 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-GF3CXBEQ.mjs  | editor-component | 525.48 kB | 
+
+Application bundle generation complete. [1.435 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Application bundle generation failed. [0.997 seconds]
+
+X [ERROR] TS2551: Property 'loadSavedPalettes' does not exist on type 'EditorComponent'. Did you mean 'savedPalettes'? [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:226:9:
+      226 │     this.loadSavedPalettes();
+          ╵          ~~~~~~~~~~~~~~~~~
+
+  'savedPalettes' is declared here.
+
+    src/app/editor/editor.component.ts:300:2:
+      300 │   savedPalettes: NamedPalette[] = [];
+          ╵   ~~~~~~~~~~~~~
+
+
+- Changes detected. Rebuilding...
+
+Browser bundles        
+Initial chunk files     | Names               |  Raw size
+polyfills.js            | polyfills           |  88.09 kB | 
+main.js                 | main                |  21.16 kB | 
+styles.css              | styles              |   4.81 kB | 
+chunk-NJ5HVBCL.js       | -                   |   3.17 kB | 
+chunk-4WXVOEFY.js       | -                   |   1.46 kB | 
+chunk-3OSS3HON.js       | -                   | 652 bytes | 
+
+                        | Initial total       | 119.32 kB
+
+Lazy chunk files        | Names               |  Raw size
+chunk-NSCZMI46.js       | editor-component    | 254.23 kB | 
+chunk-W5CCP3ZS.js       | landing-component   |  16.89 kB | 
+chunk-EWQNQPX5.js       | contact-component   |   9.10 kB | 
+chunk-CIVRPHXR.js       | pricing-component   |   8.03 kB | 
+chunk-GIECJVF4.js       | features-component  |   7.82 kB | 
+chunk-LTE4XX4C.js       | blog-post-component |   6.55 kB | 
+chunk-DOZPUEIV.js       | faq-component       |   5.99 kB | 
+chunk-XP5ZG5Q4.js       | blog-list-component |   5.46 kB | 
+chunk-5C2M5NFJ.js       | about-component     |   4.67 kB | 
+chunk-UVVVIIEP.js       | -                   |   3.47 kB | 
+chunk-C6JU3WVH.js       | not-found-component |   2.47 kB | 
+
+
+Server bundles         
+Initial chunk files     | Names               |  Raw size
+chunk-EZQGZ44X.mjs      | -                   |   1.08 MB | 
+chunk-5F6OY7OG.mjs      | -                   | 663.58 kB | 
+polyfills.server.mjs    | polyfills.server    | 559.49 kB | 
+chunk-UZUSMYHV.mjs      | -                   | 194.65 kB | 
+main.server.mjs         | main.server         |  20.69 kB | 
+chunk-5G55EGLR.mjs      | -                   |   3.11 kB | 
+chunk-VPSODEBW.mjs      | -                   |   2.51 kB | 
+chunk-C42IF335.mjs      | -                   | 687 bytes | 
+render-utils.server.mjs | render-utils.server | 462 bytes | 
+
+Lazy chunk files        | Names               |  Raw size
+chunk-LFYJ5VN7.mjs      | editor-component    | 525.51 kB | 
+chunk-BYICQ6T6.mjs      | -                   | 193.75 kB | 
+chunk-P3UOPGAK.mjs      | xhr2                |  39.09 kB | 
+chunk-MMTD3WXU.mjs      | landing-component   |  16.63 kB | 
+chunk-SGVRWMOK.mjs      | contact-component   |   9.22 kB | 
+chunk-UQVSVQGH.mjs      | pricing-component   |   7.98 kB | 
+chunk-5Y3SHNMH.mjs      | features-component  |   7.78 kB | 
+chunk-MYAZJE3V.mjs      | blog-post-component |   6.65 kB | 
+chunk-6WYM6X67.mjs      | faq-component       |   6.01 kB | 
+chunk-6MHDVW5A.mjs      | blog-list-component |   5.52 kB | 
+chunk-KVWSICDQ.mjs      | about-component     |   4.67 kB | 
+chunk-ROHT27OW.mjs      | -                   |   3.50 kB | 
+chunk-3DEKIRMO.mjs      | not-found-component |   2.54 kB | 
+
+Application bundle generation complete. [2.349 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.16 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-BPECARXP.js   | editor-component | 254.31 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  20.69 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-Y54JZ3OM.mjs  | editor-component | 528.80 kB | 
+
+Application bundle generation complete. [1.358 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.16 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-Y7UU2B5G.js   | editor-component | 254.31 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  20.69 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-OEL56IYU.mjs  | editor-component | 528.81 kB | 
+
+Application bundle generation complete. [1.156 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.16 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-77T2QVCU.js   | editor-component | 254.28 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  20.69 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-XVJUBNJN.mjs  | editor-component | 528.78 kB | 
+
+Application bundle generation complete. [1.029 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Application bundle generation failed. [1.179 seconds]
+
+X [ERROR] TS2741: Property 'palette' is missing in type '{ tools: string; color: string; layers: string; display: string; convert: string; canvas: string; transform: string; timeline: string; }' but required in type 'Record<PanelId, string>'. [plugin angular-compiler]
+
+    src/app/editor/dock/dock.types.ts:53:13:
+      53 │ export const PANEL_TITLES: Record<PanelId, string> = {
+         ╵              ~~~~~~~~~~~~
+
+
+- Changes detected. Rebuilding...
+
+Browser bundles        
+Initial chunk files     | Names               |  Raw size
+polyfills.js            | polyfills           |  88.09 kB | 
+main.js                 | main                |  21.16 kB | 
+styles.css              | styles              |   4.81 kB | 
+chunk-NJ5HVBCL.js       | -                   |   3.17 kB | 
+chunk-4WXVOEFY.js       | -                   |   1.46 kB | 
+chunk-3OSS3HON.js       | -                   | 652 bytes | 
+
+                        | Initial total       | 119.32 kB
+
+Lazy chunk files        | Names               |  Raw size
+chunk-AZ35TSJ3.js       | editor-component    | 254.32 kB | 
+chunk-W5CCP3ZS.js       | landing-component   |  16.89 kB | 
+chunk-EWQNQPX5.js       | contact-component   |   9.10 kB | 
+chunk-CIVRPHXR.js       | pricing-component   |   8.03 kB | 
+chunk-GIECJVF4.js       | features-component  |   7.82 kB | 
+chunk-LTE4XX4C.js       | blog-post-component |   6.55 kB | 
+chunk-DOZPUEIV.js       | faq-component       |   5.99 kB | 
+chunk-XP5ZG5Q4.js       | blog-list-component |   5.46 kB | 
+chunk-5C2M5NFJ.js       | about-component     |   4.67 kB | 
+chunk-UVVVIIEP.js       | -                   |   3.47 kB | 
+chunk-C6JU3WVH.js       | not-found-component |   2.47 kB | 
+
+
+Server bundles         
+Initial chunk files     | Names               |  Raw size
+chunk-EZQGZ44X.mjs      | -                   |   1.08 MB | 
+chunk-5F6OY7OG.mjs      | -                   | 663.58 kB | 
+polyfills.server.mjs    | polyfills.server    | 559.49 kB | 
+chunk-UZUSMYHV.mjs      | -                   | 194.65 kB | 
+main.server.mjs         | main.server         |  20.69 kB | 
+chunk-5G55EGLR.mjs      | -                   |   3.11 kB | 
+chunk-VPSODEBW.mjs      | -                   |   2.51 kB | 
+chunk-C42IF335.mjs      | -                   | 687 bytes | 
+render-utils.server.mjs | render-utils.server | 462 bytes | 
+
+Lazy chunk files        | Names               |  Raw size
+chunk-PG3OCHFA.mjs      | editor-component    | 528.81 kB | 
+chunk-BYICQ6T6.mjs      | -                   | 193.75 kB | 
+chunk-P3UOPGAK.mjs      | xhr2                |  39.09 kB | 
+chunk-MMTD3WXU.mjs      | landing-component   |  16.63 kB | 
+chunk-SGVRWMOK.mjs      | contact-component   |   9.22 kB | 
+chunk-UQVSVQGH.mjs      | pricing-component   |   7.98 kB | 
+chunk-5Y3SHNMH.mjs      | features-component  |   7.78 kB | 
+chunk-MYAZJE3V.mjs      | blog-post-component |   6.65 kB | 
+chunk-6WYM6X67.mjs      | faq-component       |   6.01 kB | 
+chunk-6MHDVW5A.mjs      | blog-list-component |   5.52 kB | 
+chunk-KVWSICDQ.mjs      | about-component     |   4.67 kB | 
+chunk-ROHT27OW.mjs      | -                   |   3.50 kB | 
+chunk-3DEKIRMO.mjs      | not-found-component |   2.54 kB | 
+
+Application bundle generation complete. [0.372 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.16 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-SB7WFCWY.js   | editor-component | 254.33 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  20.69 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-UR3NB653.mjs  | editor-component | 528.82 kB | 
+
+Application bundle generation complete. [1.085 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.16 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-DHH33SVF.js   | editor-component | 254.72 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  20.69 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-U5YITU7T.mjs  | editor-component | 529.22 kB | 
+
+Application bundle generation complete. [1.819 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.16 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-M3IVLIJG.js   | editor-component | 262.61 kB | 
+
+Application bundle generation complete. [0.970 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.16 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-67R4TGZC.js   | editor-component | 263.91 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  20.69 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-5FD7ASKD.mjs  | editor-component | 537.94 kB | 
+
+Application bundle generation complete. [1.493 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.16 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-3YBSOP3X.js   | editor-component | 263.97 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  20.69 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-EVWAPA5F.mjs  | editor-component | 538.00 kB | 
+
+Application bundle generation complete. [1.887 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.16 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-2POGOEL3.js   | editor-component | 264.37 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  20.69 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-DCNL4UEI.mjs  | editor-component | 538.40 kB | 
+
+Application bundle generation complete. [1.603 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Application bundle generation failed. [1.045 seconds]
+
+X [ERROR] TS2339: Property 'drawPivot' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:3405:9:
+      3405 │     this.drawPivot();
+           ╵          ~~~~~~~~~
+
+
+- Changes detected. Rebuilding...
+
+Browser bundles        
+Initial chunk files     | Names               |  Raw size
+polyfills.js            | polyfills           |  88.09 kB | 
+main.js                 | main                |  21.16 kB | 
+styles.css              | styles              |   4.81 kB | 
+chunk-NJ5HVBCL.js       | -                   |   3.17 kB | 
+chunk-4WXVOEFY.js       | -                   |   1.46 kB | 
+chunk-3OSS3HON.js       | -                   | 652 bytes | 
+
+                        | Initial total       | 119.32 kB
+
+Lazy chunk files        | Names               |  Raw size
+chunk-DF5DPGM2.js       | editor-component    | 264.96 kB | 
+chunk-W5CCP3ZS.js       | landing-component   |  16.89 kB | 
+chunk-EWQNQPX5.js       | contact-component   |   9.10 kB | 
+chunk-CIVRPHXR.js       | pricing-component   |   8.03 kB | 
+chunk-GIECJVF4.js       | features-component  |   7.82 kB | 
+chunk-LTE4XX4C.js       | blog-post-component |   6.55 kB | 
+chunk-DOZPUEIV.js       | faq-component       |   5.99 kB | 
+chunk-XP5ZG5Q4.js       | blog-list-component |   5.46 kB | 
+chunk-5C2M5NFJ.js       | about-component     |   4.67 kB | 
+chunk-UVVVIIEP.js       | -                   |   3.47 kB | 
+chunk-C6JU3WVH.js       | not-found-component |   2.47 kB | 
+
+
+Server bundles         
+Initial chunk files     | Names               |  Raw size
+chunk-EZQGZ44X.mjs      | -                   |   1.08 MB | 
+chunk-5F6OY7OG.mjs      | -                   | 663.58 kB | 
+polyfills.server.mjs    | polyfills.server    | 559.49 kB | 
+chunk-UZUSMYHV.mjs      | -                   | 194.65 kB | 
+main.server.mjs         | main.server         |  20.69 kB | 
+chunk-5G55EGLR.mjs      | -                   |   3.11 kB | 
+chunk-VPSODEBW.mjs      | -                   |   2.51 kB | 
+chunk-C42IF335.mjs      | -                   | 687 bytes | 
+render-utils.server.mjs | render-utils.server | 462 bytes | 
+
+Lazy chunk files        | Names               |  Raw size
+chunk-3L4KH6BN.mjs      | editor-component    | 538.99 kB | 
+chunk-BYICQ6T6.mjs      | -                   | 193.75 kB | 
+chunk-P3UOPGAK.mjs      | xhr2                |  39.09 kB | 
+chunk-MMTD3WXU.mjs      | landing-component   |  16.63 kB | 
+chunk-SGVRWMOK.mjs      | contact-component   |   9.22 kB | 
+chunk-UQVSVQGH.mjs      | pricing-component   |   7.98 kB | 
+chunk-5Y3SHNMH.mjs      | features-component  |   7.78 kB | 
+chunk-MYAZJE3V.mjs      | blog-post-component |   6.65 kB | 
+chunk-6WYM6X67.mjs      | faq-component       |   6.01 kB | 
+chunk-6MHDVW5A.mjs      | blog-list-component |   5.52 kB | 
+chunk-KVWSICDQ.mjs      | about-component     |   4.67 kB | 
+chunk-ROHT27OW.mjs      | -                   |   3.50 kB | 
+chunk-3DEKIRMO.mjs      | not-found-component |   2.54 kB | 
+
+Application bundle generation complete. [1.742 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Application bundle generation failed. [1.845 seconds]
+
+X [ERROR] NG5: Argument of type '1' is not assignable to parameter of type '"grid" | "row" | undefined'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.html:475:75:
+      475 │ ...ro" (click)="exportSpriteSheet(1)">Sprite sheet + JSON <em>✦...
+          ╵                                   ^
+
+  Error occurs in the template of component EditorComponent.
+
+    src/app/editor/editor.component.ts:176:15:
+      176 │   templateUrl: './editor.component.html',
+          ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+- Changes detected. Rebuilding...
+
+Application bundle generation failed. [1.290 seconds]
+
+X [ERROR] NG5: Argument of type '1' is not assignable to parameter of type '"grid" | "row" | undefined'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.html:475:75:
+      475 │ ...ro" (click)="exportSpriteSheet(1)">Sprite sheet + JSON <em>✦...
+          ╵                                   ^
+
+  Error occurs in the template of component EditorComponent.
+
+    src/app/editor/editor.component.ts:176:15:
+      176 │   templateUrl: './editor.component.html',
+          ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+- Changes detected. Rebuilding...
+
+Browser bundles        
+Initial chunk files     | Names               |  Raw size
+polyfills.js            | polyfills           |  88.09 kB | 
+main.js                 | main                |  21.16 kB | 
+styles.css              | styles              |   4.81 kB | 
+chunk-NJ5HVBCL.js       | -                   |   3.17 kB | 
+chunk-4WXVOEFY.js       | -                   |   1.46 kB | 
+chunk-3OSS3HON.js       | -                   | 652 bytes | 
+
+                        | Initial total       | 119.32 kB
+
+Lazy chunk files        | Names               |  Raw size
+chunk-YTOXCPMH.js       | editor-component    | 265.84 kB | 
+chunk-W5CCP3ZS.js       | landing-component   |  16.89 kB | 
+chunk-EWQNQPX5.js       | contact-component   |   9.10 kB | 
+chunk-CIVRPHXR.js       | pricing-component   |   8.03 kB | 
+chunk-GIECJVF4.js       | features-component  |   7.82 kB | 
+chunk-LTE4XX4C.js       | blog-post-component |   6.55 kB | 
+chunk-DOZPUEIV.js       | faq-component       |   5.99 kB | 
+chunk-XP5ZG5Q4.js       | blog-list-component |   5.46 kB | 
+chunk-5C2M5NFJ.js       | about-component     |   4.67 kB | 
+chunk-UVVVIIEP.js       | -                   |   3.47 kB | 
+chunk-C6JU3WVH.js       | not-found-component |   2.47 kB | 
+
+
+Server bundles         
+Initial chunk files     | Names               |  Raw size
+chunk-EZQGZ44X.mjs      | -                   |   1.08 MB | 
+chunk-5F6OY7OG.mjs      | -                   | 663.58 kB | 
+polyfills.server.mjs    | polyfills.server    | 559.49 kB | 
+chunk-UZUSMYHV.mjs      | -                   | 194.65 kB | 
+main.server.mjs         | main.server         |  20.69 kB | 
+chunk-5G55EGLR.mjs      | -                   |   3.11 kB | 
+chunk-VPSODEBW.mjs      | -                   |   2.51 kB | 
+chunk-C42IF335.mjs      | -                   | 687 bytes | 
+render-utils.server.mjs | render-utils.server | 462 bytes | 
+
+Lazy chunk files        | Names               |  Raw size
+chunk-GBDM2O3U.mjs      | editor-component    | 539.83 kB | 
+chunk-BYICQ6T6.mjs      | -                   | 193.75 kB | 
+chunk-P3UOPGAK.mjs      | xhr2                |  39.09 kB | 
+chunk-MMTD3WXU.mjs      | landing-component   |  16.63 kB | 
+chunk-SGVRWMOK.mjs      | contact-component   |   9.22 kB | 
+chunk-UQVSVQGH.mjs      | pricing-component   |   7.98 kB | 
+chunk-5Y3SHNMH.mjs      | features-component  |   7.78 kB | 
+chunk-MYAZJE3V.mjs      | blog-post-component |   6.65 kB | 
+chunk-6WYM6X67.mjs      | faq-component       |   6.01 kB | 
+chunk-6MHDVW5A.mjs      | blog-list-component |   5.52 kB | 
+chunk-KVWSICDQ.mjs      | about-component     |   4.67 kB | 
+chunk-ROHT27OW.mjs      | -                   |   3.50 kB | 
+chunk-3DEKIRMO.mjs      | not-found-component |   2.54 kB | 
+
+Application bundle generation complete. [1.234 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.16 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-WN2LQFI2.js   | editor-component | 268.50 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  20.69 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-PBE5QN6T.mjs  | editor-component | 542.32 kB | 
+
+Application bundle generation complete. [1.379 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.16 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-5ZWFXDCF.js   | editor-component | 269.51 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  20.69 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-VKIPA227.mjs  | editor-component | 543.33 kB | 
+
+Application bundle generation complete. [1.226 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Application bundle generation failed. [1.371 seconds]
+
+X [ERROR] TS2353: Object literal may only specify known properties, and 'layers' does not exist in type 'Record<PanelId, string>'. [plugin angular-compiler]
+
+    src/app/editor/dock/dock.types.ts:55:2:
+      55 │   layers: 'Layers',
+         ╵   ~~~~~~
+
+
+X [ERROR] TS2322: Type '"layers"' is not assignable to type 'PanelId'. [plugin angular-compiler]
+
+    src/app/editor/dock/dock.types.ts:67:25:
+      67 │       right: ['display', 'layers', 'palette', 'canvas', 'transform...
+         ╵                          ~~~~~~~~
+
+
+X [ERROR] NG2: Type '"layers"' is not assignable to type 'PanelId'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.html:99:13:
+      99 │ <ng-template dockPanelDef="layers">
+         ╵              ~~~~~~~~~~~~
+
+  Error occurs in the template of component EditorComponent.
+
+    src/app/editor/editor.component.ts:176:15:
+      176 │   templateUrl: './editor.component.html',
+          ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+- Changes detected. Rebuilding...
+
+Application bundle generation failed. [0.397 seconds]
+
+X [ERROR] TS2322: Type '"layers"' is not assignable to type 'PanelId'. [plugin angular-compiler]
+
+    src/app/editor/dock/dock.types.ts:66:25:
+      66 │       right: ['display', 'layers', 'palette', 'canvas', 'transform...
+         ╵                          ~~~~~~~~
+
+
+X [ERROR] NG2: Type '"layers"' is not assignable to type 'PanelId'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.html:99:13:
+      99 │ <ng-template dockPanelDef="layers">
+         ╵              ~~~~~~~~~~~~
+
+  Error occurs in the template of component EditorComponent.
+
+    src/app/editor/editor.component.ts:176:15:
+      176 │   templateUrl: './editor.component.html',
+          ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+- Changes detected. Rebuilding...
+
+Application bundle generation failed. [1.138 seconds]
+
+X [ERROR] NG2: Type '"layers"' is not assignable to type 'PanelId'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.html:99:13:
+      99 │ <ng-template dockPanelDef="layers">
+         ╵              ~~~~~~~~~~~~
+
+  Error occurs in the template of component EditorComponent.
+
+    src/app/editor/editor.component.ts:176:15:
+      176 │   templateUrl: './editor.component.html',
+          ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+- Changes detected. Rebuilding...
+
+Browser bundles        
+Initial chunk files     | Names               |  Raw size
+polyfills.js            | polyfills           |  88.09 kB | 
+main.js                 | main                |  21.16 kB | 
+styles.css              | styles              |   4.81 kB | 
+chunk-NJ5HVBCL.js       | -                   |   3.17 kB | 
+chunk-4WXVOEFY.js       | -                   |   1.46 kB | 
+chunk-3OSS3HON.js       | -                   | 652 bytes | 
+
+                        | Initial total       | 119.32 kB
+
+Lazy chunk files        | Names               |  Raw size
+chunk-CYMQJWTG.js       | editor-component    | 262.44 kB | 
+chunk-W5CCP3ZS.js       | landing-component   |  16.89 kB | 
+chunk-EWQNQPX5.js       | contact-component   |   9.10 kB | 
+chunk-CIVRPHXR.js       | pricing-component   |   8.03 kB | 
+chunk-GIECJVF4.js       | features-component  |   7.82 kB | 
+chunk-LTE4XX4C.js       | blog-post-component |   6.55 kB | 
+chunk-DOZPUEIV.js       | faq-component       |   5.99 kB | 
+chunk-XP5ZG5Q4.js       | blog-list-component |   5.46 kB | 
+chunk-5C2M5NFJ.js       | about-component     |   4.67 kB | 
+chunk-UVVVIIEP.js       | -                   |   3.47 kB | 
+chunk-C6JU3WVH.js       | not-found-component |   2.47 kB | 
+
+
+Server bundles         
+Initial chunk files     | Names               |  Raw size
+chunk-2IVDQ5PT.mjs      | -                   |   1.08 MB | 
+chunk-FNRRSCE3.mjs      | -                   | 663.58 kB | 
+polyfills.server.mjs    | polyfills.server    | 559.49 kB | 
+chunk-WNHLDXI2.mjs      | -                   | 194.65 kB | 
+main.server.mjs         | main.server         |  20.69 kB | 
+chunk-GLX2V3SM.mjs      | -                   |   3.11 kB | 
+chunk-VPSODEBW.mjs      | -                   |   2.51 kB | 
+chunk-C42IF335.mjs      | -                   | 687 bytes | 
+render-utils.server.mjs | render-utils.server | 462 bytes | 
+
+Lazy chunk files        | Names               |  Raw size
+chunk-ZLKDNT5R.mjs      | editor-component    | 536.61 kB | 
+chunk-P2DWMLB6.mjs      | -                   | 193.75 kB | 
+chunk-P3UOPGAK.mjs      | xhr2                |  39.09 kB | 
+chunk-LSSCZEDQ.mjs      | landing-component   |  16.63 kB | 
+chunk-U2SNJCDC.mjs      | contact-component   |   9.22 kB | 
+chunk-PJZ43I6W.mjs      | pricing-component   |   7.98 kB | 
+chunk-X7J4HCVP.mjs      | features-component  |   7.78 kB | 
+chunk-6EYRZQH6.mjs      | blog-post-component |   6.65 kB | 
+chunk-YL3DOW4F.mjs      | faq-component       |   6.01 kB | 
+chunk-CTGYJRMM.mjs      | blog-list-component |   5.52 kB | 
+chunk-KV6QP5EI.mjs      | about-component     |   4.67 kB | 
+chunk-ROHT27OW.mjs      | -                   |   3.50 kB | 
+chunk-E7D5XWG3.mjs      | not-found-component |   2.54 kB | 
+
+Application bundle generation complete. [1.287 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.16 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-ZFA56NUI.js   | editor-component | 264.15 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  20.69 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-36KUWBHU.mjs  | editor-component | 538.22 kB | 
+
+Application bundle generation complete. [1.470 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.16 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-ZKJZBSIZ.js   | editor-component | 265.93 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  20.69 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-POTMIUSZ.mjs  | editor-component | 539.92 kB | 
+
+Application bundle generation complete. [1.333 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.16 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-ZGZUJWT3.js   | editor-component | 265.93 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  20.69 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-KJQRENSM.mjs  | editor-component | 539.92 kB | 
+
+Application bundle generation complete. [1.353 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.16 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-5CP2QOBR.js   | editor-component | 266.33 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  20.69 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-XZI6UF57.mjs  | editor-component | 540.31 kB | 
+
+Application bundle generation complete. [1.051 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.16 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-ARYIGONI.js   | editor-component | 265.03 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  20.69 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-LAIL3GXL.mjs  | editor-component | 539.02 kB | 
+
+Application bundle generation complete. [1.164 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Application bundle generation failed. [1.369 seconds]
+
+X [ERROR] TS2353: Object literal may only specify known properties, and 'palette' does not exist in type 'Record<PanelId, string>'. [plugin angular-compiler]
+
+    src/app/editor/dock/dock.types.ts:52:2:
+      52 │   palette: 'Palette',
+         ╵   ~~~~~~~
+
+
+X [ERROR] TS2322: Type '"palette"' is not assignable to type 'PanelId'. [plugin angular-compiler]
+
+    src/app/editor/dock/dock.types.ts:64:25:
+      64 │       right: ['display', 'palette', 'canvas', 'transform', 'conver...
+         ╵                          ~~~~~~~~~
+
+
+X [ERROR] NG2: Type '"palette"' is not assignable to type 'PanelId'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.html:49:13:
+      49 │ <ng-template dockPanelDef="palette">
+         ╵              ~~~~~~~~~~~~
+
+  Error occurs in the template of component EditorComponent.
+
+    src/app/editor/editor.component.ts:176:15:
+      176 │   templateUrl: './editor.component.html',
+          ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+- Changes detected. Rebuilding...
+
+Application bundle generation failed. [0.321 seconds]
+
+X [ERROR] TS2322: Type '"palette"' is not assignable to type 'PanelId'. [plugin angular-compiler]
+
+    src/app/editor/dock/dock.types.ts:63:25:
+      63 │       right: ['display', 'palette', 'canvas', 'transform', 'conver...
+         ╵                          ~~~~~~~~~
+
+
+X [ERROR] NG2: Type '"palette"' is not assignable to type 'PanelId'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.html:49:13:
+      49 │ <ng-template dockPanelDef="palette">
+         ╵              ~~~~~~~~~~~~
+
+  Error occurs in the template of component EditorComponent.
+
+    src/app/editor/editor.component.ts:176:15:
+      176 │   templateUrl: './editor.component.html',
+          ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+- Changes detected. Rebuilding...
+
+Application bundle generation failed. [1.467 seconds]
+
+X [ERROR] NG2: Type '"palette"' is not assignable to type 'PanelId'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.html:49:13:
+      49 │ <ng-template dockPanelDef="palette">
+         ╵              ~~~~~~~~~~~~
+
+  Error occurs in the template of component EditorComponent.
+
+    src/app/editor/editor.component.ts:176:15:
+      176 │   templateUrl: './editor.component.html',
+          ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+- Changes detected. Rebuilding...
+
+Browser bundles        
+Initial chunk files     | Names               |  Raw size
+polyfills.js            | polyfills           |  88.09 kB | 
+main.js                 | main                |  21.16 kB | 
+styles.css              | styles              |   4.81 kB | 
+chunk-NJ5HVBCL.js       | -                   |   3.17 kB | 
+chunk-4WXVOEFY.js       | -                   |   1.46 kB | 
+chunk-3OSS3HON.js       | -                   | 652 bytes | 
+
+                        | Initial total       | 119.32 kB
+
+Lazy chunk files        | Names               |  Raw size
+chunk-CK57PX4W.js       | editor-component    | 263.26 kB | 
+chunk-W5CCP3ZS.js       | landing-component   |  16.89 kB | 
+chunk-EWQNQPX5.js       | contact-component   |   9.10 kB | 
+chunk-CIVRPHXR.js       | pricing-component   |   8.03 kB | 
+chunk-GIECJVF4.js       | features-component  |   7.82 kB | 
+chunk-LTE4XX4C.js       | blog-post-component |   6.55 kB | 
+chunk-DOZPUEIV.js       | faq-component       |   5.99 kB | 
+chunk-XP5ZG5Q4.js       | blog-list-component |   5.46 kB | 
+chunk-5C2M5NFJ.js       | about-component     |   4.67 kB | 
+chunk-UVVVIIEP.js       | -                   |   3.47 kB | 
+chunk-C6JU3WVH.js       | not-found-component |   2.47 kB | 
+
+
+Server bundles         
+Initial chunk files     | Names               |  Raw size
+chunk-2IVDQ5PT.mjs      | -                   |   1.08 MB | 
+chunk-FNRRSCE3.mjs      | -                   | 663.58 kB | 
+polyfills.server.mjs    | polyfills.server    | 559.49 kB | 
+chunk-WNHLDXI2.mjs      | -                   | 194.65 kB | 
+main.server.mjs         | main.server         |  20.69 kB | 
+chunk-GLX2V3SM.mjs      | -                   |   3.11 kB | 
+chunk-VPSODEBW.mjs      | -                   |   2.51 kB | 
+chunk-C42IF335.mjs      | -                   | 687 bytes | 
+render-utils.server.mjs | render-utils.server | 462 bytes | 
+
+Lazy chunk files        | Names               |  Raw size
+chunk-TQGEOC3Z.mjs      | editor-component    | 537.33 kB | 
+chunk-P2DWMLB6.mjs      | -                   | 193.75 kB | 
+chunk-P3UOPGAK.mjs      | xhr2                |  39.09 kB | 
+chunk-LSSCZEDQ.mjs      | landing-component   |  16.63 kB | 
+chunk-U2SNJCDC.mjs      | contact-component   |   9.22 kB | 
+chunk-PJZ43I6W.mjs      | pricing-component   |   7.98 kB | 
+chunk-X7J4HCVP.mjs      | features-component  |   7.78 kB | 
+chunk-6EYRZQH6.mjs      | blog-post-component |   6.65 kB | 
+chunk-YL3DOW4F.mjs      | faq-component       |   6.01 kB | 
+chunk-CTGYJRMM.mjs      | blog-list-component |   5.52 kB | 
+chunk-KV6QP5EI.mjs      | about-component     |   4.67 kB | 
+chunk-ROHT27OW.mjs      | -                   |   3.50 kB | 
+chunk-E7D5XWG3.mjs      | not-found-component |   2.54 kB | 
+
+Application bundle generation complete. [1.455 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.16 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-VZ2IBC3V.js   | editor-component | 263.34 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  20.69 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-WCBDEP53.mjs  | editor-component | 537.41 kB | 
+
+Application bundle generation complete. [1.406 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles        
+Initial chunk files     | Names               |  Raw size
+main.js                 | main                |  21.16 kB | 
+
+Lazy chunk files        | Names               |  Raw size
+chunk-ECGJFIAC.js       | editor-component    | 264.87 kB | 
+
+
+Server bundles         
+Initial chunk files     | Names               |  Raw size
+chunk-KMMXTHJC.mjs      | -                   |   1.08 MB | 
+chunk-H3JC6FW7.mjs      | -                   | 663.58 kB | 
+chunk-4Y6EZUMD.mjs      | -                   | 194.65 kB | 
+main.server.mjs         | main.server         |  20.69 kB | 
+chunk-PU2JEUWR.mjs      | -                   |   3.11 kB | 
+render-utils.server.mjs | render-utils.server | 462 bytes | 
+
+Lazy chunk files        | Names               |  Raw size
+chunk-LMA7L5CR.mjs      | editor-component    | 538.91 kB | 
+chunk-3KYDGMEG.mjs      | -                   | 193.75 kB | 
+chunk-2YRF3CSX.mjs      | landing-component   |  16.63 kB | 
+chunk-O4DVWQNP.mjs      | contact-component   |   9.22 kB | 
+chunk-GHIEH4TQ.mjs      | pricing-component   |   7.98 kB | 
+chunk-AQLZOCL2.mjs      | features-component  |   7.78 kB | 
+chunk-LSQD7E5O.mjs      | blog-post-component |   6.65 kB | 
+chunk-GVGNHBAA.mjs      | faq-component       |   6.01 kB | 
+chunk-FVET5ARZ.mjs      | blog-list-component |   5.52 kB | 
+chunk-QN4DWXKC.mjs      | about-component     |   4.67 kB | 
+chunk-NDIIUP3I.mjs      | not-found-component |   2.54 kB | 
+
+Application bundle generation complete. [1.529 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.16 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-CNZS56GR.js   | editor-component | 265.33 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  20.69 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-Y3HZMV2B.mjs  | editor-component | 539.37 kB | 
+
+Application bundle generation complete. [1.228 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.16 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-BD3DXE5I.js   | editor-component | 265.37 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  20.69 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-SYY67CX3.mjs  | editor-component | 539.41 kB | 
+
+Application bundle generation complete. [1.171 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.16 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-YM6DHE2R.js   | editor-component | 265.49 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  20.69 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-3UGQGSC4.mjs  | editor-component | 539.53 kB | 
+
+Application bundle generation complete. [1.072 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.16 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-TWUF4X4R.js   | editor-component | 265.49 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  20.69 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-QXHDKDXP.mjs  | editor-component | 539.53 kB | 
+
+Application bundle generation complete. [1.370 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.16 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-W6OIAHVV.js   | editor-component | 265.49 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  20.69 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-ZN6MVV7P.mjs  | editor-component | 539.53 kB | 
+
+Application bundle generation complete. [1.133 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Application bundle generation failed. [1.352 seconds]
+
+X [ERROR] NG9: Property 'onLayerDrop' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.html:287:67:
+      287 │ ...ine-rows" cdkDropList (cdkDropListDropped)="onLayerDrop($event)">
+          ╵                                                ~~~~~~~~~~~
+
+  Error occurs in the template of component EditorComponent.
+
+    src/app/editor/editor.component.ts:176:15:
+      176 │   templateUrl: './editor.component.html',
+          ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+- Changes detected. Rebuilding...
+
+Browser bundles        
+Initial chunk files     | Names               |  Raw size
+polyfills.js            | polyfills           |  88.09 kB | 
+main.js                 | main                |  21.16 kB | 
+styles.css              | styles              |   4.81 kB | 
+chunk-NJ5HVBCL.js       | -                   |   3.17 kB | 
+chunk-4WXVOEFY.js       | -                   |   1.46 kB | 
+chunk-3OSS3HON.js       | -                   | 652 bytes | 
+
+                        | Initial total       | 119.32 kB
+
+Lazy chunk files        | Names               |  Raw size
+chunk-LETNP3J3.js       | editor-component    | 267.20 kB | 
+chunk-W5CCP3ZS.js       | landing-component   |  16.89 kB | 
+chunk-EWQNQPX5.js       | contact-component   |   9.10 kB | 
+chunk-CIVRPHXR.js       | pricing-component   |   8.03 kB | 
+chunk-GIECJVF4.js       | features-component  |   7.82 kB | 
+chunk-LTE4XX4C.js       | blog-post-component |   6.55 kB | 
+chunk-DOZPUEIV.js       | faq-component       |   5.99 kB | 
+chunk-XP5ZG5Q4.js       | blog-list-component |   5.46 kB | 
+chunk-5C2M5NFJ.js       | about-component     |   4.67 kB | 
+chunk-UVVVIIEP.js       | -                   |   3.47 kB | 
+chunk-C6JU3WVH.js       | not-found-component |   2.47 kB | 
+
+
+Server bundles         
+Initial chunk files     | Names               |  Raw size
+chunk-YTIWM5OS.mjs      | -                   |   1.08 MB | 
+chunk-BLJU2GUZ.mjs      | -                   | 663.58 kB | 
+polyfills.server.mjs    | polyfills.server    | 559.49 kB | 
+chunk-QNCJB766.mjs      | -                   | 194.65 kB | 
+main.server.mjs         | main.server         |  20.69 kB | 
+chunk-NW3LGY2X.mjs      | -                   |   3.11 kB | 
+chunk-VPSODEBW.mjs      | -                   |   2.51 kB | 
+chunk-C42IF335.mjs      | -                   | 687 bytes | 
+render-utils.server.mjs | render-utils.server | 462 bytes | 
+
+Lazy chunk files        | Names               |  Raw size
+chunk-5GJHS6VM.mjs      | editor-component    | 541.12 kB | 
+chunk-L223UYD3.mjs      | -                   | 193.75 kB | 
+chunk-P3UOPGAK.mjs      | xhr2                |  39.09 kB | 
+chunk-JLNTAZUW.mjs      | landing-component   |  16.63 kB | 
+chunk-GIXLFTM4.mjs      | contact-component   |   9.22 kB | 
+chunk-BS4BESCR.mjs      | pricing-component   |   7.98 kB | 
+chunk-QJI6EFVZ.mjs      | features-component  |   7.78 kB | 
+chunk-3O6CK3XK.mjs      | blog-post-component |   6.65 kB | 
+chunk-2ZMA4HEH.mjs      | faq-component       |   6.01 kB | 
+chunk-E74JRKOZ.mjs      | blog-list-component |   5.52 kB | 
+chunk-PVTT2WAC.mjs      | about-component     |   4.67 kB | 
+chunk-ROHT27OW.mjs      | -                   |   3.50 kB | 
+chunk-3SRJZIUF.mjs      | not-found-component |   2.54 kB | 
+
+Application bundle generation complete. [1.642 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.16 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-FCJWSESA.js   | editor-component | 268.20 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  20.69 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-S2MVIRKS.mjs  | editor-component | 542.12 kB | 
+
+Application bundle generation complete. [1.299 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.16 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-YEKNGGI2.js   | editor-component | 268.26 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  20.69 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-UJMZYEGW.mjs  | editor-component | 542.18 kB | 
+
+Application bundle generation complete. [1.189 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Application bundle generation failed. [1.228 seconds]
+
+X [ERROR] TS2353: Object literal may only specify known properties, and 'convert' does not exist in type 'Record<PanelId, string>'. [plugin angular-compiler]
+
+    src/app/editor/dock/dock.types.ts:51:2:
+      51 │   convert: 'Image Convert',
+         ╵   ~~~~~~~
+
+
+X [ERROR] TS2322: Type '"convert"' is not assignable to type 'PanelId'. [plugin angular-compiler]
+
+    src/app/editor/dock/dock.types.ts:61:48:
+      61 │       right: ['display', 'canvas', 'transform', 'convert'],
+         ╵                                                 ~~~~~~~~~
+
+
+X [ERROR] NG2: Type '"convert"' is not assignable to type 'PanelId'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.html:104:13:
+      104 │ <ng-template dockPanelDef="convert">
+          ╵              ~~~~~~~~~~~~
+
+  Error occurs in the template of component EditorComponent.
+
+    src/app/editor/editor.component.ts:176:15:
+      176 │   templateUrl: './editor.component.html',
+          ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+- Changes detected. Rebuilding...
+
+Application bundle generation failed. [0.323 seconds]
+
+X [ERROR] TS2322: Type '"convert"' is not assignable to type 'PanelId'. [plugin angular-compiler]
+
+    src/app/editor/dock/dock.types.ts:60:48:
+      60 │       right: ['display', 'canvas', 'transform', 'convert'],
+         ╵                                                 ~~~~~~~~~
+
+
+X [ERROR] NG2: Type '"convert"' is not assignable to type 'PanelId'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.html:104:13:
+      104 │ <ng-template dockPanelDef="convert">
+          ╵              ~~~~~~~~~~~~
+
+  Error occurs in the template of component EditorComponent.
+
+    src/app/editor/editor.component.ts:176:15:
+      176 │   templateUrl: './editor.component.html',
+          ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+- Changes detected. Rebuilding...
+
+Application bundle generation failed. [1.230 seconds]
+
+X [ERROR] NG2: Type '"convert"' is not assignable to type 'PanelId'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.html:104:13:
+      104 │ <ng-template dockPanelDef="convert">
+          ╵              ~~~~~~~~~~~~
+
+  Error occurs in the template of component EditorComponent.
+
+    src/app/editor/editor.component.ts:176:15:
+      176 │   templateUrl: './editor.component.html',
+          ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+- Changes detected. Rebuilding...
+
+Application bundle generation failed. [1.827 seconds]
+
+X [ERROR] NG2: Type '"convert"' is not assignable to type 'PanelId'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.html:104:13:
+      104 │ <ng-template dockPanelDef="convert">
+          ╵              ~~~~~~~~~~~~
+
+  Error occurs in the template of component EditorComponent.
+
+    src/app/editor/editor.component.ts:176:15:
+      176 │   templateUrl: './editor.component.html',
+          ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+- Changes detected. Rebuilding...
+
+Application bundle generation failed. [1.723 seconds]
+
+X [ERROR] NG2: Type '"convert"' is not assignable to type 'PanelId'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.html:104:13:
+      104 │ <ng-template dockPanelDef="convert">
+          ╵              ~~~~~~~~~~~~
+
+  Error occurs in the template of component EditorComponent.
+
+    src/app/editor/editor.component.ts:176:15:
+      176 │   templateUrl: './editor.component.html',
+          ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+- Changes detected. Rebuilding...
+
+Application bundle generation failed. [1.558 seconds]
+
+X [ERROR] NG2: Type '"convert"' is not assignable to type 'PanelId'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.html:104:13:
+      104 │ <ng-template dockPanelDef="convert">
+          ╵              ~~~~~~~~~~~~
+
+  Error occurs in the template of component EditorComponent.
+
+    src/app/editor/editor.component.ts:176:15:
+      176 │   templateUrl: './editor.component.html',
+          ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+- Changes detected. Rebuilding...
+
+Browser bundles        
+Initial chunk files     | Names               |  Raw size
+polyfills.js            | polyfills           |  88.09 kB | 
+main.js                 | main                |  21.16 kB | 
+styles.css              | styles              |   4.81 kB | 
+chunk-NJ5HVBCL.js       | -                   |   3.17 kB | 
+chunk-4WXVOEFY.js       | -                   |   1.46 kB | 
+chunk-3OSS3HON.js       | -                   | 652 bytes | 
+
+                        | Initial total       | 119.32 kB
+
+Lazy chunk files        | Names               |  Raw size
+chunk-44ZSL3YE.js       | editor-component    | 260.45 kB | 
+chunk-W5CCP3ZS.js       | landing-component   |  16.89 kB | 
+chunk-EWQNQPX5.js       | contact-component   |   9.10 kB | 
+chunk-CIVRPHXR.js       | pricing-component   |   8.03 kB | 
+chunk-GIECJVF4.js       | features-component  |   7.82 kB | 
+chunk-LTE4XX4C.js       | blog-post-component |   6.55 kB | 
+chunk-DOZPUEIV.js       | faq-component       |   5.99 kB | 
+chunk-XP5ZG5Q4.js       | blog-list-component |   5.46 kB | 
+chunk-5C2M5NFJ.js       | about-component     |   4.67 kB | 
+chunk-UVVVIIEP.js       | -                   |   3.47 kB | 
+chunk-C6JU3WVH.js       | not-found-component |   2.47 kB | 
+
+
+Server bundles         
+Initial chunk files     | Names               |  Raw size
+chunk-YTIWM5OS.mjs      | -                   |   1.08 MB | 
+chunk-BLJU2GUZ.mjs      | -                   | 663.58 kB | 
+polyfills.server.mjs    | polyfills.server    | 559.49 kB | 
+chunk-QNCJB766.mjs      | -                   | 194.65 kB | 
+main.server.mjs         | main.server         |  20.69 kB | 
+chunk-NW3LGY2X.mjs      | -                   |   3.11 kB | 
+chunk-VPSODEBW.mjs      | -                   |   2.51 kB | 
+chunk-C42IF335.mjs      | -                   | 687 bytes | 
+render-utils.server.mjs | render-utils.server | 462 bytes | 
+
+Lazy chunk files        | Names               |  Raw size
+chunk-YEOLY3D2.mjs      | editor-component    | 534.84 kB | 
+chunk-FJN5PL6I.mjs      | -                   | 193.73 kB | 
+chunk-P3UOPGAK.mjs      | xhr2                |  39.09 kB | 
+chunk-JLNTAZUW.mjs      | landing-component   |  16.63 kB | 
+chunk-G27YKVKX.mjs      | contact-component   |   9.22 kB | 
+chunk-BS4BESCR.mjs      | pricing-component   |   7.98 kB | 
+chunk-QJI6EFVZ.mjs      | features-component  |   7.78 kB | 
+chunk-3O6CK3XK.mjs      | blog-post-component |   6.65 kB | 
+chunk-2ZMA4HEH.mjs      | faq-component       |   6.01 kB | 
+chunk-E74JRKOZ.mjs      | blog-list-component |   5.52 kB | 
+chunk-PVTT2WAC.mjs      | about-component     |   4.67 kB | 
+chunk-ROHT27OW.mjs      | -                   |   3.50 kB | 
+chunk-3SRJZIUF.mjs      | not-found-component |   2.54 kB | 
+
+Application bundle generation complete. [1.198 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.16 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-7K6T3LRX.js   | editor-component | 260.43 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  20.69 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-Z4CAGRQI.mjs  | editor-component | 534.82 kB | 
+
+Application bundle generation complete. [1.411 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names             |  Raw size
+main.js             | main              |  21.16 kB | 
+
+Lazy chunk files    | Names             |  Raw size
+chunk-RFVIP4JH.js   | editor-component  | 270.44 kB | 
+
+
+Server bundles     
+Initial chunk files | Names             |  Raw size
+main.server.mjs     | main.server       |  20.69 kB | 
+
+Lazy chunk files    | Names             |  Raw size
+chunk-BPDZTOMA.mjs  | editor-component  | 544.23 kB | 
+chunk-L223UYD3.mjs  | -                 | 193.75 kB | 
+chunk-GIXLFTM4.mjs  | contact-component |   9.22 kB | 
+
+Application bundle generation complete. [1.391 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.16 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-JE6OWVO6.js   | editor-component | 270.44 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  20.69 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-YFHW5W7D.mjs  | editor-component | 544.23 kB | 
+
+Application bundle generation complete. [1.377 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.16 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-NQIWWQ2T.js   | editor-component | 272.42 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  20.69 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-AY4P6QLT.mjs  | editor-component | 546.21 kB | 
+
+Application bundle generation complete. [1.412 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.16 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-MGSC3ZY2.js   | editor-component | 272.45 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  20.69 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-JGZOND2C.mjs  | editor-component | 546.24 kB | 
+
+Application bundle generation complete. [1.891 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.16 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-2YHJ7DKD.js   | editor-component | 273.24 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  20.69 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-5PIJG4DJ.mjs  | editor-component | 547.03 kB | 
+
+Application bundle generation complete. [2.146 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.16 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-VCHTPNWL.js   | editor-component | 273.31 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  20.69 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-QGK6ARBD.mjs  | editor-component | 547.11 kB | 
+
+Application bundle generation complete. [1.452 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.16 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-BWV4DOAO.js   | editor-component | 275.00 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  20.69 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-7LRDUMR5.mjs  | editor-component | 548.69 kB | 
+
+Application bundle generation complete. [1.080 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.16 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-ZM2CAG2J.js   | editor-component | 275.00 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  20.69 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-FVQSIRPV.mjs  | editor-component | 548.69 kB | 
+
+Application bundle generation complete. [1.426 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.16 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-AIMDYYCM.js   | editor-component | 275.10 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  20.69 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-TOF6KWKQ.mjs  | editor-component | 548.79 kB | 
+
+Application bundle generation complete. [1.477 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.16 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-CNGTGPTO.js   | editor-component | 275.48 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  20.69 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-B6QBL7QY.mjs  | editor-component | 549.17 kB | 
+
+Application bundle generation complete. [4.616 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.16 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-MXZCPJBO.js   | editor-component | 276.03 kB | 
+
+Application bundle generation complete. [1.141 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.16 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-QFUN4YPE.js   | editor-component | 276.19 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  20.69 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-VPYZH6BF.mjs  | editor-component | 549.86 kB | 
+
+Application bundle generation complete. [1.353 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.16 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-RLEOID6S.js   | editor-component | 276.36 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  20.69 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-3NQIO77H.mjs  | editor-component | 550.03 kB | 
+
+Application bundle generation complete. [1.501 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.16 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-3BGTC6JF.js   | editor-component | 276.41 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  20.69 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-PLF7S57B.mjs  | editor-component | 550.07 kB | 
+
+Application bundle generation complete. [1.253 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.16 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-NISPDCGF.js   | editor-component | 277.18 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  20.69 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-2QCA6WZT.mjs  | editor-component | 550.85 kB | 
+
+Application bundle generation complete. [1.297 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.16 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-WR5MMZO2.js   | editor-component | 277.17 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  20.69 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-DUPMHJZS.mjs  | editor-component | 550.84 kB | 
+
+Application bundle generation complete. [1.721 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.16 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-T4B2HGV5.js   | editor-component | 277.16 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  20.69 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-Z4MAGQFE.mjs  | editor-component | 550.83 kB | 
+
+Application bundle generation complete. [1.488 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.16 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-R4M6VTS2.js   | editor-component | 277.74 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  20.69 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-4V65GJPS.mjs  | editor-component | 551.37 kB | 
+
+Application bundle generation complete. [1.169 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.16 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-NFZ4LCUM.js   | editor-component | 277.90 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  20.69 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-GAAP3XU7.mjs  | editor-component | 551.52 kB | 
+
+Application bundle generation complete. [1.534 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.16 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-2BPIKAE6.js   | editor-component | 278.05 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  20.69 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-G3MAQWC6.mjs  | editor-component | 551.66 kB | 
+
+Application bundle generation complete. [1.366 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.16 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-BVLGTJSC.js   | editor-component | 278.48 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  20.69 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-TA5S6SZA.mjs  | editor-component | 552.09 kB | 
+
+Application bundle generation complete. [1.299 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.16 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-32LO4QDS.js   | editor-component | 278.55 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  20.69 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-O2JD5IZV.mjs  | editor-component | 552.16 kB | 
+
+Application bundle generation complete. [1.188 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.16 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-XLMFQWBQ.js   | editor-component | 278.55 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  20.69 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-XTOOXCTA.mjs  | editor-component | 552.16 kB | 
+
+Application bundle generation complete. [1.381 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.16 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-OYZXEMGQ.js   | editor-component | 278.64 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  20.69 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-25JKOHZO.mjs  | editor-component | 552.25 kB | 
+
+Application bundle generation complete. [1.370 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Application bundle generation failed. [1.601 seconds]
+
+X [ERROR] TS2339: Property 'lastZone' does not exist on type 'DockService'. [plugin angular-compiler]
+
+    src/app/editor/dock/dock.service.ts:168:9:
+      168 │     this.lastZone[id] = this.zoneOf(id) ?? this.lastZone[id] ?? t...
+          ╵          ~~~~~~~~
+
+
+X [ERROR] TS2339: Property 'lastZone' does not exist on type 'DockService'. [plugin angular-compiler]
+
+    src/app/editor/dock/dock.service.ts:168:48:
+      168 │ ...d] = this.zoneOf(id) ?? this.lastZone[id] ?? this.homeZoneOf(id);
+          ╵                                 ~~~~~~~~
+
+
+X [ERROR] TS2339: Property 'lastZone' does not exist on type 'DockService'. [plugin angular-compiler]
+
+    src/app/editor/dock/dock.service.ts:186:31:
+      186 │     this.dock(id, zone ?? this.lastZone[id] ?? this.homeZoneOf(id));
+          ╵                                ~~~~~~~~
+
+
+- Changes detected. Rebuilding...
+
+Browser bundles        
+Initial chunk files     | Names               |  Raw size
+polyfills.js            | polyfills           |  88.09 kB | 
+main.js                 | main                |  21.16 kB | 
+styles.css              | styles              |   4.81 kB | 
+chunk-NJ5HVBCL.js       | -                   |   3.17 kB | 
+chunk-4WXVOEFY.js       | -                   |   1.46 kB | 
+chunk-3OSS3HON.js       | -                   | 652 bytes | 
+
+                        | Initial total       | 119.32 kB
+
+Lazy chunk files        | Names               |  Raw size
+chunk-S2UT4AXQ.js       | editor-component    | 279.01 kB | 
+chunk-W5CCP3ZS.js       | landing-component   |  16.89 kB | 
+chunk-EWQNQPX5.js       | contact-component   |   9.10 kB | 
+chunk-CIVRPHXR.js       | pricing-component   |   8.03 kB | 
+chunk-GIECJVF4.js       | features-component  |   7.82 kB | 
+chunk-LTE4XX4C.js       | blog-post-component |   6.55 kB | 
+chunk-DOZPUEIV.js       | faq-component       |   5.99 kB | 
+chunk-XP5ZG5Q4.js       | blog-list-component |   5.46 kB | 
+chunk-5C2M5NFJ.js       | about-component     |   4.67 kB | 
+chunk-UVVVIIEP.js       | -                   |   3.47 kB | 
+chunk-C6JU3WVH.js       | not-found-component |   2.47 kB | 
+
+
+Server bundles         
+Initial chunk files     | Names               |  Raw size
+chunk-YTIWM5OS.mjs      | -                   |   1.08 MB | 
+chunk-BLJU2GUZ.mjs      | -                   | 663.58 kB | 
+polyfills.server.mjs    | polyfills.server    | 559.49 kB | 
+chunk-QNCJB766.mjs      | -                   | 194.65 kB | 
+main.server.mjs         | main.server         |  20.69 kB | 
+chunk-NW3LGY2X.mjs      | -                   |   3.11 kB | 
+chunk-VPSODEBW.mjs      | -                   |   2.51 kB | 
+chunk-C42IF335.mjs      | -                   | 687 bytes | 
+render-utils.server.mjs | render-utils.server | 462 bytes | 
+
+Lazy chunk files        | Names               |  Raw size
+chunk-LFJ4MCIY.mjs      | editor-component    | 552.62 kB | 
+chunk-L223UYD3.mjs      | -                   | 193.75 kB | 
+chunk-P3UOPGAK.mjs      | xhr2                |  39.09 kB | 
+chunk-JLNTAZUW.mjs      | landing-component   |  16.63 kB | 
+chunk-GIXLFTM4.mjs      | contact-component   |   9.22 kB | 
+chunk-BS4BESCR.mjs      | pricing-component   |   7.98 kB | 
+chunk-QJI6EFVZ.mjs      | features-component  |   7.78 kB | 
+chunk-3O6CK3XK.mjs      | blog-post-component |   6.65 kB | 
+chunk-2ZMA4HEH.mjs      | faq-component       |   6.01 kB | 
+chunk-E74JRKOZ.mjs      | blog-list-component |   5.52 kB | 
+chunk-PVTT2WAC.mjs      | about-component     |   4.67 kB | 
+chunk-ROHT27OW.mjs      | -                   |   3.50 kB | 
+chunk-3SRJZIUF.mjs      | not-found-component |   2.54 kB | 
+
+Application bundle generation complete. [1.742 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.16 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-HMGF6C6M.js   | editor-component | 279.03 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  20.69 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-5AZ4WQTS.mjs  | editor-component | 552.64 kB | 
+
+Application bundle generation complete. [3.365 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.16 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-AGCQH5QS.js   | editor-component | 280.61 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  20.69 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-TXUGA3TG.mjs  | editor-component | 554.23 kB | 
+
+Application bundle generation complete. [2.765 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Application bundle generation failed. [1.838 seconds]
+
+X [ERROR] NG1: Property 'rotateL' comes from an index signature, so it must be accessed with ['rotateL']. [plugin angular-compiler]
+
+    src/app/editor/editor.component.html:162:86:
+      162 │ ... left" [innerHTML]="uiIcons.rotateL" (click)="rotateSelection(...
+          ╵                                ~~~~~~~
+
+  Error occurs in the template of component EditorComponent.
+
+    src/app/editor/editor.component.ts:176:15:
+      176 │   templateUrl: './editor.component.html',
+          ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] NG1: Property 'rotateR' comes from an index signature, so it must be accessed with ['rotateR']. [plugin angular-compiler]
+
+    src/app/editor/editor.component.html:163:87:
+      163 │ ...right" [innerHTML]="uiIcons.rotateR" (click)="rotateSelection(...
+          ╵                                ~~~~~~~
+
+  Error occurs in the template of component EditorComponent.
+
+    src/app/editor/editor.component.ts:176:15:
+      176 │   templateUrl: './editor.component.html',
+          ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] NG1: Property 'flipH' comes from an index signature, so it must be accessed with ['flipH']. [plugin angular-compiler]
+
+    src/app/editor/editor.component.html:164:90:
+      164 │ ...zontal" [innerHTML]="uiIcons.flipH" (click)="flipSelection(tru...
+          ╵                                 ~~~~~
+
+  Error occurs in the template of component EditorComponent.
+
+    src/app/editor/editor.component.ts:176:15:
+      176 │   templateUrl: './editor.component.html',
+          ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] NG1: Property 'flipV' comes from an index signature, so it must be accessed with ['flipV']. [plugin angular-compiler]
+
+    src/app/editor/editor.component.html:165:88:
+      165 │ ...rtical" [innerHTML]="uiIcons.flipV" (click)="flipSelection(fal...
+          ╵                                 ~~~~~
+
+  Error occurs in the template of component EditorComponent.
+
+    src/app/editor/editor.component.ts:176:15:
+      176 │   templateUrl: './editor.component.html',
+          ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] NG1: Property 'arrowL' comes from an index signature, so it must be accessed with ['arrowL']. [plugin angular-compiler]
+
+    src/app/editor/editor.component.html:169:85:
+      169 │ ... left" [innerHTML]="uiIcons.arrowL" (click)="shift(-1, 0)"></b...
+          ╵                                ~~~~~~
+
+  Error occurs in the template of component EditorComponent.
+
+    src/app/editor/editor.component.ts:176:15:
+      176 │   templateUrl: './editor.component.html',
+          ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] NG1: Property 'arrowR' comes from an index signature, so it must be accessed with ['arrowR']. [plugin angular-compiler]
+
+    src/app/editor/editor.component.html:170:86:
+      170 │ ...right" [innerHTML]="uiIcons.arrowR" (click)="shift(1, 0)"></bu...
+          ╵                                ~~~~~~
+
+  Error occurs in the template of component EditorComponent.
+
+    src/app/editor/editor.component.ts:176:15:
+      176 │   templateUrl: './editor.component.html',
+          ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] NG1: Property 'arrowU' comes from an index signature, so it must be accessed with ['arrowU']. [plugin angular-compiler]
+
+    src/app/editor/editor.component.html:171:83:
+      171 │ ...ft up" [innerHTML]="uiIcons.arrowU" (click)="shift(0, -1)"></b...
+          ╵                                ~~~~~~
+
+  Error occurs in the template of component EditorComponent.
+
+    src/app/editor/editor.component.ts:176:15:
+      176 │   templateUrl: './editor.component.html',
+          ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] NG1: Property 'arrowD' comes from an index signature, so it must be accessed with ['arrowD']. [plugin angular-compiler]
+
+    src/app/editor/editor.component.html:172:85:
+      172 │ ... down" [innerHTML]="uiIcons.arrowD" (click)="shift(0, 1)"></bu...
+          ╵                                ~~~~~~
+
+  Error occurs in the template of component EditorComponent.
+
+    src/app/editor/editor.component.ts:176:15:
+      176 │   templateUrl: './editor.component.html',
+          ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] NG1: Property 'copy' comes from an index signature, so it must be accessed with ['copy']. [plugin angular-compiler]
+
+    src/app/editor/editor.component.html:177:33:
+      177 │       <span [innerHTML]="uiIcons.copy"></span> Copy
+          ╵                                  ~~~~
+
+  Error occurs in the template of component EditorComponent.
+
+    src/app/editor/editor.component.ts:176:15:
+      176 │   templateUrl: './editor.component.html',
+          ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] NG1: Property 'cut' comes from an index signature, so it must be accessed with ['cut']. [plugin angular-compiler]
+
+    src/app/editor/editor.component.html:180:33:
+      180 │       <span [innerHTML]="uiIcons.cut"></span> Cut
+          ╵                                  ~~~
+
+  Error occurs in the template of component EditorComponent.
+
+    src/app/editor/editor.component.ts:176:15:
+      176 │   templateUrl: './editor.component.html',
+          ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] NG1: Property 'paste' comes from an index signature, so it must be accessed with ['paste']. [plugin angular-compiler]
+
+    src/app/editor/editor.component.html:183:33:
+      183 │       <span [innerHTML]="uiIcons.paste"></span> Paste
+          ╵                                  ~~~~~
+
+  Error occurs in the template of component EditorComponent.
+
+    src/app/editor/editor.component.ts:176:15:
+      176 │   templateUrl: './editor.component.html',
+          ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+- Changes detected. Rebuilding...
+
+Application bundle generation failed. [1.723 seconds]
+
+X [ERROR] NG1: Property 'swap' comes from an index signature, so it must be accessed with ['swap']. [plugin angular-compiler]
+
+    src/app/editor/editor.component.html:32:33:
+      32 │       <span [innerHTML]="uiIcons.swap"></span> Swap
+         ╵                                  ~~~~
+
+  Error occurs in the template of component EditorComponent.
+
+    src/app/editor/editor.component.ts:176:15:
+      176 │   templateUrl: './editor.component.html',
+          ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] NG1: Property 'pick' comes from an index signature, so it must be accessed with ['pick']. [plugin angular-compiler]
+
+    src/app/editor/editor.component.html:36:35:
+      36 │         <span [innerHTML]="uiIcons.pick"></span> Pick P
+         ╵                                    ~~~~
+
+  Error occurs in the template of component EditorComponent.
+
+    src/app/editor/editor.component.ts:176:15:
+      176 │   templateUrl: './editor.component.html',
+          ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] NG1: Property 'pick' comes from an index signature, so it must be accessed with ['pick']. [plugin angular-compiler]
+
+    src/app/editor/editor.component.html:39:35:
+      39 │         <span [innerHTML]="uiIcons.pick"></span> Pick S
+         ╵                                    ~~~~
+
+  Error occurs in the template of component EditorComponent.
+
+    src/app/editor/editor.component.ts:176:15:
+      176 │   templateUrl: './editor.component.html',
+          ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] NG1: Property 'rotateL' comes from an index signature, so it must be accessed with ['rotateL']. [plugin angular-compiler]
+
+    src/app/editor/editor.component.html:170:86:
+      170 │ ... left" [innerHTML]="uiIcons.rotateL" (click)="rotateSelection(...
+          ╵                                ~~~~~~~
+
+  Error occurs in the template of component EditorComponent.
+
+    src/app/editor/editor.component.ts:176:15:
+      176 │   templateUrl: './editor.component.html',
+          ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] NG1: Property 'rotateR' comes from an index signature, so it must be accessed with ['rotateR']. [plugin angular-compiler]
+
+    src/app/editor/editor.component.html:171:87:
+      171 │ ...right" [innerHTML]="uiIcons.rotateR" (click)="rotateSelection(...
+          ╵                                ~~~~~~~
+
+  Error occurs in the template of component EditorComponent.
+
+    src/app/editor/editor.component.ts:176:15:
+      176 │   templateUrl: './editor.component.html',
+          ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] NG1: Property 'flipH' comes from an index signature, so it must be accessed with ['flipH']. [plugin angular-compiler]
+
+    src/app/editor/editor.component.html:172:90:
+      172 │ ...zontal" [innerHTML]="uiIcons.flipH" (click)="flipSelection(tru...
+          ╵                                 ~~~~~
+
+  Error occurs in the template of component EditorComponent.
+
+    src/app/editor/editor.component.ts:176:15:
+      176 │   templateUrl: './editor.component.html',
+          ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] NG1: Property 'flipV' comes from an index signature, so it must be accessed with ['flipV']. [plugin angular-compiler]
+
+    src/app/editor/editor.component.html:173:88:
+      173 │ ...rtical" [innerHTML]="uiIcons.flipV" (click)="flipSelection(fal...
+          ╵                                 ~~~~~
+
+  Error occurs in the template of component EditorComponent.
+
+    src/app/editor/editor.component.ts:176:15:
+      176 │   templateUrl: './editor.component.html',
+          ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] NG1: Property 'arrowL' comes from an index signature, so it must be accessed with ['arrowL']. [plugin angular-compiler]
+
+    src/app/editor/editor.component.html:177:85:
+      177 │ ... left" [innerHTML]="uiIcons.arrowL" (click)="shift(-1, 0)"></b...
+          ╵                                ~~~~~~
+
+  Error occurs in the template of component EditorComponent.
+
+    src/app/editor/editor.component.ts:176:15:
+      176 │   templateUrl: './editor.component.html',
+          ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] NG1: Property 'arrowR' comes from an index signature, so it must be accessed with ['arrowR']. [plugin angular-compiler]
+
+    src/app/editor/editor.component.html:178:86:
+      178 │ ...right" [innerHTML]="uiIcons.arrowR" (click)="shift(1, 0)"></bu...
+          ╵                                ~~~~~~
+
+  Error occurs in the template of component EditorComponent.
+
+    src/app/editor/editor.component.ts:176:15:
+      176 │   templateUrl: './editor.component.html',
+          ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] NG1: Property 'arrowU' comes from an index signature, so it must be accessed with ['arrowU']. [plugin angular-compiler]
+
+    src/app/editor/editor.component.html:179:83:
+      179 │ ...ft up" [innerHTML]="uiIcons.arrowU" (click)="shift(0, -1)"></b...
+          ╵                                ~~~~~~
+
+  Error occurs in the template of component EditorComponent.
+
+    src/app/editor/editor.component.ts:176:15:
+      176 │   templateUrl: './editor.component.html',
+          ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] NG1: Property 'arrowD' comes from an index signature, so it must be accessed with ['arrowD']. [plugin angular-compiler]
+
+    src/app/editor/editor.component.html:180:85:
+      180 │ ... down" [innerHTML]="uiIcons.arrowD" (click)="shift(0, 1)"></bu...
+          ╵                                ~~~~~~
+
+  Error occurs in the template of component EditorComponent.
+
+    src/app/editor/editor.component.ts:176:15:
+      176 │   templateUrl: './editor.component.html',
+          ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] NG1: Property 'copy' comes from an index signature, so it must be accessed with ['copy']. [plugin angular-compiler]
+
+    src/app/editor/editor.component.html:185:33:
+      185 │       <span [innerHTML]="uiIcons.copy"></span> Copy
+          ╵                                  ~~~~
+
+  Error occurs in the template of component EditorComponent.
+
+    src/app/editor/editor.component.ts:176:15:
+      176 │   templateUrl: './editor.component.html',
+          ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] NG1: Property 'cut' comes from an index signature, so it must be accessed with ['cut']. [plugin angular-compiler]
+
+    src/app/editor/editor.component.html:188:33:
+      188 │       <span [innerHTML]="uiIcons.cut"></span> Cut
+          ╵                                  ~~~
+
+  Error occurs in the template of component EditorComponent.
+
+    src/app/editor/editor.component.ts:176:15:
+      176 │   templateUrl: './editor.component.html',
+          ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] NG1: Property 'paste' comes from an index signature, so it must be accessed with ['paste']. [plugin angular-compiler]
+
+    src/app/editor/editor.component.html:191:33:
+      191 │       <span [innerHTML]="uiIcons.paste"></span> Paste
+          ╵                                  ~~~~~
+
+  Error occurs in the template of component EditorComponent.
+
+    src/app/editor/editor.component.ts:176:15:
+      176 │   templateUrl: './editor.component.html',
+          ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+- Changes detected. Rebuilding...
+
+Application bundle generation failed. [1.470 seconds]
+
+X [ERROR] NG1: Property 'swap' comes from an index signature, so it must be accessed with ['swap']. [plugin angular-compiler]
+
+    src/app/editor/editor.component.html:32:33:
+      32 │       <span [innerHTML]="uiIcons.swap"></span> Swap
+         ╵                                  ~~~~
+
+  Error occurs in the template of component EditorComponent.
+
+    src/app/editor/editor.component.ts:176:15:
+      176 │   templateUrl: './editor.component.html',
+          ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] NG1: Property 'pick' comes from an index signature, so it must be accessed with ['pick']. [plugin angular-compiler]
+
+    src/app/editor/editor.component.html:36:35:
+      36 │         <span [innerHTML]="uiIcons.pick"></span> Pick P
+         ╵                                    ~~~~
+
+  Error occurs in the template of component EditorComponent.
+
+    src/app/editor/editor.component.ts:176:15:
+      176 │   templateUrl: './editor.component.html',
+          ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] NG1: Property 'pick' comes from an index signature, so it must be accessed with ['pick']. [plugin angular-compiler]
+
+    src/app/editor/editor.component.html:39:35:
+      39 │         <span [innerHTML]="uiIcons.pick"></span> Pick S
+         ╵                                    ~~~~
+
+  Error occurs in the template of component EditorComponent.
+
+    src/app/editor/editor.component.ts:176:15:
+      176 │   templateUrl: './editor.component.html',
+          ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] NG1: Property 'rotateL' comes from an index signature, so it must be accessed with ['rotateL']. [plugin angular-compiler]
+
+    src/app/editor/editor.component.html:170:86:
+      170 │ ... left" [innerHTML]="uiIcons.rotateL" (click)="rotateSelection(...
+          ╵                                ~~~~~~~
+
+  Error occurs in the template of component EditorComponent.
+
+    src/app/editor/editor.component.ts:176:15:
+      176 │   templateUrl: './editor.component.html',
+          ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] NG1: Property 'rotateR' comes from an index signature, so it must be accessed with ['rotateR']. [plugin angular-compiler]
+
+    src/app/editor/editor.component.html:171:87:
+      171 │ ...right" [innerHTML]="uiIcons.rotateR" (click)="rotateSelection(...
+          ╵                                ~~~~~~~
+
+  Error occurs in the template of component EditorComponent.
+
+    src/app/editor/editor.component.ts:176:15:
+      176 │   templateUrl: './editor.component.html',
+          ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] NG1: Property 'flipH' comes from an index signature, so it must be accessed with ['flipH']. [plugin angular-compiler]
+
+    src/app/editor/editor.component.html:172:90:
+      172 │ ...zontal" [innerHTML]="uiIcons.flipH" (click)="flipSelection(tru...
+          ╵                                 ~~~~~
+
+  Error occurs in the template of component EditorComponent.
+
+    src/app/editor/editor.component.ts:176:15:
+      176 │   templateUrl: './editor.component.html',
+          ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] NG1: Property 'flipV' comes from an index signature, so it must be accessed with ['flipV']. [plugin angular-compiler]
+
+    src/app/editor/editor.component.html:173:88:
+      173 │ ...rtical" [innerHTML]="uiIcons.flipV" (click)="flipSelection(fal...
+          ╵                                 ~~~~~
+
+  Error occurs in the template of component EditorComponent.
+
+    src/app/editor/editor.component.ts:176:15:
+      176 │   templateUrl: './editor.component.html',
+          ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] NG1: Property 'arrowL' comes from an index signature, so it must be accessed with ['arrowL']. [plugin angular-compiler]
+
+    src/app/editor/editor.component.html:177:85:
+      177 │ ... left" [innerHTML]="uiIcons.arrowL" (click)="shift(-1, 0)"></b...
+          ╵                                ~~~~~~
+
+  Error occurs in the template of component EditorComponent.
+
+    src/app/editor/editor.component.ts:176:15:
+      176 │   templateUrl: './editor.component.html',
+          ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] NG1: Property 'arrowR' comes from an index signature, so it must be accessed with ['arrowR']. [plugin angular-compiler]
+
+    src/app/editor/editor.component.html:178:86:
+      178 │ ...right" [innerHTML]="uiIcons.arrowR" (click)="shift(1, 0)"></bu...
+          ╵                                ~~~~~~
+
+  Error occurs in the template of component EditorComponent.
+
+    src/app/editor/editor.component.ts:176:15:
+      176 │   templateUrl: './editor.component.html',
+          ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] NG1: Property 'arrowU' comes from an index signature, so it must be accessed with ['arrowU']. [plugin angular-compiler]
+
+    src/app/editor/editor.component.html:179:83:
+      179 │ ...ft up" [innerHTML]="uiIcons.arrowU" (click)="shift(0, -1)"></b...
+          ╵                                ~~~~~~
+
+  Error occurs in the template of component EditorComponent.
+
+    src/app/editor/editor.component.ts:176:15:
+      176 │   templateUrl: './editor.component.html',
+          ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] NG1: Property 'arrowD' comes from an index signature, so it must be accessed with ['arrowD']. [plugin angular-compiler]
+
+    src/app/editor/editor.component.html:180:85:
+      180 │ ... down" [innerHTML]="uiIcons.arrowD" (click)="shift(0, 1)"></bu...
+          ╵                                ~~~~~~
+
+  Error occurs in the template of component EditorComponent.
+
+    src/app/editor/editor.component.ts:176:15:
+      176 │   templateUrl: './editor.component.html',
+          ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] NG1: Property 'copy' comes from an index signature, so it must be accessed with ['copy']. [plugin angular-compiler]
+
+    src/app/editor/editor.component.html:185:33:
+      185 │       <span [innerHTML]="uiIcons.copy"></span> Copy
+          ╵                                  ~~~~
+
+  Error occurs in the template of component EditorComponent.
+
+    src/app/editor/editor.component.ts:176:15:
+      176 │   templateUrl: './editor.component.html',
+          ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] NG1: Property 'cut' comes from an index signature, so it must be accessed with ['cut']. [plugin angular-compiler]
+
+    src/app/editor/editor.component.html:188:33:
+      188 │       <span [innerHTML]="uiIcons.cut"></span> Cut
+          ╵                                  ~~~
+
+  Error occurs in the template of component EditorComponent.
+
+    src/app/editor/editor.component.ts:176:15:
+      176 │   templateUrl: './editor.component.html',
+          ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] NG1: Property 'paste' comes from an index signature, so it must be accessed with ['paste']. [plugin angular-compiler]
+
+    src/app/editor/editor.component.html:191:33:
+      191 │       <span [innerHTML]="uiIcons.paste"></span> Paste
+          ╵                                  ~~~~~
+
+  Error occurs in the template of component EditorComponent.
+
+    src/app/editor/editor.component.ts:176:15:
+      176 │   templateUrl: './editor.component.html',
+          ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+- Changes detected. Rebuilding...
+
+Browser bundles        
+Initial chunk files     | Names               |  Raw size
+polyfills.js            | polyfills           |  88.09 kB | 
+main.js                 | main                |  21.16 kB | 
+styles.css              | styles              |   4.81 kB | 
+chunk-NJ5HVBCL.js       | -                   |   3.17 kB | 
+chunk-4WXVOEFY.js       | -                   |   1.46 kB | 
+chunk-3OSS3HON.js       | -                   | 652 bytes | 
+
+                        | Initial total       | 119.32 kB
+
+Lazy chunk files        | Names               |  Raw size
+chunk-G54SDMZQ.js       | editor-component    | 284.93 kB | 
+chunk-W5CCP3ZS.js       | landing-component   |  16.89 kB | 
+chunk-EWQNQPX5.js       | contact-component   |   9.10 kB | 
+chunk-CIVRPHXR.js       | pricing-component   |   8.03 kB | 
+chunk-GIECJVF4.js       | features-component  |   7.82 kB | 
+chunk-LTE4XX4C.js       | blog-post-component |   6.55 kB | 
+chunk-DOZPUEIV.js       | faq-component       |   5.99 kB | 
+chunk-XP5ZG5Q4.js       | blog-list-component |   5.46 kB | 
+chunk-5C2M5NFJ.js       | about-component     |   4.67 kB | 
+chunk-UVVVIIEP.js       | -                   |   3.47 kB | 
+chunk-C6JU3WVH.js       | not-found-component |   2.47 kB | 
+
+
+Server bundles         
+Initial chunk files     | Names               |  Raw size
+chunk-YTIWM5OS.mjs      | -                   |   1.08 MB | 
+chunk-BLJU2GUZ.mjs      | -                   | 663.58 kB | 
+polyfills.server.mjs    | polyfills.server    | 559.49 kB | 
+chunk-QNCJB766.mjs      | -                   | 194.65 kB | 
+main.server.mjs         | main.server         |  20.69 kB | 
+chunk-NW3LGY2X.mjs      | -                   |   3.11 kB | 
+chunk-VPSODEBW.mjs      | -                   |   2.51 kB | 
+chunk-C42IF335.mjs      | -                   | 687 bytes | 
+render-utils.server.mjs | render-utils.server | 462 bytes | 
+
+Lazy chunk files        | Names               |  Raw size
+chunk-UPEL4ACE.mjs      | editor-component    | 558.35 kB | 
+chunk-L223UYD3.mjs      | -                   | 193.75 kB | 
+chunk-P3UOPGAK.mjs      | xhr2                |  39.09 kB | 
+chunk-JLNTAZUW.mjs      | landing-component   |  16.63 kB | 
+chunk-GIXLFTM4.mjs      | contact-component   |   9.22 kB | 
+chunk-BS4BESCR.mjs      | pricing-component   |   7.98 kB | 
+chunk-QJI6EFVZ.mjs      | features-component  |   7.78 kB | 
+chunk-3O6CK3XK.mjs      | blog-post-component |   6.65 kB | 
+chunk-2ZMA4HEH.mjs      | faq-component       |   6.01 kB | 
+chunk-E74JRKOZ.mjs      | blog-list-component |   5.52 kB | 
+chunk-PVTT2WAC.mjs      | about-component     |   4.67 kB | 
+chunk-ROHT27OW.mjs      | -                   |   3.50 kB | 
+chunk-3SRJZIUF.mjs      | not-found-component |   2.54 kB | 
+
+Application bundle generation complete. [2.162 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.16 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-Q6JFMOKS.js   | editor-component | 284.93 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  20.69 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-JNNJCEO4.mjs  | editor-component | 558.35 kB | 
+
+Application bundle generation complete. [1.431 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.16 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-LVXBE7OK.js   | editor-component | 285.11 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  20.69 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-VA2G2ZIV.mjs  | editor-component | 558.52 kB | 
+
+Application bundle generation complete. [1.329 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.16 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-6XKQ6SNV.js   | editor-component | 286.00 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  20.69 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-EZRCPZQY.mjs  | editor-component | 559.42 kB | 
+
+Application bundle generation complete. [1.297 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.16 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-BGJWYB6C.js   | editor-component | 286.07 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  20.69 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-I3FPDTWN.mjs  | editor-component | 559.48 kB | 
+
+Application bundle generation complete. [1.123 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Application bundle generation failed. [2.152 seconds]
+
+X [ERROR] TS2353: Object literal may only specify known properties, and 'transform' does not exist in type 'Record<PanelId, string>'. [plugin angular-compiler]
+
+    src/app/editor/dock/dock.types.ts:50:2:
+      50 │   transform: 'Transform',
+         ╵   ~~~~~~~~~
+
+
+X [ERROR] TS2322: Type '"transform"' is not assignable to type 'PanelId'. [plugin angular-compiler]
+
+    src/app/editor/dock/dock.types.ts:58:35:
+      58 │       right: ['display', 'canvas', 'transform'],
+         ╵                                    ~~~~~~~~~~~
+
+
+X [ERROR] NG2: Type '"transform"' is not assignable to type 'PanelId'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.html:167:13:
+      167 │ <ng-template dockPanelDef="transform">
+          ╵              ~~~~~~~~~~~~
+
+  Error occurs in the template of component EditorComponent.
+
+    src/app/editor/editor.component.ts:176:15:
+      176 │   templateUrl: './editor.component.html',
+          ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+- Changes detected. Rebuilding...
+
+Application bundle generation failed. [0.678 seconds]
+
+X [ERROR] TS2322: Type '"transform"' is not assignable to type 'PanelId'. [plugin angular-compiler]
+
+    src/app/editor/dock/dock.types.ts:57:35:
+      57 │       right: ['display', 'canvas', 'transform'],
+         ╵                                    ~~~~~~~~~~~
+
+
+X [ERROR] NG2: Type '"transform"' is not assignable to type 'PanelId'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.html:167:13:
+      167 │ <ng-template dockPanelDef="transform">
+          ╵              ~~~~~~~~~~~~
+
+  Error occurs in the template of component EditorComponent.
+
+    src/app/editor/editor.component.ts:176:15:
+      176 │   templateUrl: './editor.component.html',
+          ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+- Changes detected. Rebuilding...
+
+Application bundle generation failed. [1.517 seconds]
+
+X [ERROR] NG2: Type '"transform"' is not assignable to type 'PanelId'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.html:167:13:
+      167 │ <ng-template dockPanelDef="transform">
+          ╵              ~~~~~~~~~~~~
+
+  Error occurs in the template of component EditorComponent.
+
+    src/app/editor/editor.component.ts:176:15:
+      176 │   templateUrl: './editor.component.html',
+          ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+- Changes detected. Rebuilding...
+
+Browser bundles        
+Initial chunk files     | Names               |  Raw size
+polyfills.js            | polyfills           |  88.09 kB | 
+main.js                 | main                |  21.16 kB | 
+styles.css              | styles              |   4.81 kB | 
+chunk-NJ5HVBCL.js       | -                   |   3.17 kB | 
+chunk-4WXVOEFY.js       | -                   |   1.46 kB | 
+chunk-3OSS3HON.js       | -                   | 652 bytes | 
+
+                        | Initial total       | 119.32 kB
+
+Lazy chunk files        | Names               |  Raw size
+chunk-YBXKNWN7.js       | editor-component    | 278.59 kB | 
+chunk-W5CCP3ZS.js       | landing-component   |  16.89 kB | 
+chunk-EWQNQPX5.js       | contact-component   |   9.10 kB | 
+chunk-CIVRPHXR.js       | pricing-component   |   8.03 kB | 
+chunk-GIECJVF4.js       | features-component  |   7.82 kB | 
+chunk-LTE4XX4C.js       | blog-post-component |   6.55 kB | 
+chunk-DOZPUEIV.js       | faq-component       |   5.99 kB | 
+chunk-XP5ZG5Q4.js       | blog-list-component |   5.46 kB | 
+chunk-5C2M5NFJ.js       | about-component     |   4.67 kB | 
+chunk-UVVVIIEP.js       | -                   |   3.47 kB | 
+chunk-C6JU3WVH.js       | not-found-component |   2.47 kB | 
+
+
+Server bundles         
+Initial chunk files     | Names               |  Raw size
+chunk-YTIWM5OS.mjs      | -                   |   1.08 MB | 
+chunk-BLJU2GUZ.mjs      | -                   | 663.58 kB | 
+polyfills.server.mjs    | polyfills.server    | 559.49 kB | 
+chunk-QNCJB766.mjs      | -                   | 194.65 kB | 
+main.server.mjs         | main.server         |  20.69 kB | 
+chunk-NW3LGY2X.mjs      | -                   |   3.11 kB | 
+chunk-VPSODEBW.mjs      | -                   |   2.51 kB | 
+chunk-C42IF335.mjs      | -                   | 687 bytes | 
+render-utils.server.mjs | render-utils.server | 462 bytes | 
+
+Lazy chunk files        | Names               |  Raw size
+chunk-SUYOKCIO.mjs      | editor-component    | 552.46 kB | 
+chunk-L223UYD3.mjs      | -                   | 193.75 kB | 
+chunk-P3UOPGAK.mjs      | xhr2                |  39.09 kB | 
+chunk-JLNTAZUW.mjs      | landing-component   |  16.63 kB | 
+chunk-GIXLFTM4.mjs      | contact-component   |   9.22 kB | 
+chunk-BS4BESCR.mjs      | pricing-component   |   7.98 kB | 
+chunk-QJI6EFVZ.mjs      | features-component  |   7.78 kB | 
+chunk-3O6CK3XK.mjs      | blog-post-component |   6.65 kB | 
+chunk-2ZMA4HEH.mjs      | faq-component       |   6.01 kB | 
+chunk-E74JRKOZ.mjs      | blog-list-component |   5.52 kB | 
+chunk-PVTT2WAC.mjs      | about-component     |   4.67 kB | 
+chunk-ROHT27OW.mjs      | -                   |   3.50 kB | 
+chunk-3SRJZIUF.mjs      | not-found-component |   2.54 kB | 
+
+Application bundle generation complete. [1.064 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.16 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-TTKXKCEU.js   | editor-component | 284.50 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  20.69 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-Z4YVJJMV.mjs  | editor-component | 558.02 kB | 
+
+Application bundle generation complete. [1.378 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.16 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-ZTUWNG4A.js   | editor-component | 284.64 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  20.69 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-YVAAT5W6.mjs  | editor-component | 558.17 kB | 
+
+Application bundle generation complete. [1.432 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.16 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-TRNJXYHU.js   | editor-component | 283.49 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  20.69 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-VALZ3BYA.mjs  | editor-component | 557.02 kB | 
+
+Application bundle generation complete. [1.120 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.16 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-RJLDX2YQ.js   | editor-component | 283.27 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  20.69 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-U36IPU36.mjs  | editor-component | 556.80 kB | 
+
+Application bundle generation complete. [1.015 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.16 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-CMQ4WCCQ.js   | editor-component | 283.32 kB | 
+
+Application bundle generation complete. [1.731 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.16 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-RYFN5U6F.js   | editor-component | 283.05 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  20.69 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-IG276QJG.mjs  | editor-component | 556.60 kB | 
+
+Application bundle generation complete. [1.366 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.16 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-ZFXNBVSF.js   | editor-component | 283.06 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  20.69 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-2WGBSCEM.mjs  | editor-component | 556.62 kB | 
+
+Application bundle generation complete. [1.523 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.16 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-YC5KVZOZ.js   | editor-component | 282.85 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  20.69 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-ICGY5LC6.mjs  | editor-component | 556.41 kB | 
+
+Application bundle generation complete. [1.125 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.16 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-VFWZHU7F.js   | editor-component | 282.80 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  20.69 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-34ISD2SN.mjs  | editor-component | 556.36 kB | 
+
+Application bundle generation complete. [1.137 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.16 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-IWZWNGY6.js   | editor-component | 282.90 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  20.69 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-5LUK6N7Z.mjs  | editor-component | 556.46 kB | 
+
+Application bundle generation complete. [1.280 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.16 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-VTS74WTV.js   | editor-component | 283.05 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  20.69 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-HGEPBQBC.mjs  | editor-component | 556.61 kB | 
+
+Application bundle generation complete. [1.167 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.16 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-74KF4ULQ.js   | editor-component | 283.09 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  20.69 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-FPTKPQUD.mjs  | editor-component | 556.64 kB | 
+
+Application bundle generation complete. [1.190 seconds]
+
+Page reload sent to client(s).

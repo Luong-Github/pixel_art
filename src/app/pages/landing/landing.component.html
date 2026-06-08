@@ -1,30 +1,46 @@
-<section class="hero">
+<section class="hero pixel-grid">
+  <div class="hero-glow" aria-hidden="true"></div>
   <div class="container hero-grid">
     <div class="hero-copy">
-      <span class="eyebrow">Browser-based pixel art editor</span>
-      <h1 class="h-xl">Draw, animate &amp; export<br />pixel art in your browser</h1>
+      <span class="badge">✦ Free · Browser-based · No sign-up</span>
+      <h1 class="h-xl">
+        Draw, animate &amp; export<br />
+        <span class="gradient-text">pixel art</span> in your browser
+      </h1>
       <p class="lead">
-        Pixel Art Studio is a free, focused workspace for sprites and animations — full
-        drawing tools, frame-by-frame timeline, layers, image conversion and one-click export.
-        No install, no sign-up.
+        Pixel Art Studio is a focused workspace for sprites and animations — full drawing
+        tools, a frame-by-frame timeline, layers, image conversion and one-click export.
+        Nothing to install.
       </p>
       <div class="hero-cta">
         <a routerLink="/editor" class="btn btn-primary btn-lg">Launch the app →</a>
-        <a routerLink="/features" class="btn btn-ghost btn-lg">See features</a>
+        <a routerLink="/features" class="btn btn-ghost btn-lg">Explore features</a>
       </div>
       <ul class="hero-points">
         <li>Free forever</li>
-        <li>Runs offline</li>
-        <li>Exports PNG &amp; project files</li>
+        <li>Works offline</li>
+        <li>PNG &amp; project export</li>
       </ul>
     </div>
 
     <div class="hero-art" aria-hidden="true">
       <div class="window">
-        <div class="bar"><span></span><span></span><span></span></div>
+        <div class="bar">
+          <span></span><span></span><span></span>
+          <em>idle.pixelart</em>
+        </div>
         <img src="/assets/idle-preset.webp" alt="" loading="eager" />
       </div>
+      <div class="float-chip chip-a">9 tools</div>
+      <div class="float-chip chip-b">onion skin</div>
     </div>
+  </div>
+
+  <div class="hero-stats container">
+    <div><strong>9</strong><span>drawing tools</span></div>
+    <div><strong>∞</strong><span>frames &amp; layers</span></div>
+    <div><strong>0</strong><span>install steps</span></div>
+    <div><strong>3</strong><span>export formats</span></div>
   </div>
 </section>
 
@@ -33,9 +49,10 @@
     <div class="sec-head">
       <span class="eyebrow">Everything you need</span>
       <h2 class="h-lg">A complete pixel art toolkit</h2>
+      <p class="lead">From first pixel to finished animation — without leaving the tab.</p>
     </div>
     <div class="grid grid-3">
-      <article class="card feat" *ngFor="let f of highlights">
+      <article class="card card-hover feat" *ngFor="let f of highlights">
         <div class="ico" aria-hidden="true">{{ f.icon }}</div>
         <h3>{{ f.title }}</h3>
         <p>{{ f.text }}</p>
@@ -44,13 +61,13 @@
   </div>
 </section>
 
-<section class="section steps-sec">
+<section class="section steps-sec pixel-grid">
   <div class="container">
     <div class="sec-head">
       <span class="eyebrow">How it works</span>
       <h2 class="h-lg">From blank canvas to export in three steps</h2>
     </div>
-    <div class="grid grid-3">
+    <div class="grid grid-3 steps">
       <div class="step" *ngFor="let s of steps">
         <span class="n">{{ s.n }}</span>
         <h3>{{ s.title }}</h3>
@@ -61,9 +78,12 @@
 </section>
 
 <section class="section">
-  <div class="container cta-band">
-    <h2 class="h-lg">Ready to make some pixels?</h2>
-    <p class="lead">Open the studio and start drawing in seconds.</p>
-    <a routerLink="/editor" class="btn btn-primary btn-lg">Launch Pixel Art Studio →</a>
+  <div class="container">
+    <div class="cta-band">
+      <div class="cta-glow" aria-hidden="true"></div>
+      <h2 class="h-lg">Ready to make some pixels?</h2>
+      <p class="lead">Open the studio and start drawing in seconds.</p>
+      <a routerLink="/editor" class="btn btn-primary btn-lg">Launch Pixel Art Studio →</a>
+    </div>
   </div>
 </section>

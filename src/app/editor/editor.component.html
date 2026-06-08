@@ -10,9 +10,9 @@
       class="tool-button"
       [class.active]="activeTool === tool.id"
       [title]="tool.label + ' (' + tool.key + ')'"
+      [attr.aria-label]="tool.label + ' (' + tool.key + ')'"
       (click)="setTool(tool.id)">
-      <span>{{ tool.label }}</span>
-      <kbd>{{ tool.key }}</kbd>
+      <span class="ti" [innerHTML]="toolIcons[tool.id]"></span>
     </button>
   </div>
 </ng-template>
@@ -27,10 +27,45 @@
       <span>Secondary</span>
       <input type="color" [(ngModel)]="secondaryColor" />
     </label>
-    <button type="button" class="icon-action" title="Swap colors" (click)="swapColors()">Swap Colors</button>
-    <button type="button" class="icon-action" title="Pick primary color from screen" (click)="pickFromScreen(false)">Pick Primary</button>
-    <button type="button" class="icon-action" title="Pick secondary color from screen" (click)="pickFromScreen(true)">Pick Secondary</button>
+    <button type="button" class="icon-action labeled" title="Swap primary / secondary" (click)="swapColors()">
+      <span [innerHTML]="uiIcons.swap"></span> Swap
+    </button>
+    <div class="pick-row">
+      <button type="button" class="action-btn labeled" title="Pick primary color from screen" (click)="pickFromScreen(false)">
+        <span [innerHTML]="uiIcons.pick"></span> Pick P
+      </button>
+      <button type="button" class="action-btn labeled" title="Pick secondary color from screen" (click)="pickFromScreen(true)">
+        <span [innerHTML]="uiIcons.pick"></span> Pick S
+      </button>
+    </div>
   </div>
+
+  <div class="palette-controls">
+    <label class="pal-select">
+      <span>Palette</span>
+      <select (change)="onPaletteSelect($event)">
+        <option value="">— load a palette —</option>
+        <optgroup label="Built-in">
+          <option *ngFor="let p of builtinPalettes" [value]="'b:' + p.id">{{ p.name }} · {{ p.colors.length }}</option>
+        </optgroup>
+        <optgroup label="Saved" *ngIf="savedPalettes.length">
+          <option *ngFor="let p of savedPalettes" [value]="'s:' + p.id">{{ p.name }} · {{ p.colors.length }}</option>
+        </optgroup>
+      </select>
+    </label>
+    <div class="pal-actions">
+      <button type="button" (click)="saveCurrentPalette()">Save</button>
+      <button
+        type="button"
+        class="pal-lock"
+        [class.on]="paletteLock"
+        title="Restrict drawing to palette colours"
+        (click)="togglePaletteLock()">
+        {{ paletteLock ? '🔒 Locked' : '🔓 Lock' }}
+      </button>
+    </div>
+  </div>
+
   <div class="palette">
     <button
       *ngFor="let color of palette"
@@ -42,6 +77,17 @@
       (click)="primaryColor = color"
       (contextmenu)="setSecondaryFromPalette($event, color)">
     </button>
+  </div>
+
+  <div class="dither-controls">
+    <span class="dither-label">Dither brush</span>
+    <div class="seg">
+      <button type="button" [class.on]="ditherMode === 'off'" (click)="setDither('off')">Off</button>
+      <button type="button" [class.on]="ditherMode === '25'" (click)="setDither('25')">25%</button>
+      <button type="button" [class.on]="ditherMode === '50'" (click)="setDither('50')">50%</button>
+      <button type="button" [class.on]="ditherMode === '75'" (click)="setDither('75')">75%</button>
+    </div>
+    <p class="dither-hint">Uses primary + secondary colours.</p>
   </div>
 </ng-template>
 
@@ -62,45 +108,6 @@
   </label>
 </ng-template>
 
-<ng-template dockPanelDef="convert">
-  <div class="panel-actions">
-    <button type="button" (click)="triggerImport()">Import</button>
-  </div>
-  <div class="preset-row">
-    <button type="button" [class.active]="importLongSide === 64" (click)="setImportPreset(64)">64</button>
-    <button type="button" [class.active]="importLongSide === 96" (click)="setImportPreset(96)">96</button>
-    <button type="button" [class.active]="importLongSide === 128" (click)="setImportPreset(128)">128</button>
-  </div>
-  <div class="field-grid">
-    <label>
-      <span>Long side</span>
-      <input type="number" min="16" max="128" [(ngModel)]="importLongSide" />
-    </label>
-    <label>
-      <span>Palette</span>
-      <input type="number" min="4" max="64" [(ngModel)]="importPaletteSize" />
-    </label>
-    <label>
-      <span>Fit</span>
-      <select [(ngModel)]="importFit">
-        <option value="contain">Contain</option>
-        <option value="cover">Cover</option>
-        <option value="stretch">Stretch</option>
-      </select>
-    </label>
-    <label>
-      <span>Contrast</span>
-      <input type="range" min="0.8" max="1.4" step="0.02" [(ngModel)]="importContrast" />
-    </label>
-    <label>
-      <span>Sharpen</span>
-      <input type="range" min="0" max="1" step="0.05" [(ngModel)]="importSharpen" />
-    </label>
-    <label class="check"><input type="checkbox" [(ngModel)]="importResizeCanvas" /> Resize canvas</label>
-    <label class="check"><input type="checkbox" [(ngModel)]="importDither" /> Dither</label>
-  </div>
-</ng-template>
-
 <ng-template dockPanelDef="canvas">
   <div class="field-grid">
     <label>
@@ -112,8 +119,8 @@
       <input type="number" min="8" max="128" [(ngModel)]="height" />
     </label>
     <label>
-      <span>Zoom</span>
-      <input type="range" min="6" max="32" [(ngModel)]="zoom" (input)="render()" />
+      <span>Zoom · {{ zoom }}x</span>
+      <input type="range" [min]="minZoom" [max]="maxZoom" [(ngModel)]="zoom" (input)="render()" />
     </label>
     <label>
       <span>Brush</span>
@@ -121,117 +128,180 @@
     </label>
   </div>
   <div class="control-group stretch">
+    <button type="button" (click)="fitToScreen()">Fit</button>
     <button type="button" (click)="newSprite()">New</button>
     <label class="check"><input type="checkbox" [(ngModel)]="showGrid" (change)="render()" /> Grid</label>
     <label class="check"><input type="checkbox" [(ngModel)]="onionSkin" (change)="render()" /> Onion</label>
     <label class="check"><input type="checkbox" [(ngModel)]="mirrorX" (change)="render()" /> Mirror X</label>
   </div>
-</ng-template>
-
-<ng-template dockPanelDef="transform">
-  <div class="button-grid">
-    <button type="button" (click)="rotateSelection(false)">Rotate L</button>
-    <button type="button" (click)="rotateSelection(true)">Rotate R</button>
-    <button type="button" (click)="flipSelection(true)">Flip H</button>
-    <button type="button" (click)="flipSelection(false)">Flip V</button>
-    <button type="button" (click)="shift(-1, 0)">Shift L</button>
-    <button type="button" (click)="shift(1, 0)">Shift R</button>
-    <button type="button" (click)="shift(0, -1)">Shift U</button>
-    <button type="button" (click)="shift(0, 1)">Shift D</button>
+  <div class="onion-controls" *ngIf="onionSkin">
+    <label class="check"><input type="checkbox" [(ngModel)]="onionTint" (change)="render()" /> Tint prev/next</label>
+    <label>
+      <span>Prev opacity</span>
+      <input type="range" min="0" max="1" step="0.05" [(ngModel)]="onionPrevOpacity" (input)="render()" />
+    </label>
+    <label>
+      <span>Next opacity</span>
+      <input type="range" min="0" max="1" step="0.05" [(ngModel)]="onionNextOpacity" (input)="render()" />
+    </label>
   </div>
-  <div class="control-group stretch">
-    <button type="button" (click)="copySelection()">Copy</button>
-    <button type="button" (click)="cutSelection()">Cut</button>
-    <button type="button" (click)="pasteSelection()">Paste</button>
+
+  <div class="export-props">
+    <span class="props-title">Export / Anchor</span>
+    <label class="prop-row">
+      <span>Sheet columns</span>
+      <input type="number" min="0" max="32" [(ngModel)]="sheetColumns" title="0 = auto (square grid)" />
+    </label>
+    <div class="prop-row">
+      <span>Pivot</span>
+      <div class="seg">
+        <button type="button" [class.on]="pivotPreset === 'center'" (click)="setPivot('center')">Center</button>
+        <button type="button" [class.on]="pivotPreset === 'feet'" (click)="setPivot('feet')">Feet</button>
+        <button type="button" [class.on]="pivotPreset === 'topleft'" (click)="setPivot('topleft')">Top-L</button>
+      </div>
+    </div>
   </div>
 </ng-template>
 
 <ng-template dockPanelDef="timeline">
-  <div class="panel-actions timeline-actions">
-    <button type="button" (click)="addLayer()">Add Layer</button>
-    <button type="button" (click)="addFrame()">Add Frame</button>
-    <button type="button" (click)="toggleLayersMinimized()">{{ layersMinimized ? 'Show Layers' : 'Hide Layers' }}</button>
-    <button type="button" (click)="toggleFramesMinimized()">{{ framesMinimized ? 'Show Frames' : 'Hide Frames' }}</button>
+  <div class="timeline-toolbar playback-bar">
+    <button type="button" class="tb-icon" title="Previous frame" (click)="stepFrame(-1)">⏮</button>
+    <button type="button" class="tb-icon play" [title]="isPlaying ? 'Pause' : 'Play'" (click)="togglePlayback()">{{ isPlaying ? '⏸' : '▶' }}</button>
+    <button type="button" class="tb-icon" title="Next frame" (click)="stepFrame(1)">⏭</button>
+    <button type="button" class="tb-toggle" [class.on]="loop" title="Loop playback" (click)="toggleLoop()">⟳ Loop</button>
+    <label class="tb-num"><span>FPS</span><input type="number" min="1" max="60" [(ngModel)]="fps" (change)="applyFps()" /></label>
+    <label class="tb-num"><span>ms</span><input type="number" min="20" step="10" [(ngModel)]="activeFrame.duration" (change)="render()" /></label>
+    <span class="tb-frameinfo">Frame {{ activeFrameIndex + 1 }} / {{ frames.length }}</span>
   </div>
-  <div class="timeline-toolbar">
-    <button type="button" (click)="togglePlayback()">{{ isPlaying ? 'Stop' : 'Play' }}</button>
-    <button type="button" (click)="duplicateFrame()">Duplicate Frame</button>
-    <button type="button" (click)="deleteFrame()">Delete Frame</button>
-    <button type="button" (click)="duplicateLayer()">Duplicate Layer</button>
-    <button type="button" (click)="deleteLayer()">Delete Layer</button>
-    <label class="timeline-duration">
-      <span>Duration</span>
-      <input type="number" min="40" step="20" [(ngModel)]="activeFrame.duration" />
-    </label>
+  <div class="timeline-toolbar ops-bar">
+    <span class="tb-group">
+      <span class="tb-group-label">Frame</span>
+      <button type="button" class="tb-add" (click)="addFrame()">＋ Add</button>
+      <button type="button" class="tb-icon" title="Duplicate frame" (click)="duplicateFrame()">⧉</button>
+      <button type="button" class="tb-icon" title="Insert blank before" (click)="insertFrame(false)">⇤</button>
+      <button type="button" class="tb-icon" title="Insert blank after" (click)="insertFrame(true)">⇥</button>
+      <button type="button" class="tb-icon" title="Reverse frame order" (click)="reverseFrames()">⇄</button>
+      <button type="button" class="tb-icon danger-action" title="Delete frame" (click)="deleteFrame()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/><path d="M6 7l1 13a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-13"/></svg>
+      </button>
+    </span>
+    <span class="tb-group">
+      <span class="tb-group-label">Layer</span>
+      <button type="button" class="tb-add" (click)="addLayer()">＋ Add</button>
+      <button type="button" class="tb-icon" title="Duplicate layer" (click)="duplicateLayer()">⧉</button>
+      <button type="button" class="tb-icon" title="Move layer up" (click)="moveLayer(-1)">▲</button>
+      <button type="button" class="tb-icon" title="Move layer down" (click)="moveLayer(1)">▼</button>
+      <button type="button" class="tb-icon danger-action" title="Delete layer" (click)="deleteLayer()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/><path d="M6 7l1 13a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-13"/></svg>
+      </button>
+      <label class="tb-num" title="Active layer opacity">
+        <span>Opacity</span>
+        <input
+          type="range"
+          min="0"
+          max="1"
+          step="0.05"
+          [value]="layerOpacityAt(activeLayerIndex)"
+          (input)="setLayerOpacity(activeLayerIndex, $event)" />
+      </label>
+    </span>
+    <span class="tb-group">
+      <span class="tb-group-label">View</span>
+      <button type="button" class="tb-toggle" [class.on]="!layersMinimized" (click)="toggleLayersMinimized()">Layers</button>
+      <button type="button" class="tb-toggle" [class.on]="!framesMinimized" (click)="toggleFramesMinimized()">Frames</button>
+    </span>
   </div>
   <div class="timeline-combined-body">
     <section *ngIf="!framesMinimized" class="timeline-grid">
-      <div class="timeline-corner">Layers / Frames</div>
-      <div class="timeline-frame-header-row">
+      <div class="timeline-headrow">
+        <div class="timeline-corner">Layers / Frames</div>
         <div
-          *ngFor="let frame of frames; let i = index"
-          role="button"
-          tabindex="0"
-          class="frame-tile frame-header-tile"
-          [class.active]="activePreviewFrameIndex === i"
-          [class.selected]="activeFrameIndex === i"
-          [class.off]="!isFrameVisible(i)"
-          (click)="selectFrame(i)"
-          (keydown.enter)="selectFrame(i)">
-          <span class="frame-tile-index">{{ i + 1 }}</span>
-          <span class="frame-tile-preview" [style.background-image]="'url(' + frameThumbnail(i) + ')'"></span>
-          <span class="frame-tile-time">{{ frameDurationLabel(i) }}</span>
-          <button
-            type="button"
-            class="frame-visibility"
+          class="timeline-frame-header-row"
+          cdkDropList
+          cdkDropListOrientation="horizontal"
+          (cdkDropListDropped)="onFrameDrop($event)">
+          <div
+            *ngFor="let frame of frames; let i = index"
+            cdkDrag
+            class="frame-tile frame-header-tile"
+            [class.active]="activePreviewFrameIndex === i"
+            [class.selected]="activeFrameIndex === i"
+            [class.playhead]="isPlaying && activePreviewFrameIndex === i"
             [class.off]="!isFrameVisible(i)"
-            [title]="isFrameVisible(i) ? 'Hide frame' : 'Show frame'"
-            (click)="toggleFrameVisibility(i, $event)">
-            <span aria-hidden="true">{{ isFrameVisible(i) ? '◉' : '○' }}</span>
-          </button>
+            [title]="'Frame ' + (i + 1) + ' · ' + frameDurationLabel(i) + ' (drag to reorder)'"
+            (click)="selectFrame(i)">
+            <span class="frame-tile-index">{{ i + 1 }}</span>
+            <span class="frame-tile-preview" [style.background-image]="'url(' + frameThumbnail(i) + ')'"></span>
+            <button
+              type="button"
+              class="frame-visibility"
+              [class.off]="!isFrameVisible(i)"
+              [title]="isFrameVisible(i) ? 'Hide frame' : 'Show frame'"
+              (click)="toggleFrameVisibility(i, $event)">
+              <span aria-hidden="true">{{ isFrameVisible(i) ? '◉' : '○' }}</span>
+            </button>
+            <div class="dock-drag-preview" *cdkDragPreview>Frame {{ i + 1 }}</div>
+          </div>
         </div>
       </div>
-      <ng-container *ngFor="let layerIndex of timelineLayerIndices">
-        <div *ngIf="!layersMinimized" class="timeline-layer-row-label">
-          <button
-            type="button"
-            class="timeline-layer-button"
+
+      <div class="timeline-rows" cdkDropList (cdkDropListDropped)="onLayerDrop($event)">
+        <div *ngFor="let layerIndex of timelineLayerIndices" class="timeline-row" cdkDrag>
+          <div
+            *ngIf="!layersMinimized"
+            class="timeline-layer-row-label"
             [class.active]="activeLayerIndex === layerIndex"
+            [class.is-locked]="isLayerLocked(layerIndex)"
             (click)="selectLayer(layerIndex)">
-            <span>{{ layerNameAt(layerIndex) }}</span>
-          </button>
-          <button
-            type="button"
-            class="timeline-layer-visibility"
-            [class.off]="!isLayerVisible(layerIndex)"
-            [title]="isLayerVisible(layerIndex) ? 'Hide layer' : 'Show layer'"
-            (click)="toggleLayerVisibility(layerIndex, $event)">
-            <span aria-hidden="true">{{ isLayerVisible(layerIndex) ? '◉' : '○' }}</span>
-          </button>
-        </div>
-        <div class="timeline-cel-row">
-          <button
-            *ngFor="let frame of frames; let frameIndex = index"
-            type="button"
-            class="timeline-cel"
-            [class.active]="activePreviewFrameIndex === frameIndex && activeLayerIndex === layerIndex"
-            [class.selected]="activeFrameIndex === frameIndex && activeLayerIndex === layerIndex"
-            [class.empty]="!cellHasLayer(frameIndex, layerIndex)"
-            [class.off]="cellHasLayer(frameIndex, layerIndex) && !isCellVisible(frameIndex, layerIndex)"
-            (click)="selectTimelineCell(frameIndex, layerIndex)">
-            <span>{{ frameIndex + 1 }}</span>
+            <span class="layer-drag-handle" cdkDragHandle title="Drag to reorder layer" aria-hidden="true">⠿</span>
             <button
-              *ngIf="cellHasLayer(frameIndex, layerIndex)"
               type="button"
-              class="timeline-cel-visibility"
-              [class.off]="!isCellVisible(frameIndex, layerIndex)"
-              [title]="isCellVisible(frameIndex, layerIndex) ? 'Hide layer in this frame' : 'Show layer in this frame'"
-              (click)="toggleCellVisibility(frameIndex, layerIndex, $event)">
-              <span aria-hidden="true">{{ isCellVisible(frameIndex, layerIndex) ? '◉' : '○' }}</span>
+              class="timeline-layer-visibility"
+              [class.off]="!isLayerVisible(layerIndex)"
+              [title]="isLayerVisible(layerIndex) ? 'Hide layer' : 'Show layer'"
+              (click)="toggleLayerVisibility(layerIndex, $event)">
+              <span aria-hidden="true">{{ isLayerVisible(layerIndex) ? '◉' : '○' }}</span>
             </button>
-          </button>
+            <button
+              type="button"
+              class="timeline-layer-lock"
+              [class.on]="isLayerLocked(layerIndex)"
+              [title]="isLayerLocked(layerIndex) ? 'Unlock layer' : 'Lock layer'"
+              (click)="toggleLayerLock(layerIndex, $event)">
+              <span aria-hidden="true">{{ isLayerLocked(layerIndex) ? '🔒' : '🔓' }}</span>
+            </button>
+            <input
+              class="timeline-layer-name"
+              [value]="layerNameAt(layerIndex)"
+              (click)="selectLayer(layerIndex); $event.stopPropagation()"
+              (change)="renameLayer(layerIndex, $event)" />
+          </div>
+          <div class="timeline-cel-row">
+            <button
+              *ngFor="let frame of frames; let frameIndex = index"
+              type="button"
+              class="timeline-cel"
+              [class.active]="activePreviewFrameIndex === frameIndex && activeLayerIndex === layerIndex"
+              [class.selected]="activeFrameIndex === frameIndex && activeLayerIndex === layerIndex"
+              [class.col-active]="activeFrameIndex === frameIndex"
+              [class.playhead]="isPlaying && activePreviewFrameIndex === frameIndex"
+              [class.empty]="!cellHasLayer(frameIndex, layerIndex)"
+              [class.off]="cellHasLayer(frameIndex, layerIndex) && !isCellVisible(frameIndex, layerIndex)"
+              (click)="selectTimelineCell(frameIndex, layerIndex)">
+              <button
+                *ngIf="cellHasLayer(frameIndex, layerIndex)"
+                type="button"
+                class="timeline-cel-visibility"
+                [class.off]="!isCellVisible(frameIndex, layerIndex)"
+                [title]="isCellVisible(frameIndex, layerIndex) ? 'Hide layer in this frame' : 'Show layer in this frame'"
+                (click)="toggleCellVisibility(frameIndex, layerIndex, $event)">
+                <span aria-hidden="true">{{ isCellVisible(frameIndex, layerIndex) ? '◉' : '○' }}</span>
+              </button>
+            </button>
+          </div>
+          <div class="dock-drag-preview" *cdkDragPreview>{{ layerNameAt(layerIndex) }}</div>
         </div>
-      </ng-container>
+      </div>
     </section>
     <div *ngIf="layersMinimized || framesMinimized" class="timeline-hidden-notice">
       <span *ngIf="layersMinimized">Layers hidden</span>
@@ -308,46 +378,110 @@
       </nav>
 
       <header class="topbar">
-        <div class="control-group topbar-primary">
-          <input
-            class="workspace-name"
-            type="text"
-            [ngModel]="activeWorkspace.name"
-            (ngModelChange)="renameActiveWorkspace($event)"
-            aria-label="Workspace name" />
-          <button type="button" class="quiet-action" (click)="duplicateWorkspace()">Duplicate</button>
-          <button type="button" (click)="undo()">Undo</button>
-          <button type="button" (click)="redo()">Redo</button>
-          <button type="button" class="danger-action" (click)="clearLayer()">Clear</button>
-        </div>
-        <div class="control-group topbar-secondary">
-          <button type="button" class="primary-action" (click)="triggerImport()">Import</button>
-          <button type="button" (click)="loadIdlePresetExample()">Idle Example</button>
-          <button type="button" (click)="loadTreeExample()">Tree Example</button>
-          <button type="button" (click)="extractPaletteOnly()">Palette</button>
-          <button type="button" (click)="exportPng()">PNG 1x</button>
-          <button type="button" (click)="exportScaledPng()">PNG Zoom</button>
-          <button type="button" (click)="exportProject()">Export Project</button>
-          <button type="button" (click)="triggerProjectImport()">Import Project</button>
+        <a routerLink="/" class="editor-brand" title="Back to home">
+          <span class="brand-mark" aria-hidden="true"></span>
+          <span class="brand-name">Pixel<strong>Studio</strong></span>
+        </a>
 
-          <span class="topbar-sep"></span>
-          <div class="panels-menu">
-            <button type="button" (click)="togglePanelsMenu()">Panels ▾</button>
-            <div class="panels-dropdown" *ngIf="panelsMenuOpen">
-              <label *ngFor="let id of panelIds" class="check">
-                <input
-                  type="checkbox"
-                  [checked]="!dock.isHidden(id)"
-                  (change)="dock.toggleHidden(id)" />
-                {{ panelTitles[id] }}
-              </label>
-            </div>
+        <input
+          class="workspace-name"
+          type="text"
+          [ngModel]="activeWorkspace.name"
+          (ngModelChange)="renameActiveWorkspace($event)"
+          aria-label="Workspace name" />
+
+        <div class="edit-group">
+          <button type="button" class="icon-btn" title="Undo (Ctrl+Z)" (click)="undo()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14L4 9l5-5"/><path d="M4 9h11a5 5 0 0 1 0 10h-4"/></svg>
+          </button>
+          <button type="button" class="icon-btn" title="Redo (Ctrl+Y)" (click)="redo()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 14l5-5-5-5"/><path d="M20 9H9a5 5 0 0 0 0 10h4"/></svg>
+          </button>
+          <button type="button" class="icon-btn" title="Duplicate workspace" (click)="duplicateWorkspace()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+          </button>
+          <button type="button" class="icon-btn danger" title="Clear layer" (click)="clearLayer()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/><path d="M6 7l1 13a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-13"/></svg>
+          </button>
+        </div>
+
+        <div class="edit-group">
+          <button type="button" class="icon-btn" title="Rotate left" [innerHTML]="uiIcons.rotateL" (click)="rotateSelection(false)"></button>
+          <button type="button" class="icon-btn" title="Rotate right" [innerHTML]="uiIcons.rotateR" (click)="rotateSelection(true)"></button>
+          <button type="button" class="icon-btn" title="Flip horizontal" [innerHTML]="uiIcons.flipH" (click)="flipSelection(true)"></button>
+          <button type="button" class="icon-btn" title="Flip vertical" [innerHTML]="uiIcons.flipV" (click)="flipSelection(false)"></button>
+        </div>
+
+        <div class="edit-group">
+          <button type="button" class="icon-btn" title="Nudge left" [innerHTML]="uiIcons.arrowL" (click)="shift(-1, 0)"></button>
+          <button type="button" class="icon-btn" title="Nudge right" [innerHTML]="uiIcons.arrowR" (click)="shift(1, 0)"></button>
+          <button type="button" class="icon-btn" title="Nudge up" [innerHTML]="uiIcons.arrowU" (click)="shift(0, -1)"></button>
+          <button type="button" class="icon-btn" title="Nudge down" [innerHTML]="uiIcons.arrowD" (click)="shift(0, 1)"></button>
+        </div>
+
+        <div class="edit-group">
+          <button type="button" class="icon-btn" title="Copy (Ctrl+C)" [innerHTML]="uiIcons.copy" (click)="copySelection()"></button>
+          <button type="button" class="icon-btn" title="Cut (Ctrl+X)" [innerHTML]="uiIcons.cut" (click)="cutSelection()"></button>
+          <button type="button" class="icon-btn" title="Paste (Ctrl+V)" [innerHTML]="uiIcons.paste" (click)="pasteSelection()"></button>
+        </div>
+
+        <span class="topbar-spacer"></span>
+
+        <div class="menu file-menu">
+          <button type="button" class="primary-action" (click)="toggleFileMenu()">File ▾</button>
+          <div class="menu-dropdown" *ngIf="fileMenuOpen">
+            <span class="menu-label">Import</span>
+            <button type="button" (click)="openConvertModal()">Import / convert image…</button>
+            <button type="button" (click)="extractPaletteOnly(); fileMenuOpen = false">Extract palette</button>
+            <span class="menu-label">Examples</span>
+            <button type="button" (click)="loadIdlePresetExample(); fileMenuOpen = false">Idle example</button>
+            <button type="button" (click)="loadTreeExample(); fileMenuOpen = false">Tree example</button>
           </div>
-          <button type="button" class="quiet-action" (click)="resetLayout()">Reset Layout</button>
-
-          <input #importInput hidden type="file" accept="image/*" (change)="importImage($event)" />
-          <input #projectInput hidden type="file" accept=".pixelart.json,application/json" (change)="importProject($event)" />
         </div>
+
+        <div class="menu export-menu">
+          <button type="button" (click)="toggleExportMenu()">Export ▾</button>
+          <div class="menu-dropdown" *ngIf="exportMenuOpen">
+            <span class="menu-label">Image</span>
+            <button type="button" (click)="exportPngScale(1)">PNG · 1x</button>
+            <button type="button" (click)="exportPngScale(2)">PNG · 2x</button>
+            <button type="button" class="pro" (click)="exportPngScale(4)">PNG · 4x <em>✦</em></button>
+            <button type="button" class="pro" (click)="exportPngScale(8)">PNG · 8x <em>✦</em></button>
+            <span class="menu-label">Animation</span>
+            <button type="button" class="pro" (click)="exportGif(1)">Animated GIF <em>✦</em></button>
+            <button type="button" class="pro" (click)="exportGif(2)">Animated GIF · 2x <em>✦</em></button>
+            <button type="button" class="pro" (click)="exportSpriteSheet('grid', 1)">Sprite sheet · grid + JSON <em>✦</em></button>
+            <button type="button" class="pro" (click)="exportSpriteSheet('row', 1)">Sprite sheet · row + JSON <em>✦</em></button>
+            <span class="menu-label">Project</span>
+            <button type="button" (click)="exportProject(); exportMenuOpen = false">Export Project (.json)</button>
+            <button type="button" (click)="triggerProjectImport(); exportMenuOpen = false">Import Project</button>
+          </div>
+        </div>
+
+        <div class="menu view-menu">
+          <button type="button" (click)="togglePanelsMenu()">View ▾</button>
+          <div class="menu-dropdown" *ngIf="panelsMenuOpen">
+            <span class="menu-label">Panels</span>
+            <label *ngFor="let id of panelIds" class="check">
+              <input type="checkbox" [checked]="!dock.isHidden(id)" (change)="dock.toggleHidden(id)" />
+              {{ panelTitles[id] }}
+            </label>
+            <span class="menu-label">Layout</span>
+            <button type="button" (click)="resetLayout(); panelsMenuOpen = false">Reset layout</button>
+          </div>
+        </div>
+
+        <button
+          type="button"
+          class="pro-badge"
+          [class.is-pro]="premium.isPro"
+          (click)="promptActivatePro()"
+          [title]="premium.isPro ? 'Pro unlocked' : 'Unlock Pro features'">
+          ✦ {{ premium.isPro ? 'Pro' : 'Go Pro' }}
+        </button>
+
+        <input #importInput hidden type="file" accept="image/*" (change)="importImage($event)" />
+        <input #projectInput hidden type="file" accept=".pixelart.json,application/json" (change)="importProject($event)" />
       </header>
 
       <div
@@ -502,4 +636,68 @@
     </div>
     <span class="float-resize" *ngIf="!dock.isCollapsed(f.id)" (pointerdown)="beginFloatDrag($event, f.id, 'resize')"></span>
   </article>
+</div>
+
+<!-- ============================================================
+     Image → Pixel Art conversion modal
+     ============================================================ -->
+<div class="modal-overlay" *ngIf="convertModalOpen" (click)="closeConvertModal()">
+  <div class="modal" (click)="$event.stopPropagation()" role="dialog" aria-label="Image to pixel art">
+    <header class="modal-head">
+      <h2>Image → Pixel Art</h2>
+      <button type="button" class="dock-btn" title="Close" (click)="closeConvertModal()">✕</button>
+    </header>
+    <div class="modal-body">
+      <div class="modal-row">
+        <span class="modal-label">Import into</span>
+        <div class="seg">
+          <button type="button" [class.on]="importTarget === 'current'" (click)="importTarget = 'current'">Current tab</button>
+          <button type="button" [class.on]="importTarget === 'new'" (click)="importTarget = 'new'">New tab</button>
+        </div>
+      </div>
+      <p class="modal-warn" *ngIf="importTarget === 'current' && workspaceInProgress">
+        ⚠ This tab has artwork — importing here will overwrite it.
+      </p>
+      <div class="modal-row">
+        <span class="modal-label">Target size</span>
+        <div class="seg">
+          <button type="button" [class.on]="importLongSide === 64" (click)="setImportPreset(64)">64</button>
+          <button type="button" [class.on]="importLongSide === 96" (click)="setImportPreset(96)">96</button>
+          <button type="button" [class.on]="importLongSide === 128" (click)="setImportPreset(128)">128</button>
+        </div>
+      </div>
+      <div class="field-grid">
+        <label>
+          <span>Long side</span>
+          <input type="number" min="16" max="128" [(ngModel)]="importLongSide" />
+        </label>
+        <label>
+          <span>Palette</span>
+          <input type="number" min="4" max="64" [(ngModel)]="importPaletteSize" />
+        </label>
+        <label>
+          <span>Fit</span>
+          <select [(ngModel)]="importFit">
+            <option value="contain">Contain</option>
+            <option value="cover">Cover</option>
+            <option value="stretch">Stretch</option>
+          </select>
+        </label>
+        <label>
+          <span>Contrast</span>
+          <input type="range" min="0.8" max="1.4" step="0.02" [(ngModel)]="importContrast" />
+        </label>
+        <label>
+          <span>Sharpen</span>
+          <input type="range" min="0" max="1" step="0.05" [(ngModel)]="importSharpen" />
+        </label>
+        <label class="check"><input type="checkbox" [(ngModel)]="importResizeCanvas" /> Resize canvas</label>
+        <label class="check"><input type="checkbox" [(ngModel)]="importDither" /> Dither</label>
+      </div>
+    </div>
+    <footer class="modal-foot">
+      <button type="button" class="quiet-action" (click)="closeConvertModal()">Cancel</button>
+      <button type="button" class="primary-action" (click)="startImageImport()">Choose image &amp; convert</button>
+    </footer>
+  </div>
 </div>

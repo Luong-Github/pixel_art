@@ -13,13 +13,18 @@ import {
 } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { RouterLink } from '@angular/router';
 import {
   CdkDragDrop,
   DragDropModule,
   moveItemInArray,
   transferArrayItem,
 } from '@angular/cdk/drag-drop';
+import { GIFEncoder, quantize, applyPalette } from 'gifenc';
 import { DockService } from './dock/dock.service';
+import { PremiumService } from './premium.service';
+import { BUILTIN_PALETTES, NamedPalette, PALETTE_STORAGE_KEY } from './palettes';
 import { DockPanelDefDirective } from './dock/dock-panel-def.directive';
 import {
   FloatRect,
@@ -80,6 +85,7 @@ declare global {
 interface Layer {
   name: string;
   visible: boolean;
+  locked?: boolean;
   opacity: number;
   pixels: Pixel[];
 }
@@ -166,7 +172,7 @@ interface PixelArtProjectFile {
 @Component({
   selector: 'app-editor',
   standalone: true,
-  imports: [CommonModule, FormsModule, DragDropModule, DockPanelDefDirective],
+  imports: [CommonModule, FormsModule, RouterLink, DragDropModule, DockPanelDefDirective],
   templateUrl: './editor.component.html',
   styleUrl: './editor.component.scss',
   host: { class: 'editor-host' },
@@ -203,12 +209,119 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
 
   private readonly isBrowser: boolean;
 
+  exportMenuOpen = false;
+  fileMenuOpen = false;
+  convertModalOpen = false;
+  /** Where an imported image should land. */
+  importTarget: 'current' | 'new' = 'current';
+  /** Sanitized inline SVG icons keyed by tool id. */
+  toolIcons: Record<string, SafeHtml> = {};
+  /** Sanitized inline SVG icons for action buttons (transform, color). */
+  uiIcons: Record<
+    | 'rotateL' | 'rotateR' | 'flipH' | 'flipV'
+    | 'arrowL' | 'arrowR' | 'arrowU' | 'arrowD'
+    | 'copy' | 'cut' | 'paste' | 'swap' | 'pick',
+    SafeHtml
+  > = {} as Record<string, SafeHtml> as never;
+
   constructor(
     public dock: DockService,
+    public premium: PremiumService,
     private hostRef: ElementRef<HTMLElement>,
+    private sanitizer: DomSanitizer,
     @Inject(PLATFORM_ID) platformId: object,
   ) {
     this.isBrowser = isPlatformBrowser(platformId);
+    this.buildToolIcons();
+    this.buildUiIcons();
+    this.loadSavedPalettes();
+  }
+
+  private buildUiIcons(): void {
+    const s =
+      '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">';
+    const icons: Record<string, string> = {
+      rotateL: `${s}<path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg>`,
+      rotateR: `${s}<path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 4v5h-5"/></svg>`,
+      flipH: `${s}<path d="M12 3v18"/><path d="M8 8L4 12l4 4"/><path d="M16 8l4 4-4 4"/></svg>`,
+      flipV: `${s}<path d="M3 12h18"/><path d="M8 8l4-4 4 4"/><path d="M8 16l4 4 4-4"/></svg>`,
+      arrowL: `${s}<path d="M19 12H5"/><path d="M11 6l-6 6 6 6"/></svg>`,
+      arrowR: `${s}<path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>`,
+      arrowU: `${s}<path d="M12 19V5"/><path d="M6 11l6-6 6 6"/></svg>`,
+      arrowD: `${s}<path d="M12 5v14"/><path d="M6 13l6 6 6-6"/></svg>`,
+      copy: `${s}<rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>`,
+      cut: `${s}<circle cx="6" cy="6" r="2.5"/><circle cx="6" cy="18" r="2.5"/><path d="M8 7.5l12 9M8 16.5l12-9"/></svg>`,
+      paste: `${s}<rect x="6" y="4" width="12" height="16" rx="2"/><path d="M9 4V3a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v1"/></svg>`,
+      swap: `${s}<path d="M7 4L3 8l4 4"/><path d="M3 8h13"/><path d="M17 20l4-4-4-4"/><path d="M21 16H8"/></svg>`,
+      pick: `${s}<path d="M3 21l1-4 9.5-9.5 3 3L7 20z"/><path d="M14.5 4.5l2-2a2.1 2.1 0 0 1 3 3l-2 2"/></svg>`,
+    };
+    const map: Record<string, SafeHtml> = {};
+    for (const key of Object.keys(icons)) {
+      map[key] = this.sanitizer.bypassSecurityTrustHtml(icons[key]);
+    }
+    this.uiIcons = map as typeof this.uiIcons;
+  }
+
+  toggleFileMenu(): void {
+    this.fileMenuOpen = !this.fileMenuOpen;
+  }
+
+  openConvertModal(): void {
+    this.fileMenuOpen = false;
+    // Default to a new tab when the current one already has artwork.
+    this.importTarget = this.workspaceInProgress ? 'new' : 'current';
+    this.convertModalOpen = true;
+  }
+
+  closeConvertModal(): void {
+    this.convertModalOpen = false;
+  }
+
+  /** True when the active workspace has drawn content (multiple frames or any pixel). */
+  get workspaceInProgress(): boolean {
+    if (this.frames.length > 1) return true;
+    for (const frame of this.frames) {
+      for (const layer of frame.layers) {
+        if (layer.pixels.some((p) => p !== null)) return true;
+      }
+    }
+    return false;
+  }
+
+  /** Triggered by the modal's "Choose image & convert"; confirms before overwriting. */
+  startImageImport(): void {
+    if (
+      this.importTarget === 'current' &&
+      this.workspaceInProgress &&
+      !window.confirm(
+        'This tab already has artwork. Overwrite it with the imported image?\n\n' +
+          'Tip: choose "New tab" to keep your current work.',
+      )
+    ) {
+      return;
+    }
+    this.triggerImport();
+  }
+
+  private buildToolIcons(): void {
+    const s =
+      '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">';
+    const icons: Record<string, string> = {
+      pen: `${s}<path d="M16.5 3.5l4 4L8 20l-4.5 1L4.5 16.5z"/><path d="M13.5 6.5l4 4"/></svg>`,
+      eraser: `${s}<path d="M4 14.5l7-7 6.5 6.5-5 5H7z"/><path d="M3.5 21h11"/></svg>`,
+      fill: `${s}<path d="M6.5 3.5l9 9-6.5 6.5a2.5 2.5 0 0 1-3.5 0l-3-3a2.5 2.5 0 0 1 0-3.5z"/><path d="M9 6l8 8"/><path d="M20 14.5s1.5 2 1.5 3.2A1.7 1.7 0 0 1 18.5 18c0-1.2 1.5-3.5 1.5-3.5z"/></svg>`,
+      picker: `${s}<path d="M3 21l1-4 9.5-9.5 3 3L7 20z"/><path d="M14.5 4.5l2-2a2.1 2.1 0 0 1 3 3l-2 2"/></svg>`,
+      line: `${s}<line x1="5" y1="19" x2="19" y2="5"/><circle cx="5" cy="19" r="1.4" fill="currentColor"/><circle cx="19" cy="5" r="1.4" fill="currentColor"/></svg>`,
+      rect: `${s}<rect x="4" y="5" width="16" height="14" rx="1"/></svg>`,
+      ellipse: `${s}<circle cx="12" cy="12" r="8"/></svg>`,
+      select: `${s.replace('stroke-width="2"', 'stroke-width="2" stroke-dasharray="3 3"')}<rect x="4" y="4" width="16" height="16" rx="1"/></svg>`,
+      move: `${s}<line x1="12" y1="3" x2="12" y2="21"/><line x1="3" y1="12" x2="21" y2="12"/><polyline points="9 6 12 3 15 6"/><polyline points="9 18 12 21 15 18"/><polyline points="6 9 3 12 6 15"/><polyline points="18 9 21 12 18 15"/></svg>`,
+    };
+    const map: Record<string, SafeHtml> = {};
+    for (const key of Object.keys(icons)) {
+      map[key] = this.sanitizer.bypassSecurityTrustHtml(icons[key]);
+    }
+    this.toolIcons = map;
   }
 
   readonly tools: { id: Tool; label: string; key: string }[] = [
@@ -230,7 +343,9 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
   bottomPanelHeight = 210;
   layersMinimized = false;
   framesMinimized = false;
-  zoom = 18;
+  zoom = 4;
+  readonly minZoom = 1;
+  readonly maxZoom = 40;
   displayZoom = 6;
   importResizeCanvas = true;
   importLongSide = 96;
@@ -241,11 +356,25 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
   importContrast = 1.08;
   showGrid = true;
   onionSkin = false;
+  /** Onion skin display options (render-only, never touch pixel data). */
+  onionPrevOpacity = 0.4;
+  onionNextOpacity = 0.25;
+  onionTint = true;
   mirrorX = false;
   activeTool: Tool = 'pen';
   primaryColor = '#222831';
   secondaryColor = '#f6f1de';
   brushSize = 1;
+  /** Restrict drawing to the active palette's colours when on. */
+  paletteLock = false;
+  /** Dither brush: 'off' or fill ratio 25/50/75 (primary vs secondary). */
+  ditherMode: 'off' | '25' | '50' | '75' = 'off';
+  /** Pivot/anchor for sprite-sheet export (and on-canvas marker). */
+  pivotPreset: 'center' | 'feet' | 'topleft' = 'feet';
+  /** Sprite-sheet columns; 0 = auto (square-ish grid). */
+  sheetColumns = 0;
+  readonly builtinPalettes = BUILTIN_PALETTES;
+  savedPalettes: NamedPalette[] = [];
   palette = [
     '#222831',
     '#393e46',
@@ -282,6 +411,9 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
   private animationTimer?: number;
   isPlaying = false;
   previewFrameIndex = 0;
+  loop = true;
+  /** Playback speed; applying it sets every frame's duration. */
+  fps = 12;
 
   get activeFrame(): Frame {
     return this.frames[this.activeFrameIndex];
@@ -298,6 +430,23 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
     return this.workspaces[this.activeWorkspaceIndex];
   }
 
+  /** Pivot/anchor point in pixel coordinates from the active preset. */
+  get pivotPoint(): { x: number; y: number } {
+    switch (this.pivotPreset) {
+      case 'center':
+        return { x: this.width / 2, y: this.height / 2 };
+      case 'topleft':
+        return { x: 0, y: 0 };
+      default:
+        return { x: this.width / 2, y: this.height };
+    }
+  }
+
+  setPivot(preset: 'center' | 'feet' | 'topleft'): void {
+    this.pivotPreset = preset;
+    this.render();
+  }
+
   /** Width reserved for a side zone: 0 when empty (a thin strip while dragging). */
   private sideWidth(zone: Zone, width: number): number {
     if (!this.dock.zoneEmpty(zone)) return width;
@@ -310,14 +459,27 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
     return `${l}px ${l ? 6 : 0}px minmax(0, 1fr) ${r ? 6 : 0}px ${r}px`;
   }
 
+  /** True when the bottom zone has panels but every one is collapsed. */
+  get bottomAllCollapsed(): boolean {
+    const ids = this.dock.state.zones.bottom;
+    return ids.length > 0 && ids.every((id) => this.dock.isCollapsed(id));
+  }
+
   get studioGridRows(): string {
     const empty = this.dock.zoneEmpty('bottom');
-    const h = empty ? (this.dragActive ? 44 : 0) : this.bottomPanelHeight;
-    return `minmax(0, 1fr) ${h && !empty ? 6 : 0}px ${h}px`;
+    if (empty) {
+      const h = this.dragActive ? 44 : 0;
+      return `minmax(0, 1fr) 0px ${h}px`;
+    }
+    // Collapsed panels only need header height; don't reserve full timeline space.
+    if (this.bottomAllCollapsed) {
+      return `minmax(0, 1fr) 0px auto`;
+    }
+    return `minmax(0, 1fr) 6px ${this.bottomPanelHeight}px`;
   }
 
   get showBottomResizer(): boolean {
-    return !this.dock.zoneEmpty('bottom');
+    return !this.dock.zoneEmpty('bottom') && !this.bottomAllCollapsed;
   }
 
   onDragStarted(): void {
@@ -1624,6 +1786,7 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
       frame.layers.splice(this.activeLayerIndex + 1, 0, {
         name: `${source.name} copy`,
         visible: source.visible,
+        locked: source.locked ?? false,
         opacity: source.opacity,
         pixels: [...source.pixels],
       });
@@ -1688,7 +1851,33 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
     this.render();
   }
 
+  /** Insert a blank frame before or after the active one. */
+  insertFrame(after: boolean): void {
+    this.pushUndo();
+    const at = this.activeFrameIndex + (after ? 1 : 0);
+    this.frames.splice(at, 0, this.createFrame(`Frame ${this.frames.length + 1}`));
+    this.activeFrameIndex = at;
+    this.previewFrameIndex = at;
+    this.activeLayerIndex = 0;
+    this.refreshAllFrameThumbnails();
+    this.render();
+  }
+
+  /** Reverse the order of all frames (e.g. to ping-pong an animation). */
+  reverseFrames(): void {
+    if (this.frames.length < 2) {
+      return;
+    }
+    this.pushUndo();
+    this.frames.reverse();
+    this.activeFrameIndex = this.frames.length - 1 - this.activeFrameIndex;
+    this.previewFrameIndex = this.activeFrameIndex;
+    this.refreshAllFrameThumbnails();
+    this.render();
+  }
+
   clearLayer(): void {
+    if (this.activeLayerLocked) return;
     this.pushUndo();
     this.activeLayer.pixels.fill(null);
     this.selection = null;
@@ -1718,9 +1907,8 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
     if (!point) {
       return;
     }
-    this.stageRef.nativeElement.setPointerCapture(event.pointerId);
-    this.pointer = { ...point, startX: point.x, startY: point.y };
 
+    // Picker is read-only and works on any layer (no pointer state needed).
     if (this.activeTool === 'picker') {
       const color = this.compositeAt(point.x, point.y);
       if (color) {
@@ -1729,11 +1917,20 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
       return;
     }
 
+    // Locked layer: block all editing, including drag-painting. Don't capture
+    // the pointer or set pointer state, so pointermove/up do nothing either.
+    if (this.activeLayerLocked) {
+      return;
+    }
+
+    this.stageRef.nativeElement.setPointerCapture(event.pointerId);
+    this.pointer = { ...point, startX: point.x, startY: point.y };
+
     this.pushUndo();
     if (this.activeTool === 'pen' || this.activeTool === 'eraser') {
       this.paint(point.x, point.y);
     } else if (this.activeTool === 'fill') {
-      this.fillMirrored(point.x, point.y, this.primaryColor);
+      this.fillMirrored(point.x, point.y, this.effectivePrimary);
     } else if (this.activeTool === 'select') {
       this.selection = { x: point.x, y: point.y, w: 1, h: 1, pixels: [] };
     } else if (this.activeTool === 'move' && this.selection) {
@@ -1780,10 +1977,21 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
     }
     event.preventDefault();
     const previousZoom = this.zoom;
-    this.zoom = this.clamp(this.zoom + (event.deltaY < 0 ? 1 : -1), 6, 32);
+    this.zoom = this.clamp(this.zoom + (event.deltaY < 0 ? 1 : -1), this.minZoom, this.maxZoom);
     if (this.zoom === previousZoom) {
       return;
     }
+    this.render();
+  }
+
+  /** Fit the sprite to the visible canvas area. */
+  fitToScreen(): void {
+    const wrap = this.canvasWrapRef?.nativeElement;
+    if (!wrap) return;
+    const pad = 64;
+    const zw = Math.floor((wrap.clientWidth - pad) / this.width);
+    const zh = Math.floor((wrap.clientHeight - pad) / this.height);
+    this.zoom = this.clamp(Math.min(zw, zh), this.minZoom, this.maxZoom);
     this.render();
   }
 
@@ -1962,7 +2170,7 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
   }
 
   cutSelection(): void {
-    if (!this.selection) {
+    if (this.activeLayerLocked || !this.selection) {
       return;
     }
     this.pushUndo();
@@ -1974,6 +2182,9 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
   }
 
   pasteSelection(): void {
+    if (this.activeLayerLocked) {
+      return;
+    }
     if (!this.clipboard) {
       return;
     }
@@ -1997,6 +2208,9 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
   }
 
   rotateSelection(clockwise = true): void {
+    if (this.activeLayerLocked) {
+      return;
+    }
     if (!this.selection) {
       this.rotateCanvas(clockwise);
       return;
@@ -2026,6 +2240,9 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
   }
 
   flipSelection(horizontal: boolean): void {
+    if (this.activeLayerLocked) {
+      return;
+    }
     const target = this.selection;
     if (!target) {
       this.flipCanvas(horizontal);
@@ -2088,6 +2305,9 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
   }
 
   shift(dx: number, dy: number): void {
+    if (this.activeLayerLocked) {
+      return;
+    }
     this.pushUndo();
     const next = new Array<Pixel>(this.width * this.height).fill(null);
     for (let y = 0; y < this.height; y += 1) {
@@ -2130,6 +2350,10 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
       return;
     }
     const image = await this.loadImage(file);
+    // Land the import in a fresh tab when requested (keeps current work intact).
+    if (this.importTarget === 'new') {
+      this.addWorkspace();
+    }
     this.pushUndo();
     if (this.importResizeCanvas) {
       this.resizeCanvasForImage(image);
@@ -2141,6 +2365,7 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
     this.activeLayer.pixels = sampled.pixels;
     this.palette = sampled.palette;
     input.value = '';
+    this.convertModalOpen = false;
     this.render();
   }
 
@@ -2161,36 +2386,200 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
       .map(([color]) => color);
   }
 
-  exportPng(): void {
-    const exportCanvas = document.createElement('canvas');
-    exportCanvas.width = this.width;
-    exportCanvas.height = this.height;
-    const exportCtx = exportCanvas.getContext('2d');
-    if (!exportCtx) {
-      return;
-    }
-    this.drawComposite(exportCtx, this.activeFrameIndex, 1, false);
-    const link = document.createElement('a');
-    link.download = `pixel-art-${this.width}x${this.height}.png`;
-    link.href = exportCanvas.toDataURL('image/png');
-    link.click();
+  // ===================== Export suite =====================
+
+  toggleExportMenu(): void {
+    this.exportMenuOpen = !this.exportMenuOpen;
   }
 
-  exportScaledPng(): void {
-    const scale = Math.max(1, this.zoom);
-    const exportCanvas = document.createElement('canvas');
-    exportCanvas.width = this.width * scale;
-    exportCanvas.height = this.height * scale;
-    const exportCtx = exportCanvas.getContext('2d');
-    if (!exportCtx) {
-      return;
+  /** Free users keep PNG @1x/@2x (watermarked); the rest is Pro. */
+  private requirePro(feature: string): boolean {
+    if (this.premium.isPro) return true;
+    const go = window.confirm(
+      `${feature} is a Pro feature.\n\nEnter a license key to unlock Pro? (demo key: PIXELPRO)`,
+    );
+    if (go) this.promptActivatePro();
+    return false;
+  }
+
+  promptActivatePro(): void {
+    const key = window.prompt('Enter your Pro license key (demo: PIXELPRO):', '');
+    if (key == null) return;
+    if (this.premium.activate(key)) {
+      window.alert('Pro unlocked. Thank you! ✦');
+    } else {
+      window.alert('That key was not recognised.');
     }
-    exportCtx.imageSmoothingEnabled = false;
-    this.drawComposite(exportCtx, this.activeFrameIndex, scale, false);
+  }
+
+  /** Visible frames; falls back to all frames if none are visible. */
+  private exportFrameIndices(): number[] {
+    const visible = this.frames
+      .map((_, i) => i)
+      .filter((i) => this.isFrameVisible(i));
+    return visible.length ? visible : this.frames.map((_, i) => i);
+  }
+
+  /** Render one composited frame to an offscreen canvas at the given scale. */
+  private renderFrameCanvas(frameIndex: number, scale: number): HTMLCanvasElement {
+    const canvas = document.createElement('canvas');
+    canvas.width = this.width * scale;
+    canvas.height = this.height * scale;
+    const ctx = canvas.getContext('2d');
+    if (ctx) {
+      ctx.imageSmoothingEnabled = false;
+      this.drawComposite(ctx, frameIndex, scale, false);
+    }
+    return canvas;
+  }
+
+  /** Stamp a small watermark in the corner (free tier only). */
+  private stampWatermark(ctx: CanvasRenderingContext2D, w: number, h: number): void {
+    if (this.premium.isPro) return;
+    const pad = Math.max(4, Math.round(Math.min(w, h) * 0.02));
+    const fontPx = Math.max(9, Math.round(Math.min(w, h) * 0.05));
+    ctx.save();
+    ctx.globalAlpha = 0.7;
+    ctx.font = `600 ${fontPx}px Inter, sans-serif`;
+    ctx.textAlign = 'right';
+    ctx.textBaseline = 'bottom';
+    const text = 'Pixel Art Studio';
+    ctx.lineWidth = Math.max(2, fontPx / 6);
+    ctx.strokeStyle = 'rgba(0,0,0,0.55)';
+    ctx.strokeText(text, w - pad, h - pad);
+    ctx.fillStyle = 'rgba(255,255,255,0.92)';
+    ctx.fillText(text, w - pad, h - pad);
+    ctx.restore();
+  }
+
+  private downloadBlob(blob: Blob, filename: string): void {
     const link = document.createElement('a');
-    link.download = `pixel-art-${this.width}x${this.height}-${scale}x.png`;
-    link.href = exportCanvas.toDataURL('image/png');
+    link.download = filename;
+    link.href = URL.createObjectURL(blob);
     link.click();
+    URL.revokeObjectURL(link.href);
+  }
+
+  private downloadCanvas(canvas: HTMLCanvasElement, filename: string): void {
+    canvas.toBlob((blob) => {
+      if (blob) this.downloadBlob(blob, filename);
+    }, 'image/png');
+  }
+
+  /** Export the current frame as PNG at the given scale (1/2/4/8). */
+  exportPngScale(scale: number): void {
+    this.exportMenuOpen = false;
+    if (scale > 2 && !this.requirePro(`PNG @${scale}x export`)) return;
+    const canvas = this.renderFrameCanvas(this.activeFrameIndex, scale);
+    const ctx = canvas.getContext('2d');
+    if (ctx) this.stampWatermark(ctx, canvas.width, canvas.height);
+    this.downloadCanvas(canvas, `pixel-art-${this.width}x${this.height}@${scale}x.png`);
+  }
+
+  /** Pack every (visible) frame into a sprite sheet PNG + engine-ready JSON atlas. */
+  exportSpriteSheet(layout: 'grid' | 'row' = 'grid', scale = 1): void {
+    this.exportMenuOpen = false;
+    if (!this.requirePro('Sprite sheet export')) return;
+    const indices = this.exportFrameIndices();
+    const count = indices.length;
+    let cols: number;
+    if (layout === 'row') {
+      cols = count; // single horizontal strip
+    } else if (this.sheetColumns > 0) {
+      cols = Math.min(this.sheetColumns, count); // user-configured columns
+    } else {
+      cols = Math.min(count, Math.ceil(Math.sqrt(count)) || 1); // auto square-ish
+    }
+    const rows = Math.ceil(count / cols);
+    const fw = this.width * scale;
+    const fh = this.height * scale;
+
+    const sheet = document.createElement('canvas');
+    sheet.width = cols * fw;
+    sheet.height = rows * fh;
+    const ctx = sheet.getContext('2d');
+    if (!ctx) return;
+    ctx.imageSmoothingEnabled = false;
+
+    const atlasFrames = indices.map((frameIndex, i) => {
+      const col = i % cols;
+      const row = Math.floor(i / cols);
+      const x = col * fw;
+      const y = row * fh;
+      const frameCanvas = this.renderFrameCanvas(frameIndex, scale);
+      ctx.drawImage(frameCanvas, x, y);
+      return {
+        index: i,
+        name: this.frames[frameIndex]?.name ?? `frame_${i}`,
+        x,
+        y,
+        w: fw,
+        h: fh,
+        duration: this.frames[frameIndex]?.duration ?? 100,
+      };
+    });
+
+    const base = `${this.exportBaseName()}-sheet`;
+    this.stampWatermark(ctx, sheet.width, sheet.height);
+    this.downloadCanvas(sheet, `${base}.png`);
+
+    const pivot = this.pivotPoint;
+    const atlas = {
+      app: 'Pixel Art Studio',
+      animation: this.activeWorkspace.name,
+      image: `${base}.png`,
+      layout,
+      frameWidth: fw,
+      frameHeight: fh,
+      scale,
+      columns: cols,
+      rows,
+      count,
+      pivot: { x: pivot.x * scale, y: pivot.y * scale, preset: this.pivotPreset },
+      frames: atlasFrames,
+    };
+    this.downloadBlob(
+      new Blob([JSON.stringify(atlas, null, 2)], { type: 'application/json' }),
+      `${base}.json`,
+    );
+  }
+
+  /** Export the (visible) frames as an animated GIF at the given scale. */
+  exportGif(scale = 1): void {
+    this.exportMenuOpen = false;
+    if (!this.requirePro('Animated GIF export')) return;
+    const indices = this.exportFrameIndices();
+    const gif = GIFEncoder();
+    for (const frameIndex of indices) {
+      const canvas = this.renderFrameCanvas(frameIndex, scale);
+      const ctx = canvas.getContext('2d');
+      if (!ctx) continue;
+      const { data, width, height } = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const palette = quantize(data, 256, { format: 'rgba4444' });
+      const index = applyPalette(data, palette, 'rgba4444');
+      const delay = Math.max(20, Math.round(this.frames[frameIndex]?.duration ?? 100));
+      gif.writeFrame(index, width, height, {
+        palette,
+        delay,
+        transparent: true,
+        transparentIndex: 0,
+        dispose: 2,
+      });
+    }
+    gif.finish();
+    this.downloadBlob(
+      new Blob([gif.bytes()], { type: 'image/gif' }),
+      `${this.exportBaseName()}.gif`,
+    );
+  }
+
+  private exportBaseName(): string {
+    return (
+      this.activeWorkspace.name
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/(^-|-$)/g, '') || 'pixel-art'
+    );
   }
 
   exportProject(): void {
@@ -2265,6 +2654,102 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
 
   selectLayer(index: number): void {
     this.activeLayerIndex = index;
+    this.render();
+  }
+
+  get activeLayerLocked(): boolean {
+    return !!this.activeLayer?.locked;
+  }
+
+  isLayerLocked(layerIndex: number): boolean {
+    for (const frame of this.frames) {
+      const layer = frame.layers[layerIndex];
+      if (layer) return !!layer.locked;
+    }
+    return false;
+  }
+
+  toggleLayerLock(layerIndex: number, event?: Event): void {
+    event?.stopPropagation();
+    const next = !this.isLayerLocked(layerIndex);
+    for (const frame of this.frames) {
+      const layer = frame.layers[layerIndex];
+      if (layer) layer.locked = next;
+    }
+  }
+
+  layerOpacityAt(layerIndex: number): number {
+    for (const frame of this.frames) {
+      const layer = frame.layers[layerIndex];
+      if (layer) return layer.opacity ?? 1;
+    }
+    return 1;
+  }
+
+  setLayerOpacity(layerIndex: number, event: Event): void {
+    const value = this.clamp(parseFloat((event.target as HTMLInputElement).value), 0, 1);
+    for (const frame of this.frames) {
+      const layer = frame.layers[layerIndex];
+      if (layer) layer.opacity = value;
+    }
+    this.refreshAllFrameThumbnails();
+    this.render();
+  }
+
+  renameLayer(layerIndex: number, event: Event): void {
+    const name = (event.target as HTMLInputElement).value.trim();
+    if (!name) return;
+    for (const frame of this.frames) {
+      const layer = frame.layers[layerIndex];
+      if (layer) layer.name = name;
+    }
+  }
+
+  /** Drag-and-drop reorder a frame (column) to a new position. */
+  onFrameDrop(event: CdkDragDrop<unknown>): void {
+    const from = event.previousIndex;
+    const to = event.currentIndex;
+    if (from === to) return;
+    this.pushUndo();
+    moveItemInArray(this.frames, from, to);
+    this.activeFrameIndex = to;
+    this.previewFrameIndex = to;
+    this.refreshAllFrameThumbnails();
+    this.render();
+  }
+
+  /** Drag-and-drop reorder a layer to a new position, across every frame. */
+  onLayerDrop(event: CdkDragDrop<unknown>): void {
+    const from = event.previousIndex;
+    const to = event.currentIndex;
+    if (from === to) return;
+    this.pushUndo();
+    for (const frame of this.frames) {
+      if (from < frame.layers.length && to < frame.layers.length) {
+        moveItemInArray(frame.layers, from, to);
+      }
+    }
+    this.activeLayerIndex = to;
+    this.refreshAllFrameThumbnails();
+    this.render();
+  }
+
+  /** Move the active layer up (-1) or down (+1) the stack, across every frame. */
+  moveLayer(delta: number): void {
+    const from = this.activeLayerIndex;
+    const to = from + delta;
+    if (to < 0 || to >= this.timelineLayerCount) return;
+    this.pushUndo();
+    for (const frame of this.frames) {
+      const a = frame.layers[from];
+      const b = frame.layers[to];
+      if (a && b) {
+        frame.layers[from] = b;
+        frame.layers[to] = a;
+      }
+    }
+    this.activeLayerIndex = to;
+    this.refreshAllFrameThumbnails();
     this.render();
   }
 
@@ -2362,7 +2847,126 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
     this.palette = [
       normalized,
       ...this.palette.filter((item) => item.toLowerCase() !== normalized),
-    ].slice(0, 32);
+    ].slice(0, 64);
+  }
+
+  // ===================== Palette management =====================
+
+  /** Replace the working palette and select its first colour. */
+  loadPalette(colors: string[]): void {
+    if (!colors.length) return;
+    this.palette = [...colors];
+    this.primaryColor = colors[0];
+    if (colors.length > 1) this.secondaryColor = colors[1];
+    this.render();
+  }
+
+  togglePaletteLock(): void {
+    this.paletteLock = !this.paletteLock;
+  }
+
+  /** Load a palette chosen from the dropdown (value 'b:id' built-in / 's:id' saved). */
+  onPaletteSelect(event: Event): void {
+    const value = (event.target as HTMLSelectElement).value;
+    if (!value) return;
+    const id = value.slice(2);
+    const source = value[0] === 'b' ? this.builtinPalettes : this.savedPalettes;
+    const found = source.find((p) => p.id === id);
+    if (found) this.loadPalette(found.colors);
+  }
+
+  setDither(mode: 'off' | '25' | '50' | '75'): void {
+    this.ditherMode = mode;
+  }
+
+  private loadSavedPalettes(): void {
+    try {
+      if (typeof localStorage === 'undefined') return;
+      const raw = localStorage.getItem(PALETTE_STORAGE_KEY);
+      if (raw) this.savedPalettes = JSON.parse(raw) as NamedPalette[];
+    } catch {
+      this.savedPalettes = [];
+    }
+  }
+
+  /** Save the current palette to localStorage under a user-supplied name. */
+  saveCurrentPalette(): void {
+    const name = window.prompt('Name this palette:', `Palette ${this.savedPalettes.length + 1}`);
+    if (!name) return;
+    const entry: NamedPalette = {
+      id: `saved-${name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`,
+      name,
+      colors: [...this.palette],
+    };
+    this.savedPalettes = [
+      entry,
+      ...this.savedPalettes.filter((p) => p.id !== entry.id),
+    ].slice(0, 20);
+    try {
+      if (typeof localStorage !== 'undefined') {
+        localStorage.setItem(PALETTE_STORAGE_KEY, JSON.stringify(this.savedPalettes));
+      }
+    } catch {
+      /* ignore */
+    }
+  }
+
+  deleteSavedPalette(id: string, event?: Event): void {
+    event?.stopPropagation();
+    this.savedPalettes = this.savedPalettes.filter((p) => p.id !== id);
+    try {
+      if (typeof localStorage !== 'undefined') {
+        localStorage.setItem(PALETTE_STORAGE_KEY, JSON.stringify(this.savedPalettes));
+      }
+    } catch {
+      /* ignore */
+    }
+  }
+
+  /** Snap a colour to the nearest palette entry when palette-lock is on. */
+  private lockColor(color: string): string {
+    if (!this.paletteLock || !this.palette.length) return color;
+    const [r, g, b] = this.hexToRgb(color);
+    let best = this.palette[0];
+    let bestDist = Infinity;
+    for (const candidate of this.palette) {
+      const [cr, cg, cb] = this.hexToRgb(candidate);
+      const dist = (r - cr) ** 2 + (g - cg) ** 2 + (b - cb) ** 2;
+      if (dist < bestDist) {
+        bestDist = dist;
+        best = candidate;
+      }
+    }
+    return best;
+  }
+
+  private hexToRgb(hex: string): [number, number, number] {
+    let h = hex.replace('#', '');
+    if (h.length === 3) h = h.split('').map((c) => c + c).join('');
+    const n = parseInt(h, 16);
+    return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+  }
+
+  /** Ordered 4×4 Bayer matrix for pixel-perfect dithering. */
+  private static readonly BAYER4 = [
+    [0, 8, 2, 10],
+    [12, 4, 14, 6],
+    [3, 11, 1, 9],
+    [15, 7, 13, 5],
+  ];
+
+  /** The colour the brush should place at (x,y), honouring dither + palette-lock. */
+  private brushColorAt(x: number, y: number): Pixel {
+    const primary = this.lockColor(this.primaryColor);
+    if (this.ditherMode === 'off') return primary;
+    const count = this.ditherMode === '25' ? 4 : this.ditherMode === '50' ? 8 : 12;
+    const threshold = EditorComponent.BAYER4[((y % 4) + 4) % 4][((x % 4) + 4) % 4];
+    return threshold < count ? primary : this.lockColor(this.secondaryColor);
+  }
+
+  /** Primary colour for fills/shapes, snapped to palette when locked. */
+  get effectivePrimary(): string {
+    return this.lockColor(this.primaryColor);
   }
 
   setImportPreset(longSide: number): void {
@@ -2530,7 +3134,7 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
 
     const settings = project.settings;
     if (settings) {
-      this.zoom = this.clamp(settings.zoom ?? this.zoom, 6, 32);
+      this.zoom = this.clamp(settings.zoom ?? this.zoom, this.minZoom, this.maxZoom);
       this.displayZoom = this.clamp(
         settings.displayZoom ?? this.displayZoom,
         2,
@@ -2587,6 +3191,7 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
       ).map((layer, layerIndex) => ({
         name: layer.name || `Layer ${layerIndex + 1}`,
         visible: layer.visible ?? true,
+        locked: layer.locked ?? false,
         opacity: this.clamp(layer.opacity ?? 1, 0, 1),
         pixels: this.normalizePixels(layer.pixels, pixelCount),
       })),
@@ -2674,6 +3279,7 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
     return {
       name,
       visible: true,
+      locked: false,
       opacity: 1,
       pixels: new Array<Pixel>(this.width * this.height).fill(null),
     };
@@ -2710,13 +3316,16 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
 
   private paint(x: number, y: number): void {
     const radius = Math.max(1, this.brushSize);
+    const eraser = this.activeTool === 'eraser';
     for (let oy = 0; oy < radius; oy += 1) {
       for (let ox = 0; ox < radius; ox += 1) {
+        const px = x + ox;
+        const py = y + oy;
         this.setMirroredPixel(
           this.activeLayer.pixels,
-          x + ox,
-          y + oy,
-          this.activeTool === 'eraser' ? null : this.primaryColor,
+          px,
+          py,
+          eraser ? null : this.brushColorAt(px, py),
         );
       }
     }
@@ -2779,29 +3388,20 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
     y1: number,
     tool: Tool,
   ): void {
+    const color = this.effectivePrimary;
     if (tool === 'line') {
       this.drawLine(x0, y0, x1, y1, (x, y) =>
-        this.setMirroredPixel(buffer, x, y, this.primaryColor),
+        this.setMirroredPixel(buffer, x, y, color),
       );
     } else if (tool === 'rect') {
       const rect = this.normalizeSelection(this.rectFromPoints(x0, y0, x1, y1));
       for (let x = rect.x; x < rect.x + rect.w; x += 1) {
-        this.setMirroredPixel(buffer, x, rect.y, this.primaryColor);
-        this.setMirroredPixel(
-          buffer,
-          x,
-          rect.y + rect.h - 1,
-          this.primaryColor,
-        );
+        this.setMirroredPixel(buffer, x, rect.y, color);
+        this.setMirroredPixel(buffer, x, rect.y + rect.h - 1, color);
       }
       for (let y = rect.y; y < rect.y + rect.h; y += 1) {
-        this.setMirroredPixel(buffer, rect.x, y, this.primaryColor);
-        this.setMirroredPixel(
-          buffer,
-          rect.x + rect.w - 1,
-          y,
-          this.primaryColor,
-        );
+        this.setMirroredPixel(buffer, rect.x, y, color);
+        this.setMirroredPixel(buffer, rect.x + rect.w - 1, y, color);
       }
     } else if (tool === 'ellipse') {
       const rect = this.normalizeSelection(this.rectFromPoints(x0, y0, x1, y1));
@@ -2813,7 +3413,7 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
         for (let x = rect.x; x < rect.x + rect.w; x += 1) {
           const value = Math.pow((x - cx) / rx, 2) + Math.pow((y - cy) / ry, 2);
           if (value > 0.72 && value < 1.28) {
-            this.setMirroredPixel(buffer, x, y, this.primaryColor);
+            this.setMirroredPixel(buffer, x, y, color);
           }
         }
       }
@@ -2889,10 +3489,18 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
     this.ctx.fillRect(0, 0, canvas.width, canvas.height);
     this.drawCheckerboard();
 
-    if (this.onionSkin && this.activeFrameIndex > 0) {
-      this.ctx.globalAlpha = 0.25;
-      this.drawComposite(this.ctx, this.activeFrameIndex - 1, this.zoom, false);
-      this.ctx.globalAlpha = 1;
+    if (this.onionSkin && !this.isPlaying) {
+      // Ghost the neighbouring frames beneath the active one (render-only).
+      this.drawOnionFrame(
+        this.activeFrameIndex - 1,
+        this.onionPrevOpacity,
+        this.onionTint ? 'rgba(255, 80, 90, 0.55)' : null,
+      );
+      this.drawOnionFrame(
+        this.activeFrameIndex + 1,
+        this.onionNextOpacity,
+        this.onionTint ? 'rgba(70, 150, 255, 0.55)' : null,
+      );
     }
 
     this.drawComposite(
@@ -2915,6 +3523,7 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
     if (this.mirrorX) {
       this.drawMirrorGuide();
     }
+    this.drawPivot();
     if (this.selection) {
       this.drawSelection();
     }
@@ -3006,6 +3615,33 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
     return `${this.frames[frameIndex]?.duration ?? 0} ms`;
   }
 
+  /** Draw a neighbouring frame as a translucent (optionally tinted) onion overlay. */
+  private drawOnionFrame(frameIndex: number, alpha: number, tint: string | null): void {
+    const frame = this.frames[frameIndex];
+    if (!frame || !frame.visible || alpha <= 0) {
+      return;
+    }
+    const off = document.createElement('canvas');
+    off.width = this.canvasWidth;
+    off.height = this.canvasHeight;
+    const octx = off.getContext('2d');
+    if (!octx) {
+      return;
+    }
+    octx.imageSmoothingEnabled = false;
+    this.drawComposite(octx, frameIndex, this.zoom, false);
+    if (tint) {
+      // Tint only the drawn pixels so prev (red) / next (blue) are distinguishable.
+      octx.globalCompositeOperation = 'source-atop';
+      octx.fillStyle = tint;
+      octx.fillRect(0, 0, off.width, off.height);
+      octx.globalCompositeOperation = 'source-over';
+    }
+    this.ctx.globalAlpha = alpha;
+    this.ctx.drawImage(off, 0, 0);
+    this.ctx.globalAlpha = 1;
+  }
+
   private drawComposite(
     ctx: CanvasRenderingContext2D,
     frameIndex: number,
@@ -3066,6 +3702,10 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
   }
 
   private drawGrid(): void {
+    // Skip the pixel grid when zoomed far out — lines would just be noise.
+    if (this.zoom < 4) {
+      return;
+    }
     this.ctx.strokeStyle = 'rgba(20, 25, 32, 0.16)';
     this.ctx.lineWidth = 1;
     for (let x = 0; x <= this.width; x += 1) {
@@ -3080,6 +3720,25 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
       this.ctx.lineTo(this.canvasWidth, y * this.zoom + 0.5);
       this.ctx.stroke();
     }
+  }
+
+  /** Draw the pivot/anchor crosshair (display only, not part of the sprite). */
+  private drawPivot(): void {
+    const p = this.pivotPoint;
+    const cx = p.x * this.zoom;
+    const cy = p.y * this.zoom;
+    const r = 5;
+    this.ctx.save();
+    this.ctx.lineWidth = 1.5;
+    this.ctx.strokeStyle = 'rgba(255, 60, 160, 0.95)';
+    this.ctx.beginPath();
+    this.ctx.arc(cx, cy, r, 0, Math.PI * 2);
+    this.ctx.moveTo(cx - r - 3, cy);
+    this.ctx.lineTo(cx + r + 3, cy);
+    this.ctx.moveTo(cx, cy - r - 3);
+    this.ctx.lineTo(cx, cy + r + 3);
+    this.ctx.stroke();
+    this.ctx.restore();
   }
 
   private drawMirrorGuide(): void {
@@ -3606,14 +4265,44 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
       this.isPlaying = false;
       return;
     }
-    this.previewFrameIndex = this.findNextVisibleFrameIndex(
-      this.previewFrameIndex,
-    );
+    const next = this.findNextVisibleFrameIndex(this.previewFrameIndex);
+    // When looping is off, stop once we wrap past the last frame.
+    if (!this.loop && next <= this.previewFrameIndex) {
+      this.isPlaying = false;
+      this.previewFrameIndex = this.activeFrameIndex;
+      this.render();
+      return;
+    }
+    this.previewFrameIndex = next;
     this.render();
     this.animationTimer = window.setTimeout(
       () => this.playNextFrame(),
       this.frames[this.previewFrameIndex].duration,
     );
+  }
+
+  toggleLoop(): void {
+    this.loop = !this.loop;
+  }
+
+  /** Step the active frame backwards/forwards (wraps), pausing playback. */
+  stepFrame(delta: number): void {
+    if (this.isPlaying) {
+      this.togglePlayback();
+    }
+    const n = this.frames.length;
+    this.selectFrame(((this.activeFrameIndex + delta) % n + n) % n);
+  }
+
+  /** Apply the FPS value to every frame's duration. */
+  applyFps(): void {
+    const fps = this.clamp(Math.round(this.fps) || 1, 1, 60);
+    this.fps = fps;
+    const duration = Math.max(20, Math.round(1000 / fps));
+    for (const frame of this.frames) {
+      frame.duration = duration;
+    }
+    this.render();
   }
 
   private findNextVisibleFrameIndex(currentIndex: number): number {
