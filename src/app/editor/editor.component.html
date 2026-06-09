@@ -127,9 +127,11 @@
       <input type="number" min="1" max="8" [(ngModel)]="brushSize" />
     </label>
   </div>
-  <div class="control-group stretch">
+  <div class="btn-row">
     <button type="button" (click)="fitToScreen()">Fit</button>
     <button type="button" (click)="newSprite()">New</button>
+  </div>
+  <div class="check-row">
     <label class="check"><input type="checkbox" [(ngModel)]="showGrid" (change)="render()" /> Grid</label>
     <label class="check"><input type="checkbox" [(ngModel)]="onionSkin" (change)="render()" /> Onion</label>
     <label class="check"><input type="checkbox" [(ngModel)]="mirrorX" (change)="render()" /> Mirror X</label>
@@ -214,7 +216,7 @@
   <div class="timeline-combined-body">
     <section *ngIf="!framesMinimized" class="timeline-grid">
       <div class="timeline-headrow">
-        <div class="timeline-corner">Layers / Frames</div>
+        <div class="timeline-corner" *ngIf="!layersMinimized">Layers / Frames</div>
         <div
           class="timeline-frame-header-row"
           cdkDropList

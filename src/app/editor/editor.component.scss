@@ -1005,7 +1005,8 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 10px;
+  flex-wrap: wrap;
+  gap: 8px 10px;
   color: var(--muted);
   font-size: 12px;
 }
@@ -1014,9 +1015,12 @@
 }
 .prop-row .seg {
   display: flex;
+  flex-wrap: wrap;
   gap: 4px;
 }
 .prop-row .seg button {
+  flex: 1 1 auto;
+  min-width: 0;
   padding: 0 8px;
   min-height: 28px;
   font-size: 11px;
@@ -1342,10 +1346,30 @@ kbd {
 .control-group.stretch {
   margin-top: 10px;
   align-items: stretch;
+  flex-wrap: wrap;
 
   button {
     flex: 1;
   }
+}
+
+/* Canvas panel: flexible button + checkbox rows (no horizontal scroll) */
+.btn-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+  gap: 6px;
+  margin-top: 10px;
+}
+.check-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+.check-row .check {
+  flex: 1 1 auto;
+  min-width: 0;
+  white-space: nowrap;
 }
 
 .button-grid,

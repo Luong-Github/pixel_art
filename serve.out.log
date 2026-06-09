@@ -4095,3 +4095,83 @@ chunk-FPTKPQUD.mjs  | editor-component | 556.64 kB |
 Application bundle generation complete. [1.190 seconds]
 
 Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.16 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-7MF2WVJU.js   | editor-component | 283.45 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  20.69 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-LCUR6E6G.mjs  | editor-component | 557.00 kB | 
+
+Application bundle generation complete. [1.439 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.16 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-5XFPQPE7.js   | editor-component | 283.47 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  20.69 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-5PMEVKDS.mjs  | editor-component | 557.01 kB | 
+
+Application bundle generation complete. [2.400 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.16 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-F6DOTNU3.js   | editor-component | 283.86 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  20.69 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-EIY6U6AW.mjs  | editor-component | 557.40 kB | 
+
+Application bundle generation complete. [1.523 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.16 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-OY4QI5DB.js   | editor-component | 283.94 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  20.69 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-ZLMB3U5K.mjs  | editor-component | 557.48 kB | 
+
+Application bundle generation complete. [1.277 seconds]
+
+Page reload sent to client(s).
