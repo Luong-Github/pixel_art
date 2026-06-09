@@ -203,6 +203,13 @@
       <button type="button" class="tb-icon" title="Duplicate layer" (click)="duplicateLayer()">⧉</button>
       <button type="button" class="tb-icon" title="Move layer up" (click)="moveLayer(-1)">▲</button>
       <button type="button" class="tb-icon" title="Move layer down" (click)="moveLayer(1)">▼</button>
+      <button type="button" class="tb-icon" title="Group active layer" (click)="createGroupFromActive()">📁</button>
+      <label class="tb-num tb-blend" title="Active layer blend mode">
+        <span>Blend</span>
+        <select [ngModel]="activeLayerBlend" (ngModelChange)="setActiveLayerBlend($event)">
+          <option *ngFor="let b of blendModes" [ngValue]="b.value">{{ b.label }}</option>
+        </select>
+      </label>
       <button type="button" class="tb-icon danger-action" title="Delete layer" (click)="deleteLayer()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/><path d="M6 7l1 13a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-13"/></svg>
       </button>
@@ -278,12 +285,50 @@
       </div>
 
       <div class="timeline-rows" cdkDropList (cdkDropListDropped)="onLayerDrop($event)">
-        <div *ngFor="let layerIndex of timelineLayerIndices" class="timeline-row" cdkDrag>
+        <ng-container *ngFor="let layerIndex of timelineLayerIndices">
+        <!-- Group header (rendered before the group's first member layer) -->
+        <div
+          *ngIf="!layersMinimized && isGroupStart(layerIndex)"
+          class="timeline-row timeline-group-row">
+          <div
+            class="timeline-group-label"
+            [style.--group-color]="groupOf(layerIndex)!.color"
+            (contextmenu)="onGroupContextMenu($event, groupOf(layerIndex)!.id)">
+            <button type="button" class="group-caret" title="Collapse / expand group"
+              (click)="toggleGroupCollapsed(groupOf(layerIndex)!.id, $event)">
+              <span aria-hidden="true">{{ groupOf(layerIndex)!.collapsed ? '▸' : '▾' }}</span>
+            </button>
+            <button type="button" class="timeline-layer-visibility"
+              [class.off]="!groupOf(layerIndex)!.visible"
+              [title]="groupOf(layerIndex)!.visible ? 'Hide group' : 'Show group'"
+              (click)="toggleGroupVisibility(groupOf(layerIndex)!.id, $event)">
+              <span aria-hidden="true">{{ groupOf(layerIndex)!.visible ? '◉' : '○' }}</span>
+            </button>
+            <button type="button" class="timeline-layer-lock"
+              [class.on]="groupOf(layerIndex)!.locked"
+              [title]="groupOf(layerIndex)!.locked ? 'Unlock group' : 'Lock group'"
+              (click)="toggleGroupLock(groupOf(layerIndex)!.id, $event)">
+              <span aria-hidden="true">{{ groupOf(layerIndex)!.locked ? '🔒' : '🔓' }}</span>
+            </button>
+            <span class="timeline-group-name" title="Double-click to rename"
+              (dblclick)="renameGroup(groupOf(layerIndex)!.id)">📁 {{ groupOf(layerIndex)!.name }}</span>
+          </div>
+          <div class="timeline-cel-row timeline-group-band" [style.width.px]="tagTrackWidth">
+            <span class="group-band-fill" [style.background]="groupOf(layerIndex)!.color"></span>
+          </div>
+        </div>
+
+        <div
+          class="timeline-row"
+          cdkDrag
+          [class.collapsed-hidden]="isLayerRowHidden(layerIndex)">
           <div
             *ngIf="!layersMinimized"
             class="timeline-layer-row-label"
             [class.active]="activeLayerIndex === layerIndex"
             [class.is-locked]="isLayerLocked(layerIndex)"
+            [class.in-group]="groupOf(layerIndex)"
+            [style.--group-color]="groupOf(layerIndex)?.color || 'transparent'"
             (click)="selectLayer(layerIndex)"
             (contextmenu)="onLayerContextMenu($event, layerIndex)">
             <span class="layer-drag-handle" cdkDragHandle title="Drag to reorder layer" aria-hidden="true">⠿</span>
@@ -335,6 +380,7 @@
           </div>
           <div class="dock-drag-preview" *cdkDragPreview>{{ layerNameAt(layerIndex) }}</div>
         </div>
+        </ng-container>
       </div>
     </section>
     <div *ngIf="layersMinimized || framesMinimized" class="timeline-hidden-notice">
@@ -768,6 +814,15 @@
   <button type="button" (click)="moveLayer(-1)">Move up</button>
   <button type="button" (click)="moveLayer(1)">Move down</button>
   <span class="menu-sep"></span>
+  <button type="button" *ngIf="layerGroupId(layerMenu.index) == null" (click)="createGroupFromActive()">New group</button>
+  <button
+    type="button"
+    *ngFor="let g of groups"
+    (click)="moveLayerToGroup(layerMenu.index, g.id)">
+    Move to {{ g.name }}
+  </button>
+  <button type="button" *ngIf="layerGroupId(layerMenu.index) != null" (click)="moveLayerToGroup(layerMenu.index, null)">Remove from group</button>
+  <span class="menu-sep"></span>
   <button type="button" class="danger-action" (click)="deleteLayer()">Delete layer</button>
 </div>
 
@@ -789,6 +844,34 @@
   <button type="button" (click)="setTagRepeat(tagMenu.id)">Repeat: {{ tagById(tagMenu.id)!.repeat || '∞' }}…</button>
   <span class="menu-sep"></span>
   <button type="button" class="danger-action" (click)="deleteTag(tagMenu.id)">Delete tag</button>
+</div>
+
+<!-- ============================================================
+     Group header right-click context menu
+     ============================================================ -->
+<div
+  #groupMenuEl
+  class="context-menu menu-dropdown"
+  *ngIf="groupMenu"
+  [style.left.px]="groupMenu.x"
+  [style.top.px]="groupMenu.y">
+  <span class="menu-label">{{ getGroup(groupMenu.id)?.name }}</span>
+  <button type="button" (click)="renameGroup(groupMenu.id)">Rename…</button>
+  <button type="button" (click)="toggleGroupVisibility(groupMenu.id); $event.stopPropagation()">
+    {{ getGroup(groupMenu.id)!.visible ? 'Hide group' : 'Show group' }}
+  </button>
+  <button type="button" (click)="toggleGroupLock(groupMenu.id); $event.stopPropagation()">
+    {{ getGroup(groupMenu.id)!.locked ? 'Unlock group' : 'Lock group' }}
+  </button>
+  <button type="button" (click)="cycleGroupColor(groupMenu.id); $event.stopPropagation()">Change color</button>
+  <label class="menu-range" (click)="$event.stopPropagation()">
+    <span>Opacity</span>
+    <input type="range" min="0" max="1" step="0.05"
+      [value]="getGroup(groupMenu.id)!.opacity"
+      (input)="setGroupOpacity(groupMenu.id, $event)" />
+  </label>
+  <span class="menu-sep"></span>
+  <button type="button" class="danger-action" (click)="ungroup(groupMenu.id)">Ungroup</button>
 </div>
 
 <!-- ============================================================

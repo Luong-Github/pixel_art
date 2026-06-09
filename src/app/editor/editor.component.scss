@@ -701,7 +701,8 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.tb-playtag select {
+.tb-playtag select,
+.tb-blend select {
   max-width: 110px;
   padding: 2px 4px;
   border: 1px solid var(--line);
@@ -709,6 +710,76 @@
   background: var(--chrome);
   color: var(--ink);
   font-size: 11px;
+}
+
+/* Layer groups in the timeline */
+.timeline-group-row {
+  align-items: stretch;
+}
+.timeline-group-label {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  width: 196px;
+  min-width: 196px;
+  flex-shrink: 0;
+  padding: 2px 6px 2px 4px;
+  border-left: 3px solid var(--group-color, var(--accent-strong));
+  border-radius: 5px;
+  background: var(--chrome);
+  color: var(--ink);
+  font-weight: 600;
+  cursor: default;
+}
+.group-caret {
+  min-width: 18px;
+  width: 18px;
+  padding: 0;
+  font-size: 11px;
+  line-height: 1;
+}
+.timeline-group-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 12px;
+}
+.timeline-group-band {
+  align-items: center;
+}
+.group-band-fill {
+  display: block;
+  height: 4px;
+  width: 100%;
+  border-radius: 2px;
+  opacity: 0.5;
+}
+/* Indent + colored spine for layers that belong to a group */
+.timeline-layer-row-label.in-group {
+  margin-left: 12px;
+  width: 184px;
+  min-width: 184px;
+  border-left: 3px solid var(--group-color, transparent);
+  padding-left: 4px;
+}
+.timeline-row.collapsed-hidden {
+  display: none;
+}
+
+/* Slider row inside a context menu */
+.menu-range {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 10px;
+  font-size: 12px;
+  color: var(--muted);
+}
+.menu-range input {
+  flex: 1;
 }
 
 .timeline-corner {

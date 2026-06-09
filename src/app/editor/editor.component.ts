@@ -82,11 +82,24 @@ declare global {
   }
 }
 
+type BlendMode =
+  | 'normal'
+  | 'multiply'
+  | 'screen'
+  | 'overlay'
+  | 'darken'
+  | 'lighten'
+  | 'add'
+  | 'difference';
+
 interface Layer {
   name: string;
   visible: boolean;
   locked?: boolean;
   opacity: number;
+  blend?: BlendMode;
+  /** Owning group id, or null/undefined when ungrouped. */
+  groupId?: number | null;
   pixels: Pixel[];
 }
 
@@ -109,6 +122,17 @@ interface AnimTag {
   direction: TagDirection;
   /** Loop count for engine export; 0 = forever. */
   repeat: number;
+}
+
+/** A layer folder. Membership is by `Layer.groupId`; state lives at workspace level. */
+interface LayerGroup {
+  id: number;
+  name: string;
+  visible: boolean;
+  locked: boolean;
+  collapsed: boolean;
+  opacity: number;
+  color: string;
 }
 
 interface Selection {
@@ -153,6 +177,7 @@ interface WorkspaceState {
   height: number;
   frames: Frame[];
   tags: AnimTag[];
+  groups: LayerGroup[];
   activeFrameIndex: number;
   activeLayerIndex: number;
   palette: string[];
@@ -215,6 +240,9 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
 
   @ViewChild('tagMenuEl')
   private tagMenuRef?: ElementRef<HTMLElement>;
+
+  @ViewChild('groupMenuEl')
+  private groupMenuRef?: ElementRef<HTMLElement>;
   @ViewChild('dlgInput')
   private dlgInputRef?: ElementRef<HTMLInputElement>;
 
@@ -432,6 +460,11 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
 
   private ctx!: CanvasRenderingContext2D;
   private displayCtx!: CanvasRenderingContext2D;
+  /** Reused offscreen canvas for blend-mode compositing. */
+  private blendScratch: {
+    canvas: HTMLCanvasElement;
+    ctx: CanvasRenderingContext2D;
+  } | null = null;
   private pointer: PointerState | null = null;
   private selection: Selection | null = null;
   private clipboard: Selection | null = null;
@@ -469,12 +502,32 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
   private playDirection = 1;
   /** Tag right-click context menu. */
   tagMenu: { x: number; y: number; id: number } | null = null;
+  /** Group header right-click context menu. */
+  groupMenu: { x: number; y: number; id: number } | null = null;
   private readonly tagColors = [
     '#e05a5a', '#e0a23a', '#3ab0e0', '#7d6ce0', '#3ac08a', '#d65ab0', '#9aa7b3',
   ];
   /** Frame tile geometry (must match .frame-tile width + .timeline gap in SCSS). */
   private readonly TILE_W = 64;
   private readonly TILE_GAP = 10;
+
+  /** Layer folders (workspace-level); membership via Layer.groupId. */
+  groups: LayerGroup[] = [];
+  private groupIdSeed = 1;
+  private readonly groupColors = [
+    '#5b9ad6', '#d6975b', '#7bc06a', '#c06ab0', '#c0b06a', '#6ac0b0',
+  ];
+  /** Selectable layer blend modes. */
+  readonly blendModes: { value: BlendMode; label: string }[] = [
+    { value: 'normal', label: 'Normal' },
+    { value: 'multiply', label: 'Multiply' },
+    { value: 'screen', label: 'Screen' },
+    { value: 'overlay', label: 'Overlay' },
+    { value: 'darken', label: 'Darken' },
+    { value: 'lighten', label: 'Lighten' },
+    { value: 'add', label: 'Add' },
+    { value: 'difference', label: 'Difference' },
+  ];
 
   get activeFrame(): Frame {
     return this.frames[this.activeFrameIndex];
@@ -1824,6 +1877,7 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
     this.frames = [this.createFrame('Frame 1')];
     this.tags = [];
     this.activeTagId = null;
+    this.groups = [];
     this.activeFrameIndex = 0;
     this.activeLayerIndex = 0;
     this.selection = null;
@@ -1833,10 +1887,13 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
   addLayer(): void {
     this.pushUndo();
     const name = `Layer ${this.timelineLayerCount + 1}`;
+    // Insert above the active layer, inside the same group it belongs to.
+    const at = this.activeLayerIndex + 1;
+    const groupId = this.layerGroupId(this.activeLayerIndex);
     for (const frame of this.frames) {
-      frame.layers.push(this.createLayer(name));
+      frame.layers.splice(at, 0, this.createLayer(name, groupId));
     }
-    this.activeLayerIndex = this.timelineLayerCount - 1;
+    this.activeLayerIndex = at;
     this.render();
   }
 
@@ -1847,10 +1904,9 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
         frame.layers[this.activeLayerIndex] ??
         this.createLayer(`Layer ${this.activeLayerIndex + 1}`);
       frame.layers.splice(this.activeLayerIndex + 1, 0, {
+        ...source,
         name: `${source.name} copy`,
-        visible: source.visible,
         locked: source.locked ?? false,
-        opacity: source.opacity,
         pixels: [...source.pixels],
       });
     }
@@ -2787,7 +2843,11 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
   }
 
   get activeLayerLocked(): boolean {
-    return !!this.activeLayer?.locked;
+    const layer = this.activeLayer;
+    if (!layer) return false;
+    if (layer.locked) return true;
+    const g = this.groupById(layer.groupId);
+    return !!g && g.locked;
   }
 
   isLayerLocked(layerIndex: number): boolean {
@@ -2832,6 +2892,181 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
       const layer = frame.layers[layerIndex];
       if (layer) layer.name = name;
     }
+  }
+
+  // ===================== Layer blend modes =====================
+
+  layerBlendAt(layerIndex: number): BlendMode {
+    for (const frame of this.frames) {
+      const layer = frame.layers[layerIndex];
+      if (layer) return layer.blend ?? 'normal';
+    }
+    return 'normal';
+  }
+
+  private setLayerBlendAcross(layerIndex: number, blend: BlendMode): void {
+    for (const frame of this.frames) {
+      const layer = frame.layers[layerIndex];
+      if (layer) layer.blend = blend;
+    }
+  }
+
+  get activeLayerBlend(): BlendMode {
+    return this.layerBlendAt(this.activeLayerIndex);
+  }
+
+  setActiveLayerBlend(blend: BlendMode): void {
+    this.setLayerBlendAcross(this.activeLayerIndex, blend);
+    this.refreshAllFrameThumbnails();
+    this.render();
+  }
+
+  blendLabel(blend: BlendMode): string {
+    return this.blendModes.find((b) => b.value === blend)?.label ?? 'Normal';
+  }
+
+  // ===================== Layer groups =====================
+
+  getGroup(id: number | null | undefined): LayerGroup | undefined {
+    return this.groupById(id);
+  }
+
+  layerGroupId(layerIndex: number): number | null {
+    for (const frame of this.frames) {
+      const layer = frame.layers[layerIndex];
+      if (layer) return layer.groupId ?? null;
+    }
+    return null;
+  }
+
+  private setLayerGroupAcross(layerIndex: number, groupId: number | null): void {
+    for (const frame of this.frames) {
+      const layer = frame.layers[layerIndex];
+      if (layer) layer.groupId = groupId;
+    }
+  }
+
+  groupOf(layerIndex: number): LayerGroup | null {
+    return this.groupById(this.layerGroupId(layerIndex)) ?? null;
+  }
+
+  /** True when this layer is the first (lowest index) member of its group. */
+  isGroupStart(layerIndex: number): boolean {
+    const gid = this.layerGroupId(layerIndex);
+    if (gid == null) return false;
+    for (let i = 0; i < layerIndex; i += 1) {
+      if (this.layerGroupId(i) === gid) return false;
+    }
+    return true;
+  }
+
+  /** Grouped layers are hidden from the timeline when their group is collapsed. */
+  isLayerRowHidden(layerIndex: number): boolean {
+    const g = this.groupOf(layerIndex);
+    return !!g && g.collapsed;
+  }
+
+  /** Drop any empty groups (no remaining member layer). */
+  private pruneGroups(): void {
+    const used = new Set<number>();
+    for (let i = 0; i < this.timelineLayerCount; i += 1) {
+      const gid = this.layerGroupId(i);
+      if (gid != null) used.add(gid);
+    }
+    this.groups = this.groups.filter((g) => used.has(g.id));
+  }
+
+  /** Wrap the active layer in a new group. */
+  createGroupFromActive(): void {
+    if (this.layerGroupId(this.activeLayerIndex) != null) return;
+    this.pushUndo();
+    const group: LayerGroup = {
+      id: this.groupIdSeed++,
+      name: `Group ${this.groups.length + 1}`,
+      visible: true,
+      locked: false,
+      collapsed: false,
+      opacity: 1,
+      color: this.groupColors[this.groups.length % this.groupColors.length],
+    };
+    this.groups = [...this.groups, group];
+    this.setLayerGroupAcross(this.activeLayerIndex, group.id);
+    this.layerMenu = null;
+    this.render();
+  }
+
+  moveLayerToGroup(layerIndex: number, groupId: number | null): void {
+    this.pushUndo();
+    this.setLayerGroupAcross(layerIndex, groupId);
+    this.pruneGroups();
+    this.layerMenu = null;
+    this.refreshAllFrameThumbnails();
+    this.render();
+  }
+
+  async renameGroup(id: number): Promise<void> {
+    const g = this.groupById(id);
+    if (!g) return;
+    const name = await this.askPrompt({
+      title: 'Rename group',
+      value: g.name,
+      okLabel: 'Rename',
+    });
+    if (name == null) return;
+    const trimmed = name.trim();
+    if (trimmed) g.name = trimmed;
+  }
+
+  toggleGroupVisibility(id: number, event?: Event): void {
+    event?.stopPropagation();
+    const g = this.groupById(id);
+    if (!g) return;
+    g.visible = !g.visible;
+    this.refreshAllFrameThumbnails();
+    this.render();
+  }
+
+  toggleGroupLock(id: number, event?: Event): void {
+    event?.stopPropagation();
+    const g = this.groupById(id);
+    if (g) g.locked = !g.locked;
+  }
+
+  toggleGroupCollapsed(id: number, event?: Event): void {
+    event?.stopPropagation();
+    const g = this.groupById(id);
+    if (g) g.collapsed = !g.collapsed;
+  }
+
+  setGroupOpacity(id: number, event: Event): void {
+    const g = this.groupById(id);
+    if (!g) return;
+    g.opacity = this.clamp(
+      parseFloat((event.target as HTMLInputElement).value),
+      0,
+      1,
+    );
+    this.refreshAllFrameThumbnails();
+    this.render();
+  }
+
+  cycleGroupColor(id: number): void {
+    const g = this.groupById(id);
+    if (!g) return;
+    const i = this.groupColors.indexOf(g.color);
+    g.color = this.groupColors[(i + 1) % this.groupColors.length];
+  }
+
+  /** Ungroup: members become ungrouped layers; the group is removed. */
+  ungroup(id: number): void {
+    this.pushUndo();
+    for (let i = 0; i < this.timelineLayerCount; i += 1) {
+      if (this.layerGroupId(i) === id) this.setLayerGroupAcross(i, null);
+    }
+    this.groups = this.groups.filter((g) => g.id !== id);
+    this.groupMenu = null;
+    this.refreshAllFrameThumbnails();
+    this.render();
   }
 
   /** Drag-and-drop reorder a frame (column) to a new position. */
@@ -3140,6 +3375,35 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
     this.tagMenu = null;
   }
 
+  // ---- Group header right-click context menu ----
+
+  onGroupContextMenu(event: MouseEvent, id: number): void {
+    event.preventDefault();
+    event.stopPropagation();
+    if (!this.groupById(id)) return;
+    this.groupMenu = { x: event.clientX, y: event.clientY, id };
+    if (this.isBrowser) {
+      requestAnimationFrame(() => this.clampGroupMenu());
+    }
+  }
+
+  private clampGroupMenu(): void {
+    const el = this.groupMenuRef?.nativeElement;
+    if (!this.groupMenu || !el) return;
+    const pad = 8;
+    const maxX = window.innerWidth - el.offsetWidth - pad;
+    const maxY = window.innerHeight - el.offsetHeight - pad;
+    this.groupMenu = {
+      ...this.groupMenu,
+      x: Math.max(pad, Math.min(this.groupMenu.x, maxX)),
+      y: Math.max(pad, Math.min(this.groupMenu.y, maxY)),
+    };
+  }
+
+  closeGroupMenu(): void {
+    this.groupMenu = null;
+  }
+
   // ---- Tag index bookkeeping when frames mutate ----
 
   private shiftTagsForInsert(at: number, count: number): void {
@@ -3349,12 +3613,14 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
   onDocumentClick(): void {
     if (this.layerMenu) this.layerMenu = null;
     if (this.tagMenu) this.tagMenu = null;
+    if (this.groupMenu) this.groupMenu = null;
   }
 
   @HostListener('document:keydown.escape')
   onEscape(): void {
     this.layerMenu = null;
     this.tagMenu = null;
+    this.groupMenu = null;
     if (this.dialog) this.dialogCancel();
   }
 
@@ -3743,6 +4009,7 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
       height: this.height,
       frames: this.frames.map((frame) => this.cloneFrame(frame, frame.name)),
       tags: (this.tags ?? []).map((t) => ({ ...t })),
+      groups: (this.groups ?? []).map((g) => ({ ...g })),
       activeFrameIndex: this.activeFrameIndex,
       activeLayerIndex: this.activeLayerIndex,
       palette: [...this.palette],
@@ -3773,6 +4040,8 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
     this.tags = (workspace.tags ?? []).map((t) => ({ ...t }));
     this.activeTagId = null;
     this.tagIdSeed = Math.max(1, ...this.tags.map((t) => t.id + 1));
+    this.groups = (workspace.groups ?? []).map((g) => ({ ...g }));
+    this.groupIdSeed = Math.max(1, ...this.groups.map((g) => g.id + 1));
     this.activeFrameIndex = Math.min(
       workspace.activeFrameIndex,
       this.frames.length - 1,
@@ -3803,6 +4072,7 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
       height: this.height,
       frames: [this.createFrame('Frame 1')],
       tags: [],
+      groups: [],
       activeFrameIndex: 0,
       activeLayerIndex: 0,
       palette: [...this.palette],
@@ -3895,9 +4165,12 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
         visible: layer.visible ?? true,
         locked: layer.locked ?? false,
         opacity: this.clamp(layer.opacity ?? 1, 0, 1),
+        blend: this.normalizeBlend(layer.blend),
+        groupId: layer.groupId ?? null,
         pixels: this.normalizePixels(layer.pixels, pixelCount),
       })),
     }));
+    const groups = this.normalizeGroups(workspace.groups, frames);
     const activeFrameIndex = this.clamp(
       workspace.activeFrameIndex ?? 0,
       0,
@@ -3915,6 +4188,7 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
       height,
       frames,
       tags: this.normalizeTags(workspace.tags, frames.length),
+      groups,
       activeFrameIndex,
       activeLayerIndex,
       palette: this.normalizePalette(workspace.palette),
@@ -3936,6 +4210,7 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
         this.cloneFrame(frame, frame.name),
       ),
       tags: (workspace.tags ?? []).map((t) => ({ ...t })),
+      groups: (workspace.groups ?? []).map((g) => ({ ...g })),
       palette: [...workspace.palette],
     };
   }
@@ -3964,6 +4239,38 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
         repeat: Math.max(0, Math.floor(t?.repeat ?? 0) || 0),
       };
     });
+  }
+
+  private normalizeBlend(blend: unknown): BlendMode {
+    return this.blendModes.some((b) => b.value === blend)
+      ? (blend as BlendMode)
+      : 'normal';
+  }
+
+  /** Keep only groups actually referenced by a layer; sanitize their fields. */
+  private normalizeGroups(
+    groups: LayerGroup[] | undefined,
+    frames: Frame[],
+  ): LayerGroup[] {
+    if (!Array.isArray(groups)) return [];
+    const used = new Set<number>();
+    for (const layer of frames[0]?.layers ?? []) {
+      if (layer.groupId != null) used.add(layer.groupId);
+    }
+    return groups
+      .filter((g) => g && used.has(g.id))
+      .map((g, i) => ({
+        id: g.id,
+        name: g.name || `Group ${i + 1}`,
+        visible: g.visible ?? true,
+        locked: g.locked ?? false,
+        collapsed: g.collapsed ?? false,
+        opacity: this.clamp(g.opacity ?? 1, 0, 1),
+        color: this.normalizeRequiredColor(
+          g.color,
+          this.groupColors[i % this.groupColors.length],
+        ),
+      }));
   }
 
   private normalizePixels(
@@ -4005,12 +4312,14 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
     };
   }
 
-  private createLayer(name: string): Layer {
+  private createLayer(name: string, groupId: number | null = null): Layer {
     return {
       name,
       visible: true,
       locked: false,
       opacity: 1,
+      blend: 'normal',
+      groupId,
       pixels: new Array<Pixel>(this.width * this.height).fill(null),
     };
   }
@@ -4021,9 +4330,7 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
       duration: frame.duration,
       visible: frame.visible,
       layers: frame.layers.map((layer) => ({
-        name: layer.name,
-        visible: layer.visible,
-        opacity: layer.opacity,
+        ...layer,
         pixels: [...layer.pixels],
       })),
     };
@@ -4240,11 +4547,12 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
       true,
     );
     if (this.previewPixels) {
-      this.drawPixels(
+      this.drawBlendedPixels(
         this.ctx,
         this.previewPixels,
+        this.activeLayer.blend,
         this.zoom,
-        this.activeLayer.opacity,
+        this.layerEffectiveOpacity(this.activeLayer),
       );
     }
     if (this.showGrid) {
@@ -4277,11 +4585,12 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
       true,
     );
     if (this.previewPixels) {
-      this.drawPixels(
+      this.drawBlendedPixels(
         this.displayCtx,
         this.previewPixels,
+        this.activeLayer.blend,
         this.displayZoom,
-        this.activeLayer.opacity,
+        this.layerEffectiveOpacity(this.activeLayer),
       );
     }
   }
@@ -4329,8 +4638,14 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
     ctx.save();
     ctx.translate(offsetX, offsetY);
     frame.layers.forEach((layer) => {
-      if (layer.visible) {
-        this.drawPixels(ctx, layer.pixels, scale, layer.opacity);
+      if (this.layerEffectivelyVisible(layer)) {
+        this.drawBlendedPixels(
+          ctx,
+          layer.pixels,
+          layer.blend,
+          scale,
+          this.layerEffectiveOpacity(layer),
+        );
       }
     });
     ctx.restore();
@@ -4384,15 +4699,117 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
     }
     frame.layers.forEach((layer, index) => {
       if (
-        !layer.visible ||
+        !this.layerEffectivelyVisible(layer) ||
         (skipActivePreview &&
           this.previewPixels &&
           index === this.activeLayerIndex)
       ) {
         return;
       }
-      this.drawPixels(ctx, layer.pixels, scale, layer.opacity);
+      this.drawBlendedPixels(
+        ctx,
+        layer.pixels,
+        layer.blend,
+        scale,
+        this.layerEffectiveOpacity(layer),
+      );
     });
+  }
+
+  /**
+   * Draw a pixel buffer with a blend mode. For non-normal blends we render the
+   * layer to a scratch canvas once and composite it with a single drawImage,
+   * instead of blending thousands of fillRects against the backdrop (slow).
+   */
+  private drawBlendedPixels(
+    ctx: CanvasRenderingContext2D,
+    pixels: Pixel[],
+    blend: BlendMode | undefined,
+    scale: number,
+    opacity: number,
+  ): void {
+    const op = this.compositeOp(blend);
+    if (op === 'source-over') {
+      this.drawPixels(ctx, pixels, scale, opacity);
+      return;
+    }
+    const w = this.width * scale;
+    const h = this.height * scale;
+    const scratch = this.getBlendScratch(w, h);
+    if (!scratch) {
+      // Fallback: blend directly if no scratch context is available.
+      ctx.globalCompositeOperation = op;
+      this.drawPixels(ctx, pixels, scale, opacity);
+      ctx.globalCompositeOperation = 'source-over';
+      return;
+    }
+    scratch.ctx.clearRect(0, 0, scratch.canvas.width, scratch.canvas.height);
+    this.drawPixels(scratch.ctx, pixels, scale, 1);
+    ctx.globalCompositeOperation = op;
+    ctx.globalAlpha = opacity;
+    ctx.drawImage(scratch.canvas, 0, 0, w, h, 0, 0, w, h);
+    ctx.globalAlpha = 1;
+    ctx.globalCompositeOperation = 'source-over';
+  }
+
+  /** A lazily-sized offscreen canvas reused for blend compositing. */
+  private getBlendScratch(
+    w: number,
+    h: number,
+  ): { canvas: HTMLCanvasElement; ctx: CanvasRenderingContext2D } | null {
+    if (!this.isBrowser) return null;
+    if (!this.blendScratch) {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return null;
+      this.blendScratch = { canvas, ctx };
+    }
+    const { canvas, ctx } = this.blendScratch;
+    if (canvas.width < w || canvas.height < h) {
+      canvas.width = Math.max(canvas.width, w);
+      canvas.height = Math.max(canvas.height, h);
+    }
+    ctx.imageSmoothingEnabled = false;
+    return this.blendScratch;
+  }
+
+  /** Map a layer blend mode to a canvas composite operation. */
+  private compositeOp(blend: BlendMode | undefined): GlobalCompositeOperation {
+    switch (blend) {
+      case 'multiply':
+        return 'multiply';
+      case 'screen':
+        return 'screen';
+      case 'overlay':
+        return 'overlay';
+      case 'darken':
+        return 'darken';
+      case 'lighten':
+        return 'lighten';
+      case 'add':
+        return 'lighter';
+      case 'difference':
+        return 'difference';
+      default:
+        return 'source-over';
+    }
+  }
+
+  private groupById(id: number | null | undefined): LayerGroup | undefined {
+    return id == null ? undefined : this.groups.find((g) => g.id === id);
+  }
+
+  /** A layer is drawn only if it and its group (if any) are both visible. */
+  private layerEffectivelyVisible(layer: Layer): boolean {
+    if (!layer.visible) return false;
+    const g = this.groupById(layer.groupId);
+    return !g || g.visible;
+  }
+
+  /** Effective opacity folds in the owning group's opacity. */
+  private layerEffectiveOpacity(layer: Layer): number {
+    const g = this.groupById(layer.groupId);
+    return layer.opacity * (g ? g.opacity : 1);
   }
 
   private drawPixels(
@@ -4962,6 +5379,7 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
       height: this.height,
       frames: this.frames,
       tags: this.tags,
+      groups: this.groups,
       activeFrameIndex: this.activeFrameIndex,
       activeLayerIndex: this.activeLayerIndex,
       palette: this.palette,
@@ -4977,6 +5395,7 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
     this.height = state.height;
     this.frames = state.frames;
     this.tags = state.tags ?? [];
+    this.groups = state.groups ?? [];
     this.activeFrameIndex = state.activeFrameIndex;
     this.activeLayerIndex = state.activeLayerIndex;
     this.palette = state.palette;
@@ -5098,7 +5517,9 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
   private compositeAt(x: number, y: number): string | null {
     for (let i = this.activeFrame.layers.length - 1; i >= 0; i -= 1) {
       const layer = this.activeFrame.layers[i];
-      const color = layer.visible ? layer.pixels[this.index(x, y)] : null;
+      const color = this.layerEffectivelyVisible(layer)
+        ? layer.pixels[this.index(x, y)]
+        : null;
       if (color) {
         return color;
       }

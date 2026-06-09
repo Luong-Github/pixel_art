@@ -6411,3 +6411,1168 @@ chunk-IKNKR3RE.mjs  | editor-component | 602.98 kB |
 Application bundle generation complete. [2.567 seconds]
 
 Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.54 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-EIOIHCN5.js   | editor-component | 330.64 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  21.08 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-PLGCAQA2.mjs  | editor-component | 602.98 kB | 
+
+Application bundle generation complete. [2.824 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.54 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-7YX5S2LJ.js   | editor-component | 330.64 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  21.08 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-OWCV2FPB.mjs  | editor-component | 602.98 kB | 
+
+Application bundle generation complete. [1.693 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Application bundle generation failed. [2.251 seconds]
+
+X [ERROR] TS2741: Property 'groups' is missing in type '{ id: number; name: string; width: number; height: number; frames: Frame[]; tags: { id: number; name: string; from: number; to: number; color: string; direction: TagDirection; repeat: number; }[]; ... 4 more ...; secondaryColor: string; }' but required in type 'WorkspaceState'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:3764:4:
+      3764 │     return {
+           ╵     ~~~~~~
+
+  'groups' is declared here.
+
+    src/app/editor/editor.component.ts:180:2:
+      180 │   groups: LayerGroup[];
+          ╵   ~~~~~~
+
+
+X [ERROR] TS2741: Property 'groups' is missing in type '{ id: number; name: string; width: number; height: number; frames: Frame[]; tags: never[]; activeFrameIndex: number; activeLayerIndex: number; palette: string[]; primaryColor: string; secondaryColor: string; }' but required in type 'WorkspaceState'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:3824:4:
+      3824 │     return {
+           ╵     ~~~~~~
+
+  'groups' is declared here.
+
+    src/app/editor/editor.component.ts:180:2:
+      180 │   groups: LayerGroup[];
+          ╵   ~~~~~~
+
+
+X [ERROR] TS2741: Property 'groups' is missing in type '{ id: number; name: string; width: number; height: number; frames: { name: string; duration: number; visible: boolean; layers: { name: string; visible: boolean; locked: boolean; opacity: number; pixels: Pixel[]; }[]; }[]; ... 5 more ...; secondaryColor: string; }' but required in type 'WorkspaceState'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:3936:4:
+      3936 │     return {
+           ╵     ~~~~~~
+
+  'groups' is declared here.
+
+    src/app/editor/editor.component.ts:180:2:
+      180 │   groups: LayerGroup[];
+          ╵   ~~~~~~
+
+
+- Changes detected. Rebuilding...
+
+Application bundle generation failed. [2.248 seconds]
+
+X [ERROR] TS2741: Property 'groups' is missing in type '{ id: number; name: string; width: number; height: number; frames: Frame[]; tags: { id: number; name: string; from: number; to: number; color: string; direction: TagDirection; repeat: number; }[]; ... 4 more ...; secondaryColor: string; }' but required in type 'WorkspaceState'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:3782:4:
+      3782 │     return {
+           ╵     ~~~~~~
+
+  'groups' is declared here.
+
+    src/app/editor/editor.component.ts:180:2:
+      180 │   groups: LayerGroup[];
+          ╵   ~~~~~~
+
+
+X [ERROR] TS2741: Property 'groups' is missing in type '{ id: number; name: string; width: number; height: number; frames: Frame[]; tags: never[]; activeFrameIndex: number; activeLayerIndex: number; palette: string[]; primaryColor: string; secondaryColor: string; }' but required in type 'WorkspaceState'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:3842:4:
+      3842 │     return {
+           ╵     ~~~~~~
+
+  'groups' is declared here.
+
+    src/app/editor/editor.component.ts:180:2:
+      180 │   groups: LayerGroup[];
+          ╵   ~~~~~~
+
+
+X [ERROR] TS2741: Property 'groups' is missing in type '{ id: number; name: string; width: number; height: number; frames: { name: string; duration: number; visible: boolean; layers: { name: string; visible: boolean; locked: boolean; opacity: number; pixels: Pixel[]; }[]; }[]; ... 5 more ...; secondaryColor: string; }' but required in type 'WorkspaceState'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:3954:4:
+      3954 │     return {
+           ╵     ~~~~~~
+
+  'groups' is declared here.
+
+    src/app/editor/editor.component.ts:180:2:
+      180 │   groups: LayerGroup[];
+          ╵   ~~~~~~
+
+
+- Changes detected. Rebuilding...
+
+Application bundle generation failed. [2.637 seconds]
+
+X [ERROR] TS2741: Property 'groups' is missing in type '{ id: number; name: string; width: number; height: number; frames: Frame[]; tags: { id: number; name: string; from: number; to: number; color: string; direction: TagDirection; repeat: number; }[]; ... 4 more ...; secondaryColor: string; }' but required in type 'WorkspaceState'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:3782:4:
+      3782 │     return {
+           ╵     ~~~~~~
+
+  'groups' is declared here.
+
+    src/app/editor/editor.component.ts:180:2:
+      180 │   groups: LayerGroup[];
+          ╵   ~~~~~~
+
+
+X [ERROR] TS2741: Property 'groups' is missing in type '{ id: number; name: string; width: number; height: number; frames: Frame[]; tags: never[]; activeFrameIndex: number; activeLayerIndex: number; palette: string[]; primaryColor: string; secondaryColor: string; }' but required in type 'WorkspaceState'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:3842:4:
+      3842 │     return {
+           ╵     ~~~~~~
+
+  'groups' is declared here.
+
+    src/app/editor/editor.component.ts:180:2:
+      180 │   groups: LayerGroup[];
+          ╵   ~~~~~~
+
+
+X [ERROR] TS2741: Property 'groups' is missing in type '{ id: number; name: string; width: number; height: number; frames: { name: string; duration: number; visible: boolean; layers: { name: string; visible: boolean; locked: boolean; opacity: number; pixels: Pixel[]; }[]; }[]; ... 5 more ...; secondaryColor: string; }' but required in type 'WorkspaceState'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:3954:4:
+      3954 │     return {
+           ╵     ~~~~~~
+
+  'groups' is declared here.
+
+    src/app/editor/editor.component.ts:180:2:
+      180 │   groups: LayerGroup[];
+          ╵   ~~~~~~
+
+
+- Changes detected. Rebuilding...
+
+Application bundle generation failed. [1.626 seconds]
+
+X [ERROR] TS2741: Property 'groups' is missing in type '{ id: number; name: string; width: number; height: number; frames: Frame[]; tags: { id: number; name: string; from: number; to: number; color: string; direction: TagDirection; repeat: number; }[]; ... 4 more ...; secondaryColor: string; }' but required in type 'WorkspaceState'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:3782:4:
+      3782 │     return {
+           ╵     ~~~~~~
+
+  'groups' is declared here.
+
+    src/app/editor/editor.component.ts:180:2:
+      180 │   groups: LayerGroup[];
+          ╵   ~~~~~~
+
+
+X [ERROR] TS2741: Property 'groups' is missing in type '{ id: number; name: string; width: number; height: number; frames: Frame[]; tags: never[]; activeFrameIndex: number; activeLayerIndex: number; palette: string[]; primaryColor: string; secondaryColor: string; }' but required in type 'WorkspaceState'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:3842:4:
+      3842 │     return {
+           ╵     ~~~~~~
+
+  'groups' is declared here.
+
+    src/app/editor/editor.component.ts:180:2:
+      180 │   groups: LayerGroup[];
+          ╵   ~~~~~~
+
+
+X [ERROR] TS2741: Property 'groups' is missing in type '{ id: number; name: string; width: number; height: number; frames: { name: string; duration: number; visible: boolean; layers: { name: string; visible: boolean; locked: boolean; opacity: number; pixels: Pixel[]; }[]; }[]; ... 5 more ...; secondaryColor: string; }' but required in type 'WorkspaceState'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:3954:4:
+      3954 │     return {
+           ╵     ~~~~~~
+
+  'groups' is declared here.
+
+    src/app/editor/editor.component.ts:180:2:
+      180 │   groups: LayerGroup[];
+          ╵   ~~~~~~
+
+
+- Changes detected. Rebuilding...
+
+Application bundle generation failed. [1.609 seconds]
+
+X [ERROR] TS2741: Property 'groups' is missing in type '{ id: number; name: string; width: number; height: number; frames: Frame[]; tags: { id: number; name: string; from: number; to: number; color: string; direction: TagDirection; repeat: number; }[]; ... 4 more ...; secondaryColor: string; }' but required in type 'WorkspaceState'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:3782:4:
+      3782 │     return {
+           ╵     ~~~~~~
+
+  'groups' is declared here.
+
+    src/app/editor/editor.component.ts:180:2:
+      180 │   groups: LayerGroup[];
+          ╵   ~~~~~~
+
+
+X [ERROR] TS2741: Property 'groups' is missing in type '{ id: number; name: string; width: number; height: number; frames: Frame[]; tags: never[]; activeFrameIndex: number; activeLayerIndex: number; palette: string[]; primaryColor: string; secondaryColor: string; }' but required in type 'WorkspaceState'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:3842:4:
+      3842 │     return {
+           ╵     ~~~~~~
+
+  'groups' is declared here.
+
+    src/app/editor/editor.component.ts:180:2:
+      180 │   groups: LayerGroup[];
+          ╵   ~~~~~~
+
+
+X [ERROR] TS2741: Property 'groups' is missing in type '{ id: number; name: string; width: number; height: number; frames: { name: string; duration: number; visible: boolean; layers: { name: string; visible: boolean; locked: boolean; opacity: number; pixels: Pixel[]; }[]; }[]; ... 5 more ...; secondaryColor: string; }' but required in type 'WorkspaceState'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:3954:4:
+      3954 │     return {
+           ╵     ~~~~~~
+
+  'groups' is declared here.
+
+    src/app/editor/editor.component.ts:180:2:
+      180 │   groups: LayerGroup[];
+          ╵   ~~~~~~
+
+
+- Changes detected. Rebuilding...
+
+Application bundle generation failed. [1.426 seconds]
+
+X [ERROR] TS2741: Property 'groups' is missing in type '{ id: number; name: string; width: number; height: number; frames: Frame[]; tags: { id: number; name: string; from: number; to: number; color: string; direction: TagDirection; repeat: number; }[]; ... 4 more ...; secondaryColor: string; }' but required in type 'WorkspaceState'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:3782:4:
+      3782 │     return {
+           ╵     ~~~~~~
+
+  'groups' is declared here.
+
+    src/app/editor/editor.component.ts:180:2:
+      180 │   groups: LayerGroup[];
+          ╵   ~~~~~~
+
+
+X [ERROR] TS2741: Property 'groups' is missing in type '{ id: number; name: string; width: number; height: number; frames: Frame[]; tags: never[]; activeFrameIndex: number; activeLayerIndex: number; palette: string[]; primaryColor: string; secondaryColor: string; }' but required in type 'WorkspaceState'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:3842:4:
+      3842 │     return {
+           ╵     ~~~~~~
+
+  'groups' is declared here.
+
+    src/app/editor/editor.component.ts:180:2:
+      180 │   groups: LayerGroup[];
+          ╵   ~~~~~~
+
+
+X [ERROR] TS2741: Property 'groups' is missing in type '{ id: number; name: string; width: number; height: number; frames: { name: string; duration: number; visible: boolean; layers: { name: string; visible: boolean; locked: boolean; opacity: number; pixels: Pixel[]; }[]; }[]; ... 5 more ...; secondaryColor: string; }' but required in type 'WorkspaceState'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:3954:4:
+      3954 │     return {
+           ╵     ~~~~~~
+
+  'groups' is declared here.
+
+    src/app/editor/editor.component.ts:180:2:
+      180 │   groups: LayerGroup[];
+          ╵   ~~~~~~
+
+
+- Changes detected. Rebuilding...
+
+Application bundle generation failed. [2.192 seconds]
+
+X [ERROR] TS2741: Property 'groups' is missing in type '{ id: number; name: string; width: number; height: number; frames: Frame[]; tags: { id: number; name: string; from: number; to: number; color: string; direction: TagDirection; repeat: number; }[]; ... 4 more ...; secondaryColor: string; }' but required in type 'WorkspaceState'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:3782:4:
+      3782 │     return {
+           ╵     ~~~~~~
+
+  'groups' is declared here.
+
+    src/app/editor/editor.component.ts:180:2:
+      180 │   groups: LayerGroup[];
+          ╵   ~~~~~~
+
+
+X [ERROR] TS2741: Property 'groups' is missing in type '{ id: number; name: string; width: number; height: number; frames: Frame[]; tags: never[]; activeFrameIndex: number; activeLayerIndex: number; palette: string[]; primaryColor: string; secondaryColor: string; }' but required in type 'WorkspaceState'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:3842:4:
+      3842 │     return {
+           ╵     ~~~~~~
+
+  'groups' is declared here.
+
+    src/app/editor/editor.component.ts:180:2:
+      180 │   groups: LayerGroup[];
+          ╵   ~~~~~~
+
+
+X [ERROR] TS2741: Property 'groups' is missing in type '{ id: number; name: string; width: number; height: number; frames: { name: string; duration: number; visible: boolean; layers: { name: string; visible: boolean; locked: boolean; opacity: number; pixels: Pixel[]; }[]; }[]; ... 5 more ...; secondaryColor: string; }' but required in type 'WorkspaceState'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:3954:4:
+      3954 │     return {
+           ╵     ~~~~~~
+
+  'groups' is declared here.
+
+    src/app/editor/editor.component.ts:180:2:
+      180 │   groups: LayerGroup[];
+          ╵   ~~~~~~
+
+
+- Changes detected. Rebuilding...
+
+Application bundle generation failed. [1.459 seconds]
+
+X [ERROR] TS2741: Property 'groups' is missing in type '{ id: number; name: string; width: number; height: number; frames: Frame[]; tags: { id: number; name: string; from: number; to: number; color: string; direction: TagDirection; repeat: number; }[]; ... 4 more ...; secondaryColor: string; }' but required in type 'WorkspaceState'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:3782:4:
+      3782 │     return {
+           ╵     ~~~~~~
+
+  'groups' is declared here.
+
+    src/app/editor/editor.component.ts:180:2:
+      180 │   groups: LayerGroup[];
+          ╵   ~~~~~~
+
+
+X [ERROR] TS2741: Property 'groups' is missing in type '{ id: number; name: string; width: number; height: number; frames: Frame[]; tags: never[]; activeFrameIndex: number; activeLayerIndex: number; palette: string[]; primaryColor: string; secondaryColor: string; }' but required in type 'WorkspaceState'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:3842:4:
+      3842 │     return {
+           ╵     ~~~~~~
+
+  'groups' is declared here.
+
+    src/app/editor/editor.component.ts:180:2:
+      180 │   groups: LayerGroup[];
+          ╵   ~~~~~~
+
+
+X [ERROR] TS2741: Property 'groups' is missing in type '{ id: number; name: string; width: number; height: number; frames: { name: string; duration: number; visible: boolean; layers: { name: string; visible: boolean; locked: boolean; opacity: number; pixels: Pixel[]; }[]; }[]; ... 5 more ...; secondaryColor: string; }' but required in type 'WorkspaceState'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:3954:4:
+      3954 │     return {
+           ╵     ~~~~~~
+
+  'groups' is declared here.
+
+    src/app/editor/editor.component.ts:180:2:
+      180 │   groups: LayerGroup[];
+          ╵   ~~~~~~
+
+
+- Changes detected. Rebuilding...
+
+Application bundle generation failed. [1.560 seconds]
+
+X [ERROR] TS2741: Property 'groups' is missing in type '{ id: number; name: string; width: number; height: number; frames: Frame[]; tags: { id: number; name: string; from: number; to: number; color: string; direction: TagDirection; repeat: number; }[]; ... 4 more ...; secondaryColor: string; }' but required in type 'WorkspaceState'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:3782:4:
+      3782 │     return {
+           ╵     ~~~~~~
+
+  'groups' is declared here.
+
+    src/app/editor/editor.component.ts:180:2:
+      180 │   groups: LayerGroup[];
+          ╵   ~~~~~~
+
+
+X [ERROR] TS2741: Property 'groups' is missing in type '{ id: number; name: string; width: number; height: number; frames: Frame[]; tags: never[]; activeFrameIndex: number; activeLayerIndex: number; palette: string[]; primaryColor: string; secondaryColor: string; }' but required in type 'WorkspaceState'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:3842:4:
+      3842 │     return {
+           ╵     ~~~~~~
+
+  'groups' is declared here.
+
+    src/app/editor/editor.component.ts:180:2:
+      180 │   groups: LayerGroup[];
+          ╵   ~~~~~~
+
+
+X [ERROR] TS2741: Property 'groups' is missing in type '{ id: number; name: string; width: number; height: number; frames: { name: string; duration: number; visible: boolean; layers: { name: string; visible: boolean; locked: boolean; opacity: number; pixels: Pixel[]; }[]; }[]; ... 5 more ...; secondaryColor: string; }' but required in type 'WorkspaceState'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:3954:4:
+      3954 │     return {
+           ╵     ~~~~~~
+
+  'groups' is declared here.
+
+    src/app/editor/editor.component.ts:180:2:
+      180 │   groups: LayerGroup[];
+          ╵   ~~~~~~
+
+
+- Changes detected. Rebuilding...
+
+Application bundle generation failed. [1.589 seconds]
+
+X [ERROR] TS2741: Property 'groups' is missing in type '{ id: number; name: string; width: number; height: number; frames: Frame[]; tags: { id: number; name: string; from: number; to: number; color: string; direction: TagDirection; repeat: number; }[]; ... 4 more ...; secondaryColor: string; }' but required in type 'WorkspaceState'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:3781:4:
+      3781 │     return {
+           ╵     ~~~~~~
+
+  'groups' is declared here.
+
+    src/app/editor/editor.component.ts:180:2:
+      180 │   groups: LayerGroup[];
+          ╵   ~~~~~~
+
+
+X [ERROR] TS2741: Property 'groups' is missing in type '{ id: number; name: string; width: number; height: number; frames: Frame[]; tags: never[]; activeFrameIndex: number; activeLayerIndex: number; palette: string[]; primaryColor: string; secondaryColor: string; }' but required in type 'WorkspaceState'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:3841:4:
+      3841 │     return {
+           ╵     ~~~~~~
+
+  'groups' is declared here.
+
+    src/app/editor/editor.component.ts:180:2:
+      180 │   groups: LayerGroup[];
+          ╵   ~~~~~~
+
+
+X [ERROR] TS2741: Property 'groups' is missing in type '{ id: number; name: string; width: number; height: number; frames: { name: string; duration: number; visible: boolean; layers: { name: string; visible: boolean; locked: boolean; opacity: number; pixels: Pixel[]; }[]; }[]; ... 5 more ...; secondaryColor: string; }' but required in type 'WorkspaceState'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:3953:4:
+      3953 │     return {
+           ╵     ~~~~~~
+
+  'groups' is declared here.
+
+    src/app/editor/editor.component.ts:180:2:
+      180 │   groups: LayerGroup[];
+          ╵   ~~~~~~
+
+
+- Changes detected. Rebuilding...
+
+Application bundle generation failed. [1.448 seconds]
+
+X [ERROR] TS2339: Property 'layerGroupId' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:1881:25:
+      1881 │     const groupId = this.layerGroupId(this.activeLayerIndex);
+           ╵                          ~~~~~~~~~~~~
+
+
+X [ERROR] TS2741: Property 'groups' is missing in type '{ id: number; name: string; width: number; height: number; frames: Frame[]; tags: { id: number; name: string; from: number; to: number; color: string; direction: TagDirection; repeat: number; }[]; ... 4 more ...; secondaryColor: string; }' but required in type 'WorkspaceState'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:3784:4:
+      3784 │     return {
+           ╵     ~~~~~~
+
+  'groups' is declared here.
+
+    src/app/editor/editor.component.ts:180:2:
+      180 │   groups: LayerGroup[];
+          ╵   ~~~~~~
+
+
+X [ERROR] TS2741: Property 'groups' is missing in type '{ id: number; name: string; width: number; height: number; frames: Frame[]; tags: never[]; activeFrameIndex: number; activeLayerIndex: number; palette: string[]; primaryColor: string; secondaryColor: string; }' but required in type 'WorkspaceState'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:3844:4:
+      3844 │     return {
+           ╵     ~~~~~~
+
+  'groups' is declared here.
+
+    src/app/editor/editor.component.ts:180:2:
+      180 │   groups: LayerGroup[];
+          ╵   ~~~~~~
+
+
+X [ERROR] TS2741: Property 'groups' is missing in type '{ id: number; name: string; width: number; height: number; frames: { name: string; duration: number; visible: boolean; layers: { name: string; visible: boolean; locked: boolean; opacity: number; pixels: Pixel[]; }[]; }[]; ... 5 more ...; secondaryColor: string; }' but required in type 'WorkspaceState'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:3956:4:
+      3956 │     return {
+           ╵     ~~~~~~
+
+  'groups' is declared here.
+
+    src/app/editor/editor.component.ts:180:2:
+      180 │   groups: LayerGroup[];
+          ╵   ~~~~~~
+
+
+- Changes detected. Rebuilding...
+
+Application bundle generation failed. [1.590 seconds]
+
+X [ERROR] TS2339: Property 'layerGroupId' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:1881:25:
+      1881 │     const groupId = this.layerGroupId(this.activeLayerIndex);
+           ╵                          ~~~~~~~~~~~~
+
+
+X [ERROR] TS2741: Property 'groups' is missing in type '{ id: number; name: string; width: number; height: number; frames: Frame[]; tags: { id: number; name: string; from: number; to: number; color: string; direction: TagDirection; repeat: number; }[]; ... 4 more ...; secondaryColor: string; }' but required in type 'WorkspaceState'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:3784:4:
+      3784 │     return {
+           ╵     ~~~~~~
+
+  'groups' is declared here.
+
+    src/app/editor/editor.component.ts:180:2:
+      180 │   groups: LayerGroup[];
+          ╵   ~~~~~~
+
+
+X [ERROR] TS2741: Property 'groups' is missing in type '{ id: number; name: string; width: number; height: number; frames: Frame[]; tags: never[]; activeFrameIndex: number; activeLayerIndex: number; palette: string[]; primaryColor: string; secondaryColor: string; }' but required in type 'WorkspaceState'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:3844:4:
+      3844 │     return {
+           ╵     ~~~~~~
+
+  'groups' is declared here.
+
+    src/app/editor/editor.component.ts:180:2:
+      180 │   groups: LayerGroup[];
+          ╵   ~~~~~~
+
+
+X [ERROR] TS2339: Property 'normalizeBlend' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:3943:20:
+      3943 │         blend: this.normalizeBlend(layer.blend),
+           ╵                     ~~~~~~~~~~~~~~
+
+
+X [ERROR] TS2551: Property 'normalizeGroups' does not exist on type 'EditorComponent'. Did you mean 'normalizeTags'? [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:3948:24:
+      3948 │     const groups = this.normalizeGroups(workspace.groups, frames);
+           ╵                         ~~~~~~~~~~~~~~~
+
+  'normalizeTags' is declared here.
+
+    src/app/editor/editor.component.ts:3991:10:
+      3991 │   private normalizeTags(
+           ╵           ~~~~~~~~~~~~~
+
+
+X [ERROR] TS2741: Property 'groups' is missing in type '{ id: number; name: string; width: number; height: number; frames: { name: string; duration: number; visible: boolean; layers: { name: string; visible: boolean; locked: boolean; opacity: number; blend: any; groupId: number | null; pixels: Pixel[]; }[]; }[]; ... 5 more ...; secondaryColor: string; }' but required in type 'WorkspaceState'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:3959:4:
+      3959 │     return {
+           ╵     ~~~~~~
+
+  'groups' is declared here.
+
+    src/app/editor/editor.component.ts:180:2:
+      180 │   groups: LayerGroup[];
+          ╵   ~~~~~~
+
+
+- Changes detected. Rebuilding...
+
+Application bundle generation failed. [1.465 seconds]
+
+X [ERROR] TS2339: Property 'layerGroupId' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:1881:25:
+      1881 │     const groupId = this.layerGroupId(this.activeLayerIndex);
+           ╵                          ~~~~~~~~~~~~
+
+
+X [ERROR] TS2741: Property 'groups' is missing in type '{ id: number; name: string; width: number; height: number; frames: Frame[]; tags: { id: number; name: string; from: number; to: number; color: string; direction: TagDirection; repeat: number; }[]; ... 4 more ...; secondaryColor: string; }' but required in type 'WorkspaceState'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:3784:4:
+      3784 │     return {
+           ╵     ~~~~~~
+
+  'groups' is declared here.
+
+    src/app/editor/editor.component.ts:180:2:
+      180 │   groups: LayerGroup[];
+          ╵   ~~~~~~
+
+
+X [ERROR] TS2741: Property 'groups' is missing in type '{ id: number; name: string; width: number; height: number; frames: Frame[]; tags: never[]; activeFrameIndex: number; activeLayerIndex: number; palette: string[]; primaryColor: string; secondaryColor: string; }' but required in type 'WorkspaceState'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:3844:4:
+      3844 │     return {
+           ╵     ~~~~~~
+
+  'groups' is declared here.
+
+    src/app/editor/editor.component.ts:180:2:
+      180 │   groups: LayerGroup[];
+          ╵   ~~~~~~
+
+
+X [ERROR] TS2339: Property 'normalizeBlend' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:3943:20:
+      3943 │         blend: this.normalizeBlend(layer.blend),
+           ╵                     ~~~~~~~~~~~~~~
+
+
+X [ERROR] TS2551: Property 'normalizeGroups' does not exist on type 'EditorComponent'. Did you mean 'normalizeTags'? [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:3948:24:
+      3948 │     const groups = this.normalizeGroups(workspace.groups, frames);
+           ╵                         ~~~~~~~~~~~~~~~
+
+  'normalizeTags' is declared here.
+
+    src/app/editor/editor.component.ts:3992:10:
+      3992 │   private normalizeTags(
+           ╵           ~~~~~~~~~~~~~
+
+
+- Changes detected. Rebuilding...
+
+Application bundle generation failed. [2.331 seconds]
+
+X [ERROR] TS2339: Property 'layerGroupId' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:1881:25:
+      1881 │     const groupId = this.layerGroupId(this.activeLayerIndex);
+           ╵                          ~~~~~~~~~~~~
+
+
+X [ERROR] TS2741: Property 'groups' is missing in type '{ id: number; name: string; width: number; height: number; frames: Frame[]; tags: { id: number; name: string; from: number; to: number; color: string; direction: TagDirection; repeat: number; }[]; ... 4 more ...; secondaryColor: string; }' but required in type 'WorkspaceState'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:3784:4:
+      3784 │     return {
+           ╵     ~~~~~~
+
+  'groups' is declared here.
+
+    src/app/editor/editor.component.ts:180:2:
+      180 │   groups: LayerGroup[];
+          ╵   ~~~~~~
+
+
+X [ERROR] TS2741: Property 'groups' is missing in type '{ id: number; name: string; width: number; height: number; frames: Frame[]; tags: never[]; activeFrameIndex: number; activeLayerIndex: number; palette: string[]; primaryColor: string; secondaryColor: string; }' but required in type 'WorkspaceState'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:3844:4:
+      3844 │     return {
+           ╵     ~~~~~~
+
+  'groups' is declared here.
+
+    src/app/editor/editor.component.ts:180:2:
+      180 │   groups: LayerGroup[];
+          ╵   ~~~~~~
+
+
+- Changes detected. Rebuilding...
+
+Application bundle generation failed. [1.339 seconds]
+
+X [ERROR] TS2339: Property 'layerGroupId' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:1881:25:
+      1881 │     const groupId = this.layerGroupId(this.activeLayerIndex);
+           ╵                          ~~~~~~~~~~~~
+
+
+X [ERROR] TS2741: Property 'groups' is missing in type '{ id: number; name: string; width: number; height: number; frames: Frame[]; tags: { id: number; name: string; from: number; to: number; color: string; direction: TagDirection; repeat: number; }[]; ... 4 more ...; secondaryColor: string; }' but required in type 'WorkspaceState'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:3784:4:
+      3784 │     return {
+           ╵     ~~~~~~
+
+  'groups' is declared here.
+
+    src/app/editor/editor.component.ts:180:2:
+      180 │   groups: LayerGroup[];
+          ╵   ~~~~~~
+
+
+X [ERROR] TS2741: Property 'groups' is missing in type '{ id: number; name: string; width: number; height: number; frames: Frame[]; tags: never[]; activeFrameIndex: number; activeLayerIndex: number; palette: string[]; primaryColor: string; secondaryColor: string; }' but required in type 'WorkspaceState'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:3844:4:
+      3844 │     return {
+           ╵     ~~~~~~
+
+  'groups' is declared here.
+
+    src/app/editor/editor.component.ts:180:2:
+      180 │   groups: LayerGroup[];
+          ╵   ~~~~~~
+
+
+- Changes detected. Rebuilding...
+
+Application bundle generation failed. [1.755 seconds]
+
+X [ERROR] TS2339: Property 'layerGroupId' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:1881:25:
+      1881 │     const groupId = this.layerGroupId(this.activeLayerIndex);
+           ╵                          ~~~~~~~~~~~~
+
+
+X [ERROR] TS2741: Property 'groups' is missing in type '{ id: number; name: string; width: number; height: number; frames: Frame[]; tags: { id: number; name: string; from: number; to: number; color: string; direction: TagDirection; repeat: number; }[]; ... 4 more ...; secondaryColor: string; }' but required in type 'WorkspaceState'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:3784:4:
+      3784 │     return {
+           ╵     ~~~~~~
+
+  'groups' is declared here.
+
+    src/app/editor/editor.component.ts:180:2:
+      180 │   groups: LayerGroup[];
+          ╵   ~~~~~~
+
+
+X [ERROR] TS2741: Property 'groups' is missing in type '{ id: number; name: string; width: number; height: number; frames: Frame[]; tags: never[]; activeFrameIndex: number; activeLayerIndex: number; palette: string[]; primaryColor: string; secondaryColor: string; }' but required in type 'WorkspaceState'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:3844:4:
+      3844 │     return {
+           ╵     ~~~~~~
+
+  'groups' is declared here.
+
+    src/app/editor/editor.component.ts:180:2:
+      180 │   groups: LayerGroup[];
+          ╵   ~~~~~~
+
+
+- Changes detected. Rebuilding...
+
+Application bundle generation failed. [1.878 seconds]
+
+X [ERROR] TS2339: Property 'layerGroupId' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:1881:25:
+      1881 │     const groupId = this.layerGroupId(this.activeLayerIndex);
+           ╵                          ~~~~~~~~~~~~
+
+
+X [ERROR] TS2741: Property 'groups' is missing in type '{ id: number; name: string; width: number; height: number; frames: Frame[]; tags: never[]; activeFrameIndex: number; activeLayerIndex: number; palette: string[]; primaryColor: string; secondaryColor: string; }' but required in type 'WorkspaceState'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:3845:4:
+      3845 │     return {
+           ╵     ~~~~~~
+
+  'groups' is declared here.
+
+    src/app/editor/editor.component.ts:180:2:
+      180 │   groups: LayerGroup[];
+          ╵   ~~~~~~
+
+
+- Changes detected. Rebuilding...
+
+Application bundle generation failed. [1.539 seconds]
+
+X [ERROR] TS2339: Property 'layerGroupId' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:1881:25:
+      1881 │     const groupId = this.layerGroupId(this.activeLayerIndex);
+           ╵                          ~~~~~~~~~~~~
+
+
+X [ERROR] TS2741: Property 'groups' is missing in type '{ id: number; name: string; width: number; height: number; frames: Frame[]; tags: never[]; activeFrameIndex: number; activeLayerIndex: number; palette: string[]; primaryColor: string; secondaryColor: string; }' but required in type 'WorkspaceState'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:3847:4:
+      3847 │     return {
+           ╵     ~~~~~~
+
+  'groups' is declared here.
+
+    src/app/editor/editor.component.ts:180:2:
+      180 │   groups: LayerGroup[];
+          ╵   ~~~~~~
+
+
+- Changes detected. Rebuilding...
+
+Application bundle generation failed. [1.476 seconds]
+
+X [ERROR] TS2339: Property 'layerGroupId' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:1881:25:
+      1881 │     const groupId = this.layerGroupId(this.activeLayerIndex);
+           ╵                          ~~~~~~~~~~~~
+
+
+- Changes detected. Rebuilding...
+
+Application bundle generation failed. [1.459 seconds]
+
+X [ERROR] TS2339: Property 'layerGroupId' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:1881:25:
+      1881 │     const groupId = this.layerGroupId(this.activeLayerIndex);
+           ╵                          ~~~~~~~~~~~~
+
+
+- Changes detected. Rebuilding...
+
+Application bundle generation failed. [1.492 seconds]
+
+X [ERROR] TS2339: Property 'layerGroupId' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:1882:25:
+      1882 │     const groupId = this.layerGroupId(this.activeLayerIndex);
+           ╵                          ~~~~~~~~~~~~
+
+
+- Changes detected. Rebuilding...
+
+Application bundle generation failed. [2.711 seconds]
+
+X [ERROR] TS2339: Property 'groupMenu' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:3053:9:
+      3053 │     this.groupMenu = null;
+           ╵          ~~~~~~~~~
+
+
+- Changes detected. Rebuilding...
+
+Browser bundles        
+Initial chunk files     | Names               |  Raw size
+polyfills.js            | polyfills           |  88.09 kB | 
+main.js                 | main                |  21.54 kB | 
+styles.css              | styles              |   4.81 kB | 
+chunk-NJ5HVBCL.js       | -                   |   3.17 kB | 
+chunk-4WXVOEFY.js       | -                   |   1.46 kB | 
+chunk-3OSS3HON.js       | -                   | 652 bytes | 
+
+                        | Initial total       | 119.70 kB
+
+Lazy chunk files        | Names               |  Raw size
+chunk-5KEEAV7X.js       | editor-component    | 339.00 kB | 
+chunk-LQEHCUPA.js       | guide-component     |  38.14 kB | 
+chunk-W5CCP3ZS.js       | landing-component   |  16.89 kB | 
+chunk-EWQNQPX5.js       | contact-component   |   9.10 kB | 
+chunk-CIVRPHXR.js       | pricing-component   |   8.03 kB | 
+chunk-GIECJVF4.js       | features-component  |   7.82 kB | 
+chunk-LTE4XX4C.js       | blog-post-component |   6.55 kB | 
+chunk-DOZPUEIV.js       | faq-component       |   5.99 kB | 
+chunk-XP5ZG5Q4.js       | blog-list-component |   5.46 kB | 
+chunk-5C2M5NFJ.js       | about-component     |   4.67 kB | 
+chunk-UVVVIIEP.js       | -                   |   3.47 kB | 
+chunk-C6JU3WVH.js       | not-found-component |   2.47 kB | 
+
+
+Server bundles         
+Initial chunk files     | Names               |  Raw size
+chunk-HWEC66PE.mjs      | -                   |   1.08 MB | 
+chunk-6NFOLMMQ.mjs      | -                   | 663.58 kB | 
+polyfills.server.mjs    | polyfills.server    | 559.49 kB | 
+chunk-26DSXIKA.mjs      | -                   | 194.65 kB | 
+main.server.mjs         | main.server         |  21.08 kB | 
+chunk-XAUQBI7C.mjs      | -                   |   3.11 kB | 
+chunk-VPSODEBW.mjs      | -                   |   2.51 kB | 
+chunk-C42IF335.mjs      | -                   | 687 bytes | 
+render-utils.server.mjs | render-utils.server | 462 bytes | 
+
+Lazy chunk files        | Names               |  Raw size
+chunk-RLBXRRYF.mjs      | editor-component    | 611.35 kB | 
+chunk-ICEOV36X.mjs      | -                   | 193.75 kB | 
+chunk-P3UOPGAK.mjs      | xhr2                |  39.09 kB | 
+chunk-BKH2OOVI.mjs      | guide-component     |  36.73 kB | 
+chunk-VXKRBG5O.mjs      | landing-component   |  16.63 kB | 
+chunk-6WOPHNV7.mjs      | contact-component   |   9.22 kB | 
+chunk-R73ZELWR.mjs      | pricing-component   |   7.98 kB | 
+chunk-A3NFNYN3.mjs      | features-component  |   7.78 kB | 
+chunk-T6CV3IUQ.mjs      | blog-post-component |   6.65 kB | 
+chunk-GNE5HIOF.mjs      | faq-component       |   6.01 kB | 
+chunk-JHWJG5MO.mjs      | blog-list-component |   5.52 kB | 
+chunk-LF6Z3WQJ.mjs      | about-component     |   4.67 kB | 
+chunk-ROHT27OW.mjs      | -                   |   3.50 kB | 
+chunk-H7DPTBCO.mjs      | not-found-component |   2.54 kB | 
+
+Application bundle generation complete. [2.501 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.54 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-VY6QUD7L.js   | editor-component | 339.17 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  21.08 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-IHRF5PU5.mjs  | editor-component | 611.51 kB | 
+
+Application bundle generation complete. [2.192 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.54 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-DPH3MOJJ.js   | editor-component | 340.01 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  21.08 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-IDUTKDZJ.mjs  | editor-component | 612.34 kB | 
+
+Application bundle generation complete. [2.336 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.54 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-55K5EAZO.js   | editor-component | 340.09 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  21.08 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-4AXGNI3J.mjs  | editor-component | 612.42 kB | 
+
+Application bundle generation complete. [1.606 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.54 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-3B3KZEGD.js   | editor-component | 340.23 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  21.08 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-NP7WBQDQ.mjs  | editor-component | 612.56 kB | 
+
+Application bundle generation complete. [1.525 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Application bundle generation failed. [0.879 seconds]
+
+X [ERROR] NG5002: Unexpected closing tag "div". It may happen when the tag has already been closed by another tag. For more info see https://www.w3.org/TR/html5/syntax.html#closing-elements-that-have-implied-end-tags [plugin angular-compiler]
+
+    src/app/editor/editor.component.html:376:6:
+      376 │       </div>
+          ╵       ~~~~~~
+
+  Error occurs in the template of component EditorComponent.
+
+    src/app/editor/editor.component.ts:216:15:
+      216 │   templateUrl: './editor.component.html',
+          ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+- Changes detected. Rebuilding...
+
+Browser bundles        
+Initial chunk files     | Names               |  Raw size
+polyfills.js            | polyfills           |  88.09 kB | 
+main.js                 | main                |  21.54 kB | 
+styles.css              | styles              |   4.81 kB | 
+chunk-NJ5HVBCL.js       | -                   |   3.17 kB | 
+chunk-4WXVOEFY.js       | -                   |   1.46 kB | 
+chunk-3OSS3HON.js       | -                   | 652 bytes | 
+
+                        | Initial total       | 119.70 kB
+
+Lazy chunk files        | Names               |  Raw size
+chunk-WNGDPWJP.js       | editor-component    | 345.93 kB | 
+chunk-LQEHCUPA.js       | guide-component     |  38.14 kB | 
+chunk-W5CCP3ZS.js       | landing-component   |  16.89 kB | 
+chunk-EWQNQPX5.js       | contact-component   |   9.10 kB | 
+chunk-CIVRPHXR.js       | pricing-component   |   8.03 kB | 
+chunk-GIECJVF4.js       | features-component  |   7.82 kB | 
+chunk-LTE4XX4C.js       | blog-post-component |   6.55 kB | 
+chunk-DOZPUEIV.js       | faq-component       |   5.99 kB | 
+chunk-XP5ZG5Q4.js       | blog-list-component |   5.46 kB | 
+chunk-5C2M5NFJ.js       | about-component     |   4.67 kB | 
+chunk-UVVVIIEP.js       | -                   |   3.47 kB | 
+chunk-C6JU3WVH.js       | not-found-component |   2.47 kB | 
+
+
+Server bundles         
+Initial chunk files     | Names               |  Raw size
+chunk-3KVU5QX2.mjs      | -                   |   1.08 MB | 
+chunk-MM2SGXET.mjs      | -                   | 663.58 kB | 
+polyfills.server.mjs    | polyfills.server    | 559.49 kB | 
+chunk-ESQLRAC5.mjs      | -                   | 194.65 kB | 
+main.server.mjs         | main.server         |  21.08 kB | 
+chunk-AKEZM5SL.mjs      | -                   |   3.11 kB | 
+chunk-VPSODEBW.mjs      | -                   |   2.51 kB | 
+chunk-C42IF335.mjs      | -                   | 687 bytes | 
+render-utils.server.mjs | render-utils.server | 462 bytes | 
+
+Lazy chunk files        | Names               |  Raw size
+chunk-JFQAHRJF.mjs      | editor-component    | 618.02 kB | 
+chunk-OSTPOPH7.mjs      | -                   | 193.75 kB | 
+chunk-P3UOPGAK.mjs      | xhr2                |  39.09 kB | 
+chunk-NHLAZ34O.mjs      | guide-component     |  36.73 kB | 
+chunk-6S4MS7AO.mjs      | landing-component   |  16.63 kB | 
+chunk-JBYRA3XA.mjs      | contact-component   |   9.22 kB | 
+chunk-ITW4OT2Z.mjs      | pricing-component   |   7.98 kB | 
+chunk-5KGCPH36.mjs      | features-component  |   7.78 kB | 
+chunk-7TG2CDFJ.mjs      | blog-post-component |   6.65 kB | 
+chunk-YZMUJTXQ.mjs      | faq-component       |   6.01 kB | 
+chunk-EUON4EGE.mjs      | blog-list-component |   5.52 kB | 
+chunk-NT3RS6MI.mjs      | about-component     |   4.67 kB | 
+chunk-ROHT27OW.mjs      | -                   |   3.50 kB | 
+chunk-GJH5DQF4.mjs      | not-found-component |   2.54 kB | 
+
+Application bundle generation complete. [1.543 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.54 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-EYO6BHA7.js   | editor-component | 347.67 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  21.08 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-WL7AMMMK.mjs  | editor-component | 619.66 kB | 
+
+Application bundle generation complete. [2.179 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.54 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-HPBJ5E3V.js   | editor-component | 350.21 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  21.08 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-BAKO7V5X.mjs  | editor-component | 622.07 kB | 
+
+Application bundle generation complete. [2.017 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.54 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-CR3VGSFJ.js   | editor-component | 354.38 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  21.08 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-XFQ23EU6.mjs  | editor-component | 625.98 kB | 
+
+Application bundle generation complete. [1.765 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.54 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-NSIWZ3I2.js   | editor-component | 355.87 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  21.08 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-R6C24ZWH.mjs  | editor-component | 627.47 kB | 
+
+Application bundle generation complete. [2.067 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names           | Raw size
+main.js             | main            | 21.54 kB | 
+
+Lazy chunk files    | Names           | Raw size
+chunk-O57JCTF5.js   | guide-component | 40.59 kB | 
+
+
+Server bundles     
+Initial chunk files | Names           | Raw size
+main.server.mjs     | main.server     | 21.08 kB | 
+
+Lazy chunk files    | Names           | Raw size
+chunk-M2RC2TDH.mjs  | guide-component | 39.04 kB | 
+
+Application bundle generation complete. [0.516 seconds]
+
+Page reload sent to client(s).
