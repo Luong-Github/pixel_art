@@ -97,6 +97,20 @@ interface Frame {
   layers: Layer[];
 }
 
+type TagDirection = 'forward' | 'reverse' | 'pingpong';
+
+/** A named range of frames (Aseprite-style animation tag). */
+interface AnimTag {
+  id: number;
+  name: string;
+  from: number;
+  to: number;
+  color: string;
+  direction: TagDirection;
+  /** Loop count for engine export; 0 = forever. */
+  repeat: number;
+}
+
 interface Selection {
   x: number;
   y: number;
@@ -138,6 +152,7 @@ interface WorkspaceState {
   width: number;
   height: number;
   frames: Frame[];
+  tags: AnimTag[];
   activeFrameIndex: number;
   activeLayerIndex: number;
   palette: string[];
@@ -197,6 +212,9 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
   private zoneEls!: QueryList<ElementRef<HTMLElement>>;
   @ViewChild('layerMenuEl')
   private layerMenuRef?: ElementRef<HTMLElement>;
+
+  @ViewChild('tagMenuEl')
+  private tagMenuRef?: ElementRef<HTMLElement>;
   @ViewChild('dlgInput')
   private dlgInputRef?: ElementRef<HTMLInputElement>;
 
@@ -441,6 +459,22 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
   frameDropAfter = false;
   /** Copied frames buffer for paste. */
   private copiedFrames: Frame[] = [];
+
+  /** Animation tags (named frame ranges) for the active workspace. */
+  tags: AnimTag[] = [];
+  private tagIdSeed = 1;
+  /** Tag scoped for playback / selection; null = play all frames. */
+  activeTagId: number | null = null;
+  /** Ping-pong playback direction (+1 / -1). */
+  private playDirection = 1;
+  /** Tag right-click context menu. */
+  tagMenu: { x: number; y: number; id: number } | null = null;
+  private readonly tagColors = [
+    '#e05a5a', '#e0a23a', '#3ab0e0', '#7d6ce0', '#3ac08a', '#d65ab0', '#9aa7b3',
+  ];
+  /** Frame tile geometry (must match .frame-tile width + .timeline gap in SCSS). */
+  private readonly TILE_W = 64;
+  private readonly TILE_GAP = 10;
 
   get activeFrame(): Frame {
     return this.frames[this.activeFrameIndex];
@@ -1788,6 +1822,8 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
     this.width = this.clamp(Math.floor(this.width), 8, 128);
     this.height = this.clamp(Math.floor(this.height), 8, 128);
     this.frames = [this.createFrame('Frame 1')];
+    this.tags = [];
+    this.activeTagId = null;
     this.activeFrameIndex = 0;
     this.activeLayerIndex = 0;
     this.selection = null;
@@ -1845,6 +1881,7 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
 
   addFrame(): void {
     this.pushUndo();
+    this.shiftTagsForInsert(this.activeFrameIndex + 1, 1);
     this.frames.splice(
       this.activeFrameIndex + 1,
       0,
@@ -1863,6 +1900,7 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
       this.activeFrame,
       `${this.activeFrame.name} copy`,
     );
+    this.shiftTagsForInsert(this.activeFrameIndex + 1, 1);
     this.frames.splice(this.activeFrameIndex + 1, 0, copy);
     this.activeFrameIndex += 1;
     this.syncFrameSelection();
@@ -1882,6 +1920,7 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
     if (!del.length) del.push(this.activeFrameIndex);
     this.pushUndo();
     const delSet = new Set(del);
+    this.shiftTagsForDelete(del);
     this.frames = this.frames.filter((_, i) => !delSet.has(i));
     this.activeFrameIndex = this.clamp(del[0], 0, this.frames.length - 1);
     this.activeLayerIndex = Math.min(
@@ -1898,6 +1937,7 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
   insertFrame(after: boolean): void {
     this.pushUndo();
     const at = this.activeFrameIndex + (after ? 1 : 0);
+    this.shiftTagsForInsert(at, 1);
     this.frames.splice(at, 0, this.createFrame(`Frame ${this.frames.length + 1}`));
     this.activeFrameIndex = at;
     this.previewFrameIndex = at;
@@ -1913,6 +1953,13 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
       return;
     }
     this.pushUndo();
+    const n = this.frames.length;
+    for (const t of this.tags) {
+      const from = n - 1 - t.to;
+      const to = n - 1 - t.from;
+      t.from = from;
+      t.to = to;
+    }
     this.frames.reverse();
     this.activeFrameIndex = this.frames.length - 1 - this.activeFrameIndex;
     this.previewFrameIndex = this.activeFrameIndex;
@@ -1936,6 +1983,15 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
       this.previewFrameIndex = this.activeFrameIndex;
       this.render();
       return;
+    }
+    const tag = this.playingTag;
+    if (tag) {
+      this.playDirection = tag.direction === 'reverse' ? -1 : 1;
+      this.previewFrameIndex = this.clamp(
+        tag.direction === 'reverse' ? tag.to : tag.from,
+        tag.from,
+        tag.to,
+      );
     }
     this.playNextFrame();
   }
@@ -2577,6 +2633,28 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
     this.stampWatermark(ctx, sheet.width, sheet.height);
     this.downloadCanvas(sheet, `${base}.png`);
 
+    // Map tag ranges (original frame indices) onto exported sheet positions.
+    const posOf = new Map<number, number>();
+    indices.forEach((orig, i) => posOf.set(orig, i));
+    const frameTags = this.tags
+      .map((t) => {
+        const positions: number[] = [];
+        for (let f = t.from; f <= t.to; f += 1) {
+          const p = posOf.get(f);
+          if (p != null) positions.push(p);
+        }
+        if (!positions.length) return null;
+        return {
+          name: t.name,
+          from: Math.min(...positions),
+          to: Math.max(...positions),
+          direction: t.direction,
+          repeat: t.repeat,
+          color: t.color,
+        };
+      })
+      .filter(Boolean);
+
     const pivot = this.pivotPoint;
     const atlas = {
       app: 'Pixel Art Studio',
@@ -2591,6 +2669,7 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
       count,
       pivot: { x: pivot.x * scale, y: pivot.y * scale, preset: this.pivotPreset },
       frames: atlasFrames,
+      frameTags,
     };
     this.downloadBlob(
       new Blob([JSON.stringify(atlas, null, 2)], { type: 'application/json' }),
@@ -2881,6 +2960,8 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
     this.pushUndo();
     remaining.splice(insertAt, 0, ...moving);
     this.frames = remaining;
+    // Reordering frames is ambiguous for tag ranges; keep them in-bounds.
+    this.clampTags();
     this.selectedFrames = new Set<number>(moving.map((_, k) => insertAt + k));
     this.setActiveFrame(insertAt);
     this.refreshAllFrameThumbnails();
@@ -2901,11 +2982,207 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
     this.pushUndo();
     const at = this.activeFrameIndex + 1;
     const clones = this.copiedFrames.map((f) => this.cloneFrame(f, f.name));
+    this.shiftTagsForInsert(at, clones.length);
     this.frames.splice(at, 0, ...clones);
     this.selectedFrames = new Set<number>(clones.map((_, k) => at + k));
     this.frameSelAnchor = at;
     this.setActiveFrame(at);
     this.refreshAllFrameThumbnails();
+  }
+
+  // ===================== Animation tags =====================
+
+  /** The tag scoped for playback, or null when playing all frames. */
+  get playingTag(): AnimTag | null {
+    if (this.activeTagId == null) return null;
+    return this.tags.find((t) => t.id === this.activeTagId) ?? null;
+  }
+
+  /** Total pixel width of the frame track (for the tag overlay). */
+  get tagTrackWidth(): number {
+    const n = this.frames.length;
+    return n > 0 ? n * this.TILE_W + (n - 1) * this.TILE_GAP : 0;
+  }
+
+  tagLeft(tag: AnimTag): number {
+    return tag.from * (this.TILE_W + this.TILE_GAP);
+  }
+
+  tagWidth(tag: AnimTag): number {
+    const count = Math.max(1, tag.to - tag.from + 1);
+    return count * this.TILE_W + (count - 1) * this.TILE_GAP;
+  }
+
+  tagDirectionGlyph(dir: TagDirection): string {
+    return dir === 'reverse' ? '←' : dir === 'pingpong' ? '↔' : '→';
+  }
+
+  tagDirectionLabel(dir: TagDirection): string {
+    return dir === 'reverse'
+      ? 'Reverse'
+      : dir === 'pingpong'
+        ? 'Ping-pong'
+        : 'Forward';
+  }
+
+  tagById(id: number): AnimTag | undefined {
+    return this.tags.find((t) => t.id === id);
+  }
+
+  /** Create a tag spanning the currently selected frame(s). */
+  addTagFromSelection(): void {
+    const sel = [...this.selectedFrames].sort((a, b) => a - b);
+    const from = sel.length ? sel[0] : this.activeFrameIndex;
+    const to = sel.length ? sel[sel.length - 1] : this.activeFrameIndex;
+    const tag: AnimTag = {
+      id: this.tagIdSeed++,
+      name: `Tag ${this.tags.length + 1}`,
+      from,
+      to,
+      color: this.tagColors[this.tags.length % this.tagColors.length],
+      direction: 'forward',
+      repeat: 0,
+    };
+    this.tags = [...this.tags, tag];
+    this.activeTagId = tag.id;
+  }
+
+  /** Select a tag: scope playback to it and select its frame range. */
+  selectTag(tag: AnimTag): void {
+    this.activeTagId = tag.id;
+    this.activeFrameIndex = this.clamp(tag.from, 0, this.frames.length - 1);
+    this.previewFrameIndex = this.activeFrameIndex;
+    const set = new Set<number>();
+    for (let i = tag.from; i <= tag.to && i < this.frames.length; i += 1) set.add(i);
+    this.selectedFrames = set.size ? set : new Set<number>([this.activeFrameIndex]);
+    this.frameSelAnchor = tag.from;
+    this.render();
+  }
+
+  /** Set which tag drives playback (null = all frames). */
+  setPlayTag(id: number | null): void {
+    this.activeTagId = id;
+  }
+
+  async renameTag(id: number): Promise<void> {
+    const tag = this.tagById(id);
+    if (!tag) return;
+    const name = await this.askPrompt({
+      title: 'Rename tag',
+      value: tag.name,
+      okLabel: 'Rename',
+    });
+    if (name == null) return;
+    const trimmed = name.trim();
+    if (trimmed) tag.name = trimmed;
+  }
+
+  cycleTagDirection(id: number): void {
+    const tag = this.tagById(id);
+    if (!tag) return;
+    const order: TagDirection[] = ['forward', 'reverse', 'pingpong'];
+    tag.direction = order[(order.indexOf(tag.direction) + 1) % order.length];
+  }
+
+  cycleTagColor(id: number): void {
+    const tag = this.tagById(id);
+    if (!tag) return;
+    const i = this.tagColors.indexOf(tag.color);
+    tag.color = this.tagColors[(i + 1) % this.tagColors.length];
+  }
+
+  async setTagRepeat(id: number): Promise<void> {
+    const tag = this.tagById(id);
+    if (!tag) return;
+    const val = await this.askPrompt({
+      title: 'Tag repeat',
+      message: 'Number of loops written to the export JSON (0 = forever).',
+      value: String(tag.repeat),
+      okLabel: 'Set',
+    });
+    if (val == null) return;
+    tag.repeat = Math.max(0, Math.floor(Number(val)) || 0);
+  }
+
+  deleteTag(id: number): void {
+    this.tags = this.tags.filter((t) => t.id !== id);
+    if (this.activeTagId === id) this.activeTagId = null;
+    this.tagMenu = null;
+  }
+
+  // ---- Tag right-click context menu ----
+
+  onTagContextMenu(event: MouseEvent, id: number): void {
+    event.preventDefault();
+    event.stopPropagation();
+    if (!this.tagById(id)) return;
+    this.activeTagId = id;
+    this.tagMenu = { x: event.clientX, y: event.clientY, id };
+    if (this.isBrowser) {
+      requestAnimationFrame(() => this.clampTagMenu());
+    }
+  }
+
+  private clampTagMenu(): void {
+    const el = this.tagMenuRef?.nativeElement;
+    if (!this.tagMenu || !el) return;
+    const pad = 8;
+    const maxX = window.innerWidth - el.offsetWidth - pad;
+    const maxY = window.innerHeight - el.offsetHeight - pad;
+    this.tagMenu = {
+      ...this.tagMenu,
+      x: Math.max(pad, Math.min(this.tagMenu.x, maxX)),
+      y: Math.max(pad, Math.min(this.tagMenu.y, maxY)),
+    };
+  }
+
+  closeTagMenu(): void {
+    this.tagMenu = null;
+  }
+
+  // ---- Tag index bookkeeping when frames mutate ----
+
+  private shiftTagsForInsert(at: number, count: number): void {
+    for (const t of this.tags) {
+      if (at <= t.from) {
+        t.from += count;
+        t.to += count;
+      } else if (at <= t.to) {
+        t.to += count;
+      }
+    }
+  }
+
+  private shiftTagsForDelete(removed: number[]): void {
+    const set = new Set(removed);
+    const remap = (i: number) => i - removed.filter((r) => r < i).length;
+    const next: AnimTag[] = [];
+    for (const t of this.tags) {
+      let from = -1;
+      let to = -1;
+      for (let i = t.from; i <= t.to; i += 1) {
+        if (!set.has(i)) {
+          const m = remap(i);
+          if (from < 0) from = m;
+          to = m;
+        }
+      }
+      if (from >= 0) {
+        next.push({ ...t, from, to });
+      } else if (this.activeTagId === t.id) {
+        this.activeTagId = null;
+      }
+    }
+    this.tags = next;
+  }
+
+  private clampTags(): void {
+    const max = this.frames.length - 1;
+    this.tags = this.tags.map((t) => {
+      const from = this.clamp(t.from, 0, max);
+      const to = this.clamp(t.to, 0, max);
+      return { ...t, from: Math.min(from, to), to: Math.max(from, to) };
+    });
   }
 
   /** Drag-and-drop reorder a layer to a new position, across every frame. */
@@ -3071,11 +3348,13 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
   @HostListener('document:click')
   onDocumentClick(): void {
     if (this.layerMenu) this.layerMenu = null;
+    if (this.tagMenu) this.tagMenu = null;
   }
 
   @HostListener('document:keydown.escape')
   onEscape(): void {
     this.layerMenu = null;
+    this.tagMenu = null;
     if (this.dialog) this.dialogCancel();
   }
 
@@ -3463,6 +3742,7 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
       width: this.width,
       height: this.height,
       frames: this.frames.map((frame) => this.cloneFrame(frame, frame.name)),
+      tags: (this.tags ?? []).map((t) => ({ ...t })),
       activeFrameIndex: this.activeFrameIndex,
       activeLayerIndex: this.activeLayerIndex,
       palette: [...this.palette],
@@ -3490,6 +3770,9 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
     this.frames = workspace.frames.map((frame) =>
       this.cloneFrame(frame, frame.name),
     );
+    this.tags = (workspace.tags ?? []).map((t) => ({ ...t }));
+    this.activeTagId = null;
+    this.tagIdSeed = Math.max(1, ...this.tags.map((t) => t.id + 1));
     this.activeFrameIndex = Math.min(
       workspace.activeFrameIndex,
       this.frames.length - 1,
@@ -3519,6 +3802,7 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
       width: this.width,
       height: this.height,
       frames: [this.createFrame('Frame 1')],
+      tags: [],
       activeFrameIndex: 0,
       activeLayerIndex: 0,
       palette: [...this.palette],
@@ -3630,6 +3914,7 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
       width,
       height,
       frames,
+      tags: this.normalizeTags(workspace.tags, frames.length),
       activeFrameIndex,
       activeLayerIndex,
       palette: this.normalizePalette(workspace.palette),
@@ -3650,8 +3935,35 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
       frames: workspace.frames.map((frame) =>
         this.cloneFrame(frame, frame.name),
       ),
+      tags: (workspace.tags ?? []).map((t) => ({ ...t })),
       palette: [...workspace.palette],
     };
+  }
+
+  private normalizeTags(
+    tags: AnimTag[] | undefined,
+    frameCount: number,
+  ): AnimTag[] {
+    if (!Array.isArray(tags) || frameCount <= 0) return [];
+    const dirs: TagDirection[] = ['forward', 'reverse', 'pingpong'];
+    const max = frameCount - 1;
+    return tags.map((t, i) => {
+      const from = this.clamp(Math.floor(t?.from ?? 0), 0, max);
+      const to = this.clamp(Math.floor(t?.to ?? from), 0, max);
+      return {
+        id: t?.id || i + 1,
+        name: t?.name || `Tag ${i + 1}`,
+        from: Math.min(from, to),
+        to: Math.max(from, to),
+        color: this.normalizeRequiredColor(
+          t?.color,
+          this.tagColors[i % this.tagColors.length],
+        ),
+        direction:
+          t?.direction && dirs.includes(t.direction) ? t.direction : 'forward',
+        repeat: Math.max(0, Math.floor(t?.repeat ?? 0) || 0),
+      };
+    });
   }
 
   private normalizePixels(
@@ -4649,6 +4961,7 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
       width: this.width,
       height: this.height,
       frames: this.frames,
+      tags: this.tags,
       activeFrameIndex: this.activeFrameIndex,
       activeLayerIndex: this.activeLayerIndex,
       palette: this.palette,
@@ -4663,6 +4976,7 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
     this.width = state.width;
     this.height = state.height;
     this.frames = state.frames;
+    this.tags = state.tags ?? [];
     this.activeFrameIndex = state.activeFrameIndex;
     this.activeLayerIndex = state.activeLayerIndex;
     this.palette = state.palette;
@@ -4683,13 +4997,25 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
       this.isPlaying = false;
       return;
     }
-    const next = this.findNextVisibleFrameIndex(this.previewFrameIndex);
-    // When looping is off, stop once we wrap past the last frame.
-    if (!this.loop && next <= this.previewFrameIndex) {
-      this.isPlaying = false;
-      this.previewFrameIndex = this.activeFrameIndex;
-      this.render();
-      return;
+    const tag = this.playingTag;
+    let next: number;
+    if (tag) {
+      next = this.nextFrameInTag(this.previewFrameIndex, tag);
+      if (next < 0) {
+        this.isPlaying = false;
+        this.previewFrameIndex = this.activeFrameIndex;
+        this.render();
+        return;
+      }
+    } else {
+      next = this.findNextVisibleFrameIndex(this.previewFrameIndex);
+      // When looping is off, stop once we wrap past the last frame.
+      if (!this.loop && next <= this.previewFrameIndex) {
+        this.isPlaying = false;
+        this.previewFrameIndex = this.activeFrameIndex;
+        this.render();
+        return;
+      }
     }
     this.previewFrameIndex = next;
     this.render();
@@ -4697,6 +5023,39 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
       () => this.playNextFrame(),
       this.frames[this.previewFrameIndex].duration,
     );
+  }
+
+  /** Next frame within a tag's range, honoring its direction. -1 = stop. */
+  private nextFrameInTag(current: number, tag: AnimTag): number {
+    const max = this.frames.length - 1;
+    const lo = this.clamp(Math.min(tag.from, tag.to), 0, max);
+    const hi = this.clamp(Math.max(tag.from, tag.to), 0, max);
+    if (hi <= lo) return lo;
+    const pos = this.clamp(current, lo, hi);
+    switch (tag.direction) {
+      case 'reverse': {
+        const n = pos - 1;
+        if (n < lo) return this.loop ? hi : -1;
+        return n;
+      }
+      case 'pingpong': {
+        let n = pos + this.playDirection;
+        if (n > hi) {
+          this.playDirection = -1;
+          n = hi - 1;
+        } else if (n < lo) {
+          if (!this.loop) return -1;
+          this.playDirection = 1;
+          n = lo + 1;
+        }
+        return n;
+      }
+      default: {
+        const n = pos + 1;
+        if (n > hi) return this.loop ? lo : -1;
+        return n;
+      }
+    }
   }
 
   toggleLoop(): void {

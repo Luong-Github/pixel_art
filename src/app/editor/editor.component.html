@@ -173,6 +173,13 @@
     <button type="button" class="tb-toggle" [class.on]="loop" title="Loop playback" (click)="toggleLoop()">⟳ Loop</button>
     <label class="tb-num"><span>FPS</span><input type="number" min="1" max="60" [(ngModel)]="fps" (change)="applyFps()" /></label>
     <label class="tb-num"><span>ms</span><input type="number" min="20" step="10" [(ngModel)]="activeFrame.duration" (change)="render()" /></label>
+    <label class="tb-num tb-playtag" title="Limit playback to a tag's frames">
+      <span>Play</span>
+      <select [ngModel]="activeTagId" (ngModelChange)="setPlayTag($event)">
+        <option [ngValue]="null">All frames</option>
+        <option *ngFor="let t of tags" [ngValue]="t.id">{{ t.name }}</option>
+      </select>
+    </label>
     <span class="tb-frameinfo">Frame {{ activeFrameIndex + 1 }} / {{ frames.length }}</span>
   </div>
   <div class="timeline-toolbar ops-bar">
@@ -185,6 +192,7 @@
       <button type="button" class="tb-icon" title="Insert blank before" (click)="insertFrame(false)">⇤</button>
       <button type="button" class="tb-icon" title="Insert blank after" (click)="insertFrame(true)">⇥</button>
       <button type="button" class="tb-icon" title="Reverse frame order" (click)="reverseFrames()">⇄</button>
+      <button type="button" class="tb-icon" title="Tag selected frame(s)" (click)="addTagFromSelection()">🏷</button>
       <button type="button" class="tb-icon danger-action" title="Delete frame" (click)="deleteFrame()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/><path d="M6 7l1 13a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-13"/></svg>
       </button>
@@ -217,6 +225,26 @@
   </div>
   <div class="timeline-combined-body" (pointerdown)="onTimelineBackgroundDown($event)">
     <section *ngIf="!framesMinimized" class="timeline-grid" (pointerdown)="onTimelineBackgroundDown($event)">
+      <div class="timeline-tagrow" *ngIf="tags.length">
+        <div class="timeline-corner tag-corner" *ngIf="!layersMinimized">Tags</div>
+        <div class="timeline-tag-track" [style.width.px]="tagTrackWidth">
+          <button
+            *ngFor="let tag of tags"
+            type="button"
+            class="tag-bar"
+            [class.active]="activeTagId === tag.id"
+            [style.left.px]="tagLeft(tag)"
+            [style.width.px]="tagWidth(tag)"
+            [style.background]="tag.color"
+            [title]="tag.name + ' · ' + tagDirectionLabel(tag.direction) + ' — click to select, right-click for options'"
+            (pointerdown)="$event.stopPropagation()"
+            (click)="selectTag(tag)"
+            (contextmenu)="onTagContextMenu($event, tag.id)">
+            <span class="tag-bar-dir" aria-hidden="true">{{ tagDirectionGlyph(tag.direction) }}</span>
+            <span class="tag-bar-name">{{ tag.name }}</span>
+          </button>
+        </div>
+      </div>
       <div class="timeline-headrow">
         <div class="timeline-corner" *ngIf="!layersMinimized">Layers / Frames</div>
         <div class="timeline-frame-header-row">
@@ -741,6 +769,26 @@
   <button type="button" (click)="moveLayer(1)">Move down</button>
   <span class="menu-sep"></span>
   <button type="button" class="danger-action" (click)="deleteLayer()">Delete layer</button>
+</div>
+
+<!-- ============================================================
+     Tag right-click context menu
+     ============================================================ -->
+<div
+  #tagMenuEl
+  class="context-menu menu-dropdown"
+  *ngIf="tagMenu"
+  [style.left.px]="tagMenu.x"
+  [style.top.px]="tagMenu.y">
+  <span class="menu-label">{{ tagById(tagMenu.id)?.name }}</span>
+  <button type="button" (click)="renameTag(tagMenu.id)">Rename…</button>
+  <button type="button" (click)="cycleTagDirection(tagMenu.id); $event.stopPropagation()">
+    Direction: {{ tagDirectionLabel(tagById(tagMenu.id)!.direction) }} {{ tagDirectionGlyph(tagById(tagMenu.id)!.direction) }}
+  </button>
+  <button type="button" (click)="cycleTagColor(tagMenu.id); $event.stopPropagation()">Change color</button>
+  <button type="button" (click)="setTagRepeat(tagMenu.id)">Repeat: {{ tagById(tagMenu.id)!.repeat || '∞' }}…</button>
+  <span class="menu-sep"></span>
+  <button type="button" class="danger-action" (click)="deleteTag(tagMenu.id)">Delete tag</button>
 </div>
 
 <!-- ============================================================

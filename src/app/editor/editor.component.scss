@@ -648,6 +648,69 @@
   gap: 8px;
 }
 
+/* Animation tag overlay above the frame headers */
+.timeline-tagrow {
+  display: flex;
+  gap: 10px;
+  align-items: flex-end;
+  width: max-content;
+  margin-bottom: 4px;
+}
+.tag-corner {
+  min-height: 22px;
+  align-items: flex-end;
+}
+.timeline-tag-track {
+  position: relative;
+  height: 22px;
+  flex: 0 0 auto;
+}
+.tag-bar {
+  position: absolute;
+  bottom: 0;
+  height: 20px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 8px;
+  border: 0;
+  border-radius: 6px 6px 0 0;
+  color: #0b0e12;
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  cursor: pointer;
+  opacity: 0.85;
+  box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.28);
+}
+.tag-bar:hover {
+  opacity: 1;
+}
+.tag-bar.active {
+  opacity: 1;
+  box-shadow:
+    inset 0 -2px 0 rgba(0, 0, 0, 0.28),
+    0 0 0 2px var(--accent-strong);
+}
+.tag-bar-dir {
+  font-size: 12px;
+  line-height: 1;
+}
+.tag-bar-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.tb-playtag select {
+  max-width: 110px;
+  padding: 2px 4px;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  background: var(--chrome);
+  color: var(--ink);
+  font-size: 11px;
+}
+
 .timeline-corner {
   position: sticky;
   left: 0;

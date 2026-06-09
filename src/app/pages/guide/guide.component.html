@@ -111,6 +111,9 @@
           <li><strong>Select frames</strong> — click a frame to select it; <kbd>Shift</kbd>+click (or Shift-drag) for a range; <kbd>Ctrl</kbd>+click to toggle individual frames. Clicking the canvas or empty timeline clears the selection.</li>
           <li><strong>Move frames</strong> — drag a frame header to reposition it; if it’s part of a multi-selection the whole block moves.</li>
           <li><strong>Copy &amp; paste frames</strong> — use the ⧉ / 📋 buttons in the Frame group to copy the selected frames and paste them right after the current frame.</li>
+          <li>
+            <strong>Animation tags</strong> — select one or more frames and press <strong>🏷</strong> in the Frame group to name that range (e.g. <em>idle</em>, <em>walk</em>, <em>attack</em>). Tags appear as colored bars above the frames. <strong>Click</strong> a bar to select its range; <strong>right-click</strong> for options — rename, cycle <strong>direction</strong> (forward → / reverse ← / ping-pong ↔), change color, set <strong>repeat</strong>, or delete. Choose a tag in the <strong>Play</strong> dropdown to loop just that range during playback. Tags are written into the sprite-sheet JSON (<code>frameTags</code>) for your game engine.
+          </li>
           <li><strong>Onion skin</strong> — shows ghosts of the previous (red) and next (blue) frames; adjust opacity and tint in the Canvas panel.</li>
           <li>Toggle the layer/frame views from <strong>View ▾</strong> in the timeline toolbar.</li>
         </ul>
@@ -135,7 +138,7 @@
         <ul class="bullets">
           <li><strong>PNG</strong> at 1× / 2× (free) or 4× / 8× (Pro), with transparency preserved.</li>
           <li><strong>Animated GIF</strong> (Pro) of the visible frames, using each frame’s duration.</li>
-          <li><strong>Sprite sheet</strong> (Pro) — grid or single row — plus an engine-ready <strong>JSON atlas</strong> (frame size, count, durations, columns, pivot).</li>
+          <li><strong>Sprite sheet</strong> (Pro) — grid or single row — plus an engine-ready <strong>JSON atlas</strong> (frame size, count, durations, columns, pivot and <strong>animation tags</strong>).</li>
           <li><strong>Pivot / anchor</strong> — set Center / Feet / Top-left in the Canvas panel; it’s written into the sprite-sheet JSON.</li>
         </ul>
         <p class="note">Free exports add a small watermark; <a routerLink="/pricing">Pro</a> removes it and unlocks GIF, sprite sheets and higher scales.</p>
