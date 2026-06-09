@@ -140,10 +140,19 @@ dist/pixel-art-studio
 | `M` | Move |
 | `Space` | Pan canvas |
 | `Ctrl + Z` | Undo |
-| `Ctrl + Y` | Redo |
+| `Ctrl + Y` / `Ctrl + Shift + Z` | Redo |
 | `Ctrl + C` | Copy selection |
 | `Ctrl + X` / `Delete` | Cut selection |
 | `Ctrl + V` | Paste selection |
+| `← ↑ → ↓` | Nudge selection / layer |
+| `Enter` | Play / pause animation |
+| `,` / `.` | Previous / next frame |
+| `X` | Swap primary / secondary color |
+| `G` | Toggle grid |
+| `Shift + M` | Toggle mirror-X |
+| `Shift + H` / `Shift + V` | Flip horizontal / vertical |
+| `[` / `]` | Decrease / increase brush size |
+| `+` / `-` | Zoom in / out |
 
 ## Workflow
 

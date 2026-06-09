@@ -384,6 +384,11 @@
 .icon-btn.danger {
   color: var(--danger);
 }
+.help-btn {
+  font-weight: 700;
+  font-size: 14px;
+  text-decoration: none;
+}
 .icon-btn.danger:hover {
   border-color: var(--danger);
   background: #361c22;
@@ -447,6 +452,29 @@
   .menu-label:first-child {
     padding-top: 2px;
   }
+}
+
+/* Right-click context menu (positioned at the cursor) */
+.context-menu {
+  position: fixed;
+  top: auto;
+  right: auto;
+  z-index: 90;
+  min-width: 168px;
+  max-height: calc(100vh - 16px);
+  overflow-y: auto;
+}
+.context-menu .menu-label {
+  max-width: 168px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.menu-sep {
+  display: block;
+  height: 1px;
+  margin: 4px 6px;
+  background: var(--line);
 }
 
 .pro-badge {
@@ -742,6 +770,10 @@
 .timeline-cel.col-active {
   border-color: var(--accent-line);
 }
+/* Columns belonging to the multi-frame selection */
+.timeline-cel.col-selected {
+  background: var(--accent-soft);
+}
 
 .timeline-cel.active {
   border-color: var(--accent-line);
@@ -760,21 +792,23 @@
   box-shadow: 0 0 0 1px var(--accent-strong), 0 0 12px -2px var(--accent-strong);
 }
 
-/* Drag-to-reorder visuals for frame columns */
+/* Frame selection / move visuals */
 .frame-header-tile {
-  cursor: grab;
+  cursor: pointer;
+  user-select: none;
+  touch-action: none;
 }
-.frame-header-tile:active {
-  cursor: grabbing;
+/* Frames in the multi-selection */
+.frame-header-tile.multi {
+  border-color: var(--accent-line);
+  background: var(--accent-soft);
 }
-.frame-header-tile.cdk-drag-placeholder {
-  opacity: 0.4;
+/* Drop indicator — left edge (before) or right edge (after) of the hovered frame */
+.frame-header-tile.drag-over {
+  box-shadow: inset 3px 0 0 var(--accent-strong);
 }
-.frame-header-tile.cdk-drag-preview {
-  display: none;
-}
-.timeline-frame-header-row.cdk-drop-list-dragging .frame-header-tile:not(.cdk-drag-placeholder) {
-  transition: transform 180ms cubic-bezier(0, 0, 0.2, 1);
+.frame-header-tile.drag-over-after {
+  box-shadow: inset -3px 0 0 var(--accent-strong);
 }
 
 .timeline-cel.empty {

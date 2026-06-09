@@ -53,6 +53,16 @@ export const routes: Routes = [
         }),
       },
       {
+        path: 'guide',
+        loadComponent: () => import('./pages/guide/guide.component').then((m) => m.GuideComponent),
+        data: seo({
+          title: 'Guide',
+          path: 'guide',
+          description:
+            'How to use Pixel Art Studio — tools, layers, animation, palettes, import, export and keyboard shortcuts.',
+        }),
+      },
+      {
         path: 'faq',
         loadComponent: () => import('./pages/faq/faq.component').then((m) => m.FaqComponent),
         data: seo({

@@ -1,5 +1,6 @@
 /
 /features
+/guide
 /pricing
 /about
 /faq

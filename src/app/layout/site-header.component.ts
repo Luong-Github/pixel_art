@@ -14,9 +14,9 @@ export class SiteHeaderComponent {
 
   readonly nav = [
     { label: 'Features', path: '/features' },
+    { label: 'Guide', path: '/guide' },
     { label: 'Pricing', path: '/pricing' },
     { label: 'Blog', path: '/blog' },
-    { label: 'FAQ', path: '/faq' },
     { label: 'About', path: '/about' },
   ];
 

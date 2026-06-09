@@ -1,0 +1,172 @@
+<section class="section-tight page-hero pixel-grid">
+  <div class="container">
+    <span class="eyebrow">Documentation</span>
+    <h1 class="h-xl">Pixel Art Studio guide</h1>
+    <p class="lead">
+      Everything the editor can do, and how to use it — tools, layers, animation, palettes,
+      import and export. New here? <a routerLink="/editor">Open the editor</a> and follow along.
+    </p>
+  </div>
+</section>
+
+<section class="section-tight">
+  <div class="container guide-layout">
+    <!-- Table of contents -->
+    <aside class="toc">
+      <nav>
+        <span class="toc-title">On this page</span>
+        <a *ngFor="let t of toc" [href]="'#' + t.id" (click)="jumpTo($event, t.id)">{{ t.label }}</a>
+        <a routerLink="/editor" class="toc-cta">Launch editor →</a>
+      </nav>
+    </aside>
+
+    <article class="doc">
+      <section id="start" class="doc-section">
+        <h2 class="h-lg">Getting started</h2>
+        <p>
+          Pixel Art Studio runs entirely in your browser — nothing to install, and your work stays
+          on your device. Open the <a routerLink="/editor">editor</a>, pick a tool from the left
+          rail, choose a color, and start drawing on the center canvas. Zoom with
+          <kbd>Ctrl</kbd> + scroll (or <kbd>+</kbd>/<kbd>−</kbd>) and pan by holding <kbd>Space</kbd>.
+        </p>
+        <ol class="steps">
+          <li>Set the canvas size in the <strong>Canvas</strong> panel (Width × Height).</li>
+          <li>Draw with the <strong>Pen</strong>; flood areas with <strong>Fill</strong>.</li>
+          <li>Add frames &amp; layers in the <strong>Timeline</strong> to animate.</li>
+          <li>Export a PNG, animated GIF, or sprite sheet from <strong>Export ▾</strong>.</li>
+        </ol>
+      </section>
+
+      <section id="interface" class="doc-section">
+        <h2 class="h-lg">Interface &amp; panels</h2>
+        <p>
+          The workspace is built from <strong>dockable panels</strong>, like a desktop app. Every
+          panel (Tools, Color &amp; Palette, Display, Canvas, Timeline) can be rearranged:
+        </p>
+        <ul class="bullets">
+          <li><strong>Drag</strong> a panel by its title bar to move it between the left, right or bottom dock zones, or reorder it.</li>
+          <li><strong>Tear off</strong> a panel by dragging it out of any zone — it becomes a floating window you can move and resize, then drag back to re-dock.</li>
+          <li>Use the header buttons to <strong>collapse</strong> (▬), <strong>float</strong> (⧉) or <strong>close</strong> (✕) a panel.</li>
+          <li>Re-open closed panels from <strong>View ▾</strong>; restore everything with <strong>Reset layout</strong>.</li>
+          <li>Your layout is saved automatically and restored next visit.</li>
+        </ul>
+        <p class="note">The top toolbar holds undo/redo, transform, nudge and clipboard icons, plus the File, Export and View menus.</p>
+      </section>
+
+      <section id="tools" class="doc-section">
+        <h2 class="h-lg">Tools</h2>
+        <p>Pick tools from the <strong>Tools</strong> panel or with a shortcut key.</p>
+        <table class="doc-table">
+          <thead><tr><th>Key</th><th>Tool</th><th>What it does</th></tr></thead>
+          <tbody>
+            <tr *ngFor="let t of tools">
+              <td><kbd>{{ t.key }}</kbd></td>
+              <td><strong>{{ t.name }}</strong></td>
+              <td>{{ t.desc }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section id="drawing" class="doc-section">
+        <h2 class="h-lg">Drawing &amp; dithering</h2>
+        <ul class="bullets">
+          <li><strong>Brush size</strong> — set in the Canvas panel, or press <kbd>[</kbd> / <kbd>]</kbd>.</li>
+          <li><strong>Mirror-X</strong> — paints symmetrically across the vertical axis (<kbd>Shift</kbd>+<kbd>M</kbd>).</li>
+          <li><strong>Grid</strong> — toggle the pixel grid with <kbd>G</kbd> (auto-hidden when zoomed far out).</li>
+          <li><strong>Dither brush</strong> — in Color &amp; Palette, choose 25% / 50% / 75%. The pen then alternates primary &amp; secondary in a pixel-perfect pattern.</li>
+          <li><strong>Selection</strong> — use Select to mark a region, then Move, or Copy / Cut / Paste, Rotate, Flip and Nudge it.</li>
+        </ul>
+      </section>
+
+      <section id="color" class="doc-section">
+        <h2 class="h-lg">Color &amp; palette</h2>
+        <ul class="bullets">
+          <li><strong>Primary / Secondary</strong> colors — left-click a swatch sets primary, right-click sets secondary. Swap them with <kbd>X</kbd>.</li>
+          <li><strong>Pick from screen</strong> — the eyedropper buttons sample any on-screen color.</li>
+          <li><strong>Built-in palettes</strong> — load PICO-8, Game Boy, NES, DawnBringer 16 or ENDESGA 32 from the dropdown.</li>
+          <li><strong>Save</strong> your current palette (kept in the browser) and reload it later.</li>
+          <li><strong>Palette lock</strong> — when on (🔒), every stroke snaps to the nearest palette color so you never stray off-palette.</li>
+        </ul>
+      </section>
+
+      <section id="layers" class="doc-section">
+        <h2 class="h-lg">Layers</h2>
+        <p>Layers live in the <strong>Timeline</strong>’s left column (one row per layer).</p>
+        <ul class="bullets">
+          <li><strong>Add / Duplicate / Delete</strong> layers from the timeline toolbar.</li>
+          <li><strong>Reorder</strong> by dragging the ⠿ handle, or with the ▲ / ▼ buttons.</li>
+          <li><strong>Visibility</strong> (◉/○) and <strong>lock</strong> (🔒) per layer — a locked layer can’t be drawn on or edited.</li>
+          <li><strong>Rename</strong> inline, and set the active layer’s <strong>opacity</strong> with the slider.</li>
+          <li><strong>Right-click a layer</strong> for a context menu — rename, duplicate, new, show/hide, lock/unlock, move up/down or delete.</li>
+        </ul>
+      </section>
+
+      <section id="animation" class="doc-section">
+        <h2 class="h-lg">Animation &amp; timeline</h2>
+        <p>The timeline is a frame × layer grid with thumbnails per frame.</p>
+        <ul class="bullets">
+          <li><strong>Playback</strong> — ⏮ ▶ ⏭ with <strong>Loop</strong>, <strong>FPS</strong> (applies to all frames) and per-frame <strong>ms</strong>. Press <kbd>Enter</kbd> to play, <kbd>,</kbd>/<kbd>.</kbd> to step.</li>
+          <li><strong>Frame ops</strong> — Add, Duplicate, Insert before/after, Reverse, and Delete (removes all selected frames).</li>
+          <li><strong>Select frames</strong> — click a frame to select it; <kbd>Shift</kbd>+click (or Shift-drag) for a range; <kbd>Ctrl</kbd>+click to toggle individual frames. Clicking the canvas or empty timeline clears the selection.</li>
+          <li><strong>Move frames</strong> — drag a frame header to reposition it; if it’s part of a multi-selection the whole block moves.</li>
+          <li><strong>Copy &amp; paste frames</strong> — use the ⧉ / 📋 buttons in the Frame group to copy the selected frames and paste them right after the current frame.</li>
+          <li><strong>Onion skin</strong> — shows ghosts of the previous (red) and next (blue) frames; adjust opacity and tint in the Canvas panel.</li>
+          <li>Toggle the layer/frame views from <strong>View ▾</strong> in the timeline toolbar.</li>
+        </ul>
+      </section>
+
+      <section id="import" class="doc-section">
+        <h2 class="h-lg">Import &amp; convert</h2>
+        <p>
+          Turn any image into pixel art via <strong>File ▾ → Import / convert image…</strong>. The
+          dialog lets you choose:
+        </p>
+        <ul class="bullets">
+          <li><strong>Target size</strong> (64 / 96 / 128 or a custom long side) and <strong>palette</strong> count.</li>
+          <li><strong>Fit</strong> (contain / cover / stretch), <strong>contrast</strong>, <strong>sharpen</strong> and <strong>dithering</strong>.</li>
+          <li><strong>Import into</strong> the current tab (overwrites, with confirmation) or a <strong>new tab</strong>.</li>
+        </ul>
+      </section>
+
+      <section id="export" class="doc-section">
+        <h2 class="h-lg">Export</h2>
+        <p>From <strong>Export ▾</strong>:</p>
+        <ul class="bullets">
+          <li><strong>PNG</strong> at 1× / 2× (free) or 4× / 8× (Pro), with transparency preserved.</li>
+          <li><strong>Animated GIF</strong> (Pro) of the visible frames, using each frame’s duration.</li>
+          <li><strong>Sprite sheet</strong> (Pro) — grid or single row — plus an engine-ready <strong>JSON atlas</strong> (frame size, count, durations, columns, pivot).</li>
+          <li><strong>Pivot / anchor</strong> — set Center / Feet / Top-left in the Canvas panel; it’s written into the sprite-sheet JSON.</li>
+        </ul>
+        <p class="note">Free exports add a small watermark; <a routerLink="/pricing">Pro</a> removes it and unlocks GIF, sprite sheets and higher scales.</p>
+      </section>
+
+      <section id="projects" class="doc-section">
+        <h2 class="h-lg">Projects</h2>
+        <p>
+          Use <strong>Export Project</strong> to save a <code>.pixelart.json</code> file containing all
+          workspaces, frames, layers, palette and settings — then <strong>Import Project</strong> to
+          continue later. Everything stays local to your machine.
+        </p>
+      </section>
+
+      <section id="shortcuts" class="doc-section">
+        <h2 class="h-lg">Keyboard shortcuts</h2>
+        <table class="doc-table">
+          <thead><tr><th>Shortcut</th><th>Action</th></tr></thead>
+          <tbody>
+            <tr *ngFor="let s of shortcuts">
+              <td><kbd>{{ s.keys }}</kbd></td>
+              <td>{{ s.action }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <div class="doc-cta">
+        <h2 class="h-lg">Ready to draw?</h2>
+        <a routerLink="/editor" class="btn btn-primary btn-lg">Open Pixel Art Studio →</a>
+      </div>
+    </article>
+  </div>
+</section>

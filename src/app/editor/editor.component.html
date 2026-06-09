@@ -27,7 +27,7 @@
       <span>Secondary</span>
       <input type="color" [(ngModel)]="secondaryColor" />
     </label>
-    <button type="button" class="icon-action labeled" title="Swap primary / secondary" (click)="swapColors()">
+    <button type="button" class="icon-action labeled" title="Swap primary / secondary (X)" (click)="swapColors()">
       <span [innerHTML]="uiIcons.swap"></span> Swap
     </button>
     <div class="pick-row">
@@ -118,11 +118,11 @@
       <span>Height</span>
       <input type="number" min="8" max="128" [(ngModel)]="height" />
     </label>
-    <label>
+    <label title="Zoom (+ / −)">
       <span>Zoom · {{ zoom }}x</span>
       <input type="range" [min]="minZoom" [max]="maxZoom" [(ngModel)]="zoom" (input)="render()" />
     </label>
-    <label>
+    <label title="Brush size ( [ / ] )">
       <span>Brush</span>
       <input type="number" min="1" max="8" [(ngModel)]="brushSize" />
     </label>
@@ -132,9 +132,9 @@
     <button type="button" (click)="newSprite()">New</button>
   </div>
   <div class="check-row">
-    <label class="check"><input type="checkbox" [(ngModel)]="showGrid" (change)="render()" /> Grid</label>
+    <label class="check" title="Toggle grid (G)"><input type="checkbox" [(ngModel)]="showGrid" (change)="render()" /> Grid</label>
     <label class="check"><input type="checkbox" [(ngModel)]="onionSkin" (change)="render()" /> Onion</label>
-    <label class="check"><input type="checkbox" [(ngModel)]="mirrorX" (change)="render()" /> Mirror X</label>
+    <label class="check" title="Toggle mirror (Shift+M)"><input type="checkbox" [(ngModel)]="mirrorX" (change)="render()" /> Mirror X</label>
   </div>
   <div class="onion-controls" *ngIf="onionSkin">
     <label class="check"><input type="checkbox" [(ngModel)]="onionTint" (change)="render()" /> Tint prev/next</label>
@@ -167,9 +167,9 @@
 
 <ng-template dockPanelDef="timeline">
   <div class="timeline-toolbar playback-bar">
-    <button type="button" class="tb-icon" title="Previous frame" (click)="stepFrame(-1)">⏮</button>
-    <button type="button" class="tb-icon play" [title]="isPlaying ? 'Pause' : 'Play'" (click)="togglePlayback()">{{ isPlaying ? '⏸' : '▶' }}</button>
-    <button type="button" class="tb-icon" title="Next frame" (click)="stepFrame(1)">⏭</button>
+    <button type="button" class="tb-icon" title="Previous frame ( , )" (click)="stepFrame(-1)">⏮</button>
+    <button type="button" class="tb-icon play" [title]="isPlaying ? 'Pause (Enter)' : 'Play (Enter)'" (click)="togglePlayback()">{{ isPlaying ? '⏸' : '▶' }}</button>
+    <button type="button" class="tb-icon" title="Next frame ( . )" (click)="stepFrame(1)">⏭</button>
     <button type="button" class="tb-toggle" [class.on]="loop" title="Loop playback" (click)="toggleLoop()">⟳ Loop</button>
     <label class="tb-num"><span>FPS</span><input type="number" min="1" max="60" [(ngModel)]="fps" (change)="applyFps()" /></label>
     <label class="tb-num"><span>ms</span><input type="number" min="20" step="10" [(ngModel)]="activeFrame.duration" (change)="render()" /></label>
@@ -180,6 +180,8 @@
       <span class="tb-group-label">Frame</span>
       <button type="button" class="tb-add" (click)="addFrame()">＋ Add</button>
       <button type="button" class="tb-icon" title="Duplicate frame" (click)="duplicateFrame()">⧉</button>
+      <button type="button" class="tb-icon" title="Copy selected frame(s)" [innerHTML]="uiIcons.copy" (click)="copySelectedFrames()"></button>
+      <button type="button" class="tb-icon" title="Paste frame(s) after current" [disabled]="!hasFrameClipboard" [innerHTML]="uiIcons.paste" (click)="pasteFrames()"></button>
       <button type="button" class="tb-icon" title="Insert blank before" (click)="insertFrame(false)">⇤</button>
       <button type="button" class="tb-icon" title="Insert blank after" (click)="insertFrame(true)">⇥</button>
       <button type="button" class="tb-icon" title="Reverse frame order" (click)="reverseFrames()">⇄</button>
@@ -213,25 +215,25 @@
       <button type="button" class="tb-toggle" [class.on]="!framesMinimized" (click)="toggleFramesMinimized()">Frames</button>
     </span>
   </div>
-  <div class="timeline-combined-body">
-    <section *ngIf="!framesMinimized" class="timeline-grid">
+  <div class="timeline-combined-body" (pointerdown)="onTimelineBackgroundDown($event)">
+    <section *ngIf="!framesMinimized" class="timeline-grid" (pointerdown)="onTimelineBackgroundDown($event)">
       <div class="timeline-headrow">
         <div class="timeline-corner" *ngIf="!layersMinimized">Layers / Frames</div>
-        <div
-          class="timeline-frame-header-row"
-          cdkDropList
-          cdkDropListOrientation="horizontal"
-          (cdkDropListDropped)="onFrameDrop($event)">
+        <div class="timeline-frame-header-row">
           <div
             *ngFor="let frame of frames; let i = index"
-            cdkDrag
             class="frame-tile frame-header-tile"
             [class.active]="activePreviewFrameIndex === i"
             [class.selected]="activeFrameIndex === i"
+            [class.multi]="isFrameSelected(i)"
+            [class.drag-over]="isMovingFrames && frameDragOver === i && !frameDropAfter"
+            [class.drag-over-after]="isMovingFrames && frameDragOver === i && frameDropAfter"
             [class.playhead]="isPlaying && activePreviewFrameIndex === i"
             [class.off]="!isFrameVisible(i)"
-            [title]="'Frame ' + (i + 1) + ' · ' + frameDurationLabel(i) + ' (drag to reorder)'"
-            (click)="selectFrame(i)">
+            [title]="'Frame ' + (i + 1) + ' · ' + frameDurationLabel(i) + ' — drag to move, Shift-drag to select'"
+            (pointerdown)="onFrameDown(i, $event)"
+            (pointerenter)="onFrameEnter(i)"
+            (pointermove)="onFrameMove(i, $event)">
             <span class="frame-tile-index">{{ i + 1 }}</span>
             <span class="frame-tile-preview" [style.background-image]="'url(' + frameThumbnail(i) + ')'"></span>
             <button
@@ -239,10 +241,10 @@
               class="frame-visibility"
               [class.off]="!isFrameVisible(i)"
               [title]="isFrameVisible(i) ? 'Hide frame' : 'Show frame'"
+              (pointerdown)="$event.stopPropagation()"
               (click)="toggleFrameVisibility(i, $event)">
               <span aria-hidden="true">{{ isFrameVisible(i) ? '◉' : '○' }}</span>
             </button>
-            <div class="dock-drag-preview" *cdkDragPreview>Frame {{ i + 1 }}</div>
           </div>
         </div>
       </div>
@@ -254,7 +256,8 @@
             class="timeline-layer-row-label"
             [class.active]="activeLayerIndex === layerIndex"
             [class.is-locked]="isLayerLocked(layerIndex)"
-            (click)="selectLayer(layerIndex)">
+            (click)="selectLayer(layerIndex)"
+            (contextmenu)="onLayerContextMenu($event, layerIndex)">
             <span class="layer-drag-handle" cdkDragHandle title="Drag to reorder layer" aria-hidden="true">⠿</span>
             <button
               type="button"
@@ -286,6 +289,7 @@
               [class.active]="activePreviewFrameIndex === frameIndex && activeLayerIndex === layerIndex"
               [class.selected]="activeFrameIndex === frameIndex && activeLayerIndex === layerIndex"
               [class.col-active]="activeFrameIndex === frameIndex"
+              [class.col-selected]="isFrameSelected(frameIndex)"
               [class.playhead]="isPlaying && activePreviewFrameIndex === frameIndex"
               [class.empty]="!cellHasLayer(frameIndex, layerIndex)"
               [class.off]="cellHasLayer(frameIndex, layerIndex) && !isCellVisible(frameIndex, layerIndex)"
@@ -410,15 +414,15 @@
         <div class="edit-group">
           <button type="button" class="icon-btn" title="Rotate left" [innerHTML]="uiIcons.rotateL" (click)="rotateSelection(false)"></button>
           <button type="button" class="icon-btn" title="Rotate right" [innerHTML]="uiIcons.rotateR" (click)="rotateSelection(true)"></button>
-          <button type="button" class="icon-btn" title="Flip horizontal" [innerHTML]="uiIcons.flipH" (click)="flipSelection(true)"></button>
-          <button type="button" class="icon-btn" title="Flip vertical" [innerHTML]="uiIcons.flipV" (click)="flipSelection(false)"></button>
+          <button type="button" class="icon-btn" title="Flip horizontal (Shift+H)" [innerHTML]="uiIcons.flipH" (click)="flipSelection(true)"></button>
+          <button type="button" class="icon-btn" title="Flip vertical (Shift+V)" [innerHTML]="uiIcons.flipV" (click)="flipSelection(false)"></button>
         </div>
 
         <div class="edit-group">
-          <button type="button" class="icon-btn" title="Nudge left" [innerHTML]="uiIcons.arrowL" (click)="shift(-1, 0)"></button>
-          <button type="button" class="icon-btn" title="Nudge right" [innerHTML]="uiIcons.arrowR" (click)="shift(1, 0)"></button>
-          <button type="button" class="icon-btn" title="Nudge up" [innerHTML]="uiIcons.arrowU" (click)="shift(0, -1)"></button>
-          <button type="button" class="icon-btn" title="Nudge down" [innerHTML]="uiIcons.arrowD" (click)="shift(0, 1)"></button>
+          <button type="button" class="icon-btn" title="Nudge left (←)" [innerHTML]="uiIcons.arrowL" (click)="shift(-1, 0)"></button>
+          <button type="button" class="icon-btn" title="Nudge right (→)" [innerHTML]="uiIcons.arrowR" (click)="shift(1, 0)"></button>
+          <button type="button" class="icon-btn" title="Nudge up (↑)" [innerHTML]="uiIcons.arrowU" (click)="shift(0, -1)"></button>
+          <button type="button" class="icon-btn" title="Nudge down (↓)" [innerHTML]="uiIcons.arrowD" (click)="shift(0, 1)"></button>
         </div>
 
         <div class="edit-group">
@@ -472,6 +476,14 @@
             <button type="button" (click)="resetLayout(); panelsMenuOpen = false">Reset layout</button>
           </div>
         </div>
+
+        <a
+          class="icon-btn help-btn"
+          href="/guide"
+          target="_blank"
+          rel="noopener"
+          title="Help &amp; guide (opens in new tab)"
+          aria-label="Help and guide">?</a>
 
         <button
           type="button"
@@ -702,4 +714,31 @@
       <button type="button" class="primary-action" (click)="startImageImport()">Choose image &amp; convert</button>
     </footer>
   </div>
+</div>
+
+<!-- ============================================================
+     Layer right-click context menu (Aseprite-style)
+     ============================================================ -->
+<div
+  #layerMenuEl
+  class="context-menu menu-dropdown"
+  *ngIf="layerMenu"
+  [style.left.px]="layerMenu.x"
+  [style.top.px]="layerMenu.y">
+  <span class="menu-label">{{ layerNameAt(layerMenu.index) }}</span>
+  <button type="button" (click)="renameLayerPrompt(layerMenu.index)">Rename…</button>
+  <button type="button" (click)="duplicateLayer()">Duplicate layer</button>
+  <button type="button" (click)="addLayer()">New layer</button>
+  <span class="menu-sep"></span>
+  <button type="button" (click)="toggleLayerVisibility(layerMenu.index)">
+    {{ isLayerVisible(layerMenu.index) ? 'Hide layer' : 'Show layer' }}
+  </button>
+  <button type="button" (click)="toggleLayerLock(layerMenu.index)">
+    {{ isLayerLocked(layerMenu.index) ? 'Unlock layer' : 'Lock layer' }}
+  </button>
+  <span class="menu-sep"></span>
+  <button type="button" (click)="moveLayer(-1)">Move up</button>
+  <button type="button" (click)="moveLayer(1)">Move down</button>
+  <span class="menu-sep"></span>
+  <button type="button" class="danger-action" (click)="deleteLayer()">Delete layer</button>
 </div>

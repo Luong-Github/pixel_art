@@ -195,6 +195,8 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
   private panelDefs!: QueryList<DockPanelDefDirective>;
   @ViewChildren('zoneEl')
   private zoneEls!: QueryList<ElementRef<HTMLElement>>;
+  @ViewChild('layerMenuEl')
+  private layerMenuRef?: ElementRef<HTMLElement>;
 
   /** Map of panel id -> body template, populated after view init. */
   panelTemplates = new Map<PanelId, TemplateRef<unknown>>();
@@ -212,6 +214,8 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
   exportMenuOpen = false;
   fileMenuOpen = false;
   convertModalOpen = false;
+  /** Right-click context menu for a layer row ({x,y} viewport coords + layer index). */
+  layerMenu: { x: number; y: number; index: number } | null = null;
   /** Where an imported image should land. */
   importTarget: 'current' | 'new' = 'current';
   /** Sanitized inline SVG icons keyed by tool id. */
@@ -414,6 +418,15 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
   loop = true;
   /** Playback speed; applying it sets every frame's duration. */
   fps = 12;
+  /** Multi-frame selection (timeline). Always contains the active frame. */
+  selectedFrames = new Set<number>([0]);
+  private frameSelAnchor = 0;
+  private frameDrag: { mode: 'select' | 'move'; start: number; moved: boolean } | null = null;
+  frameDragOver = -1;
+  /** When moving frames, whether the drop lands after (right of) the hovered frame. */
+  frameDropAfter = false;
+  /** Copied frames buffer for paste. */
+  private copiedFrames: Frame[] = [];
 
   get activeFrame(): Frame {
     return this.frames[this.activeFrameIndex];
@@ -1810,6 +1823,12 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
     this.render();
   }
 
+  /** Reset the multi-selection to just the active frame. */
+  private syncFrameSelection(): void {
+    this.selectedFrames = new Set<number>([this.activeFrameIndex]);
+    this.frameSelAnchor = this.activeFrameIndex;
+  }
+
   addFrame(): void {
     this.pushUndo();
     this.frames.splice(
@@ -1819,6 +1838,7 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
     );
     this.activeFrameIndex += 1;
     this.activeLayerIndex = 0;
+    this.syncFrameSelection();
     this.refreshAllFrameThumbnails();
     this.render();
   }
@@ -1831,22 +1851,31 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
     );
     this.frames.splice(this.activeFrameIndex + 1, 0, copy);
     this.activeFrameIndex += 1;
+    this.syncFrameSelection();
     this.refreshAllFrameThumbnails();
     this.render();
   }
 
+  /** Delete the selected frame(s), always keeping at least one. */
   deleteFrame(): void {
     if (this.frames.length === 1) {
       this.clearLayer();
       return;
     }
+    const del = [...this.selectedFrames].sort((a, b) => a - b);
+    // Never delete every frame.
+    while (del.length >= this.frames.length) del.pop();
+    if (!del.length) del.push(this.activeFrameIndex);
     this.pushUndo();
-    this.frames.splice(this.activeFrameIndex, 1);
-    this.activeFrameIndex = Math.max(0, this.activeFrameIndex - 1);
+    const delSet = new Set(del);
+    this.frames = this.frames.filter((_, i) => !delSet.has(i));
+    this.activeFrameIndex = this.clamp(del[0], 0, this.frames.length - 1);
     this.activeLayerIndex = Math.min(
       this.activeLayerIndex,
       this.activeFrame.layers.length - 1,
     );
+    this.previewFrameIndex = this.activeFrameIndex;
+    this.syncFrameSelection();
     this.refreshAllFrameThumbnails();
     this.render();
   }
@@ -1859,6 +1888,7 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
     this.activeFrameIndex = at;
     this.previewFrameIndex = at;
     this.activeLayerIndex = 0;
+    this.syncFrameSelection();
     this.refreshAllFrameThumbnails();
     this.render();
   }
@@ -1872,6 +1902,7 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
     this.frames.reverse();
     this.activeFrameIndex = this.frames.length - 1 - this.activeFrameIndex;
     this.previewFrameIndex = this.activeFrameIndex;
+    this.syncFrameSelection();
     this.refreshAllFrameThumbnails();
     this.render();
   }
@@ -1896,6 +1927,8 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
   }
 
   onPointerDown(event: PointerEvent): void {
+    // Working on the canvas drops any multi-frame selection back to the active frame.
+    this.collapseFrameSelection();
     if (this.shouldPanCanvas(event)) {
       this.beginPan(event);
       return;
@@ -2643,13 +2676,9 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
   }
 
   selectFrame(index: number): void {
-    this.activeFrameIndex = index;
-    this.previewFrameIndex = index;
-    this.activeLayerIndex = Math.min(
-      this.activeLayerIndex,
-      this.activeFrame.layers.length - 1,
-    );
-    this.render();
+    this.selectedFrames = new Set<number>([index]);
+    this.frameSelAnchor = index;
+    this.setActiveFrame(index);
   }
 
   selectLayer(index: number): void {
@@ -2706,16 +2735,156 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
   }
 
   /** Drag-and-drop reorder a frame (column) to a new position. */
-  onFrameDrop(event: CdkDragDrop<unknown>): void {
-    const from = event.previousIndex;
-    const to = event.currentIndex;
-    if (from === to) return;
-    this.pushUndo();
-    moveItemInArray(this.frames, from, to);
-    this.activeFrameIndex = to;
-    this.previewFrameIndex = to;
-    this.refreshAllFrameThumbnails();
+  // ===================== Multi-frame selection =====================
+
+  isFrameSelected(i: number): boolean {
+    return this.selectedFrames.has(i);
+  }
+
+  get isMovingFrames(): boolean {
+    return this.frameDrag?.mode === 'move';
+  }
+
+  get hasFrameClipboard(): boolean {
+    return this.copiedFrames.length > 0;
+  }
+
+  private selectFrameRange(a: number, b: number): void {
+    const lo = Math.min(a, b);
+    const hi = Math.max(a, b);
+    this.selectedFrames = new Set<number>();
+    for (let i = lo; i <= hi; i += 1) this.selectedFrames.add(i);
+  }
+
+  /** Pointer down on a frame header — handles click / shift / ctrl / drag start. */
+  onFrameDown(i: number, event: PointerEvent): void {
+    if (event.button !== 0) return;
+    if (event.shiftKey) {
+      // Shift = (drag to) select a range.
+      this.selectFrameRange(this.frameSelAnchor, i);
+      this.setActiveFrame(i);
+      this.frameDrag = { mode: 'select', start: this.frameSelAnchor, moved: false };
+    } else if (event.ctrlKey || event.metaKey) {
+      if (this.selectedFrames.has(i) && this.selectedFrames.size > 1) {
+        this.selectedFrames.delete(i);
+      } else {
+        this.selectedFrames.add(i);
+      }
+      this.frameSelAnchor = i;
+      this.setActiveFrame(i);
+      this.frameDrag = null;
+    } else {
+      // Plain = move. Grab this frame (select it if it wasn't part of the
+      // current selection); a drag moves it, a click (no drag) just selects it.
+      if (!this.selectedFrames.has(i)) {
+        this.selectedFrames = new Set<number>([i]);
+        this.frameSelAnchor = i;
+        this.setActiveFrame(i);
+      }
+      this.frameDrag = { mode: 'move', start: i, moved: false };
+    }
+    this.frameDragOver = i;
+  }
+
+  /** Collapse a multi-frame selection back to the active frame. */
+  collapseFrameSelection(): void {
+    if (this.selectedFrames.size > 1) {
+      this.selectedFrames = new Set<number>([this.activeFrameIndex]);
+      this.frameSelAnchor = this.activeFrameIndex;
+    }
+  }
+
+  /** Clicking empty timeline space (not a frame) clears the multi-selection. */
+  onTimelineBackgroundDown(event: PointerEvent): void {
+    if (event.target === event.currentTarget) {
+      this.collapseFrameSelection();
+    }
+  }
+
+  /** Pointer entered a frame header while dragging. */
+  onFrameEnter(i: number): void {
+    if (!this.frameDrag) return;
+    if (i !== this.frameDrag.start) this.frameDrag.moved = true;
+    this.frameDragOver = i;
+    if (this.frameDrag.mode === 'select') {
+      this.selectFrameRange(this.frameSelAnchor, i);
+      this.setActiveFrame(i);
+    }
+  }
+
+  /** While moving frames, choose the drop side (left/right) from the pointer position. */
+  onFrameMove(i: number, event: PointerEvent): void {
+    if (!this.frameDrag || this.frameDrag.mode !== 'move') return;
+    const rect = (event.currentTarget as HTMLElement).getBoundingClientRect();
+    this.frameDragOver = i;
+    this.frameDropAfter = event.clientX > rect.left + rect.width / 2;
+  }
+
+  @HostListener('window:pointerup')
+  endFrameDrag(): void {
+    const drag = this.frameDrag;
+    if (!drag) return;
+    this.frameDrag = null;
+    if (drag.mode === 'move') {
+      if (drag.moved && this.frameDragOver >= 0) {
+        const gap = this.frameDragOver + (this.frameDropAfter ? 1 : 0);
+        this.moveSelectedFramesTo(gap);
+      } else {
+        // Treated as a plain click on an already-selected frame.
+        this.selectedFrames = new Set<number>([drag.start]);
+        this.frameSelAnchor = drag.start;
+        this.setActiveFrame(drag.start);
+      }
+    }
+    this.frameDragOver = -1;
+    this.frameDropAfter = false;
+  }
+
+  /** Set the active/preview frame without disturbing the selection set. */
+  private setActiveFrame(i: number): void {
+    this.activeFrameIndex = i;
+    this.previewFrameIndex = i;
+    this.activeLayerIndex = Math.min(this.activeLayerIndex, this.activeFrame.layers.length - 1);
     this.render();
+  }
+
+  /** Move the selected frames (as a block) to the insertion point `gap` (0..length). */
+  private moveSelectedFramesTo(gap: number): void {
+    const indices = [...this.selectedFrames].sort((a, b) => a - b);
+    if (!indices.length) return;
+    const moving = indices.map((i) => this.frames[i]);
+    const remaining = this.frames.filter((_, i) => !this.selectedFrames.has(i));
+    // Translate the original-array gap into an index in the trimmed array.
+    const before = indices.filter((i) => i < gap).length;
+    const insertAt = this.clamp(gap - before, 0, remaining.length);
+    this.pushUndo();
+    remaining.splice(insertAt, 0, ...moving);
+    this.frames = remaining;
+    this.selectedFrames = new Set<number>(moving.map((_, k) => insertAt + k));
+    this.setActiveFrame(insertAt);
+    this.refreshAllFrameThumbnails();
+  }
+
+  // ===================== Copy / paste frames =====================
+
+  copySelectedFrames(): void {
+    const indices = [...this.selectedFrames].sort((a, b) => a - b);
+    this.copiedFrames = indices.map((i) =>
+      this.cloneFrame(this.frames[i], this.frames[i].name),
+    );
+  }
+
+  /** Paste copied frames right after the active frame. */
+  pasteFrames(): void {
+    if (!this.copiedFrames.length) return;
+    this.pushUndo();
+    const at = this.activeFrameIndex + 1;
+    const clones = this.copiedFrames.map((f) => this.cloneFrame(f, f.name));
+    this.frames.splice(at, 0, ...clones);
+    this.selectedFrames = new Set<number>(clones.map((_, k) => at + k));
+    this.frameSelAnchor = at;
+    this.setActiveFrame(at);
+    this.refreshAllFrameThumbnails();
   }
 
   /** Drag-and-drop reorder a layer to a new position, across every frame. */
@@ -2751,6 +2920,58 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
     this.activeLayerIndex = to;
     this.refreshAllFrameThumbnails();
     this.render();
+  }
+
+  // ---- Layer right-click context menu ----
+
+  /** Open the layer context menu at the cursor (Aseprite-style). */
+  onLayerContextMenu(event: MouseEvent, layerIndex: number): void {
+    event.preventDefault();
+    this.selectLayer(layerIndex);
+    this.layerMenu = { x: event.clientX, y: event.clientY, index: layerIndex };
+    // Keep the menu fully on screen once its size is known.
+    if (this.isBrowser) {
+      requestAnimationFrame(() => this.clampLayerMenu());
+    }
+  }
+
+  private clampLayerMenu(): void {
+    const el = this.layerMenuRef?.nativeElement;
+    if (!this.layerMenu || !el) return;
+    const pad = 8;
+    const maxX = window.innerWidth - el.offsetWidth - pad;
+    const maxY = window.innerHeight - el.offsetHeight - pad;
+    this.layerMenu = {
+      ...this.layerMenu,
+      x: Math.max(pad, Math.min(this.layerMenu.x, maxX)),
+      y: Math.max(pad, Math.min(this.layerMenu.y, maxY)),
+    };
+  }
+
+  closeLayerMenu(): void {
+    this.layerMenu = null;
+  }
+
+  /** Rename a layer via a prompt (used from the context menu). */
+  renameLayerPrompt(layerIndex: number): void {
+    const name = window.prompt('Layer name:', this.layerNameAt(layerIndex));
+    if (name == null) return;
+    const trimmed = name.trim();
+    if (!trimmed) return;
+    for (const frame of this.frames) {
+      const layer = frame.layers[layerIndex];
+      if (layer) layer.name = trimmed;
+    }
+  }
+
+  @HostListener('document:click')
+  onDocumentClick(): void {
+    if (this.layerMenu) this.layerMenu = null;
+  }
+
+  @HostListener('document:keydown.escape')
+  onEscape(): void {
+    this.layerMenu = null;
   }
 
   selectTimelineCell(frameIndex: number, layerIndex: number): void {
@@ -2996,35 +3217,122 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
 
   @HostListener('window:keydown', ['$event'])
   handleShortcuts(event: KeyboardEvent): void {
-    if (event.target instanceof HTMLInputElement) {
+    // Ignore while typing in form fields.
+    const target = event.target as HTMLElement | null;
+    if (
+      target instanceof HTMLInputElement ||
+      target instanceof HTMLSelectElement ||
+      target instanceof HTMLTextAreaElement ||
+      target?.isContentEditable
+    ) {
       return;
     }
+
+    const key = event.key.toLowerCase();
+
+    // ---- Ctrl/Cmd combos ----
+    if (event.ctrlKey || event.metaKey) {
+      if (key === 'z') {
+        event.preventDefault();
+        event.shiftKey ? this.redo() : this.undo();
+      } else if (key === 'y') {
+        event.preventDefault();
+        this.redo();
+      } else if (key === 'c') {
+        event.preventDefault();
+        this.copySelection();
+      } else if (key === 'x') {
+        event.preventDefault();
+        this.cutSelection();
+      } else if (key === 'v') {
+        event.preventDefault();
+        this.pasteSelection();
+      }
+      return;
+    }
+
     if (event.code === 'Space') {
       event.preventDefault();
       this.isSpacePanning = true;
       return;
     }
-    const key = event.key.toLowerCase();
+
+    // ---- Arrow keys = nudge selection/layer ----
+    const nudge: Record<string, [number, number]> = {
+      ArrowLeft: [-1, 0],
+      ArrowRight: [1, 0],
+      ArrowUp: [0, -1],
+      ArrowDown: [0, 1],
+    };
+    if (event.key in nudge) {
+      event.preventDefault();
+      const [dx, dy] = nudge[event.key];
+      this.shift(dx, dy);
+      return;
+    }
+
+    // ---- Shift combos ----
+    if (event.shiftKey) {
+      if (key === 'h') {
+        this.flipSelection(true);
+        return;
+      }
+      if (key === 'v') {
+        this.flipSelection(false);
+        return;
+      }
+      if (key === 'm') {
+        this.mirrorX = !this.mirrorX;
+        this.render();
+        return;
+      }
+    }
+
+    // ---- Tool selection (P/E/B/I/L/R/O/S/M) ----
     const tool = this.tools.find((item) => item.key.toLowerCase() === key);
     if (tool) {
       this.setTool(tool.id);
-    } else if (event.ctrlKey && key === 'z') {
-      event.preventDefault();
-      this.undo();
-    } else if (event.ctrlKey && key === 'y') {
-      event.preventDefault();
-      this.redo();
-    } else if (event.ctrlKey && key === 'c') {
-      event.preventDefault();
-      this.copySelection();
-    } else if (event.ctrlKey && key === 'x') {
-      event.preventDefault();
-      this.cutSelection();
-    } else if (event.ctrlKey && key === 'v') {
-      event.preventDefault();
-      this.pasteSelection();
-    } else if (key === 'delete') {
-      this.cutSelection();
+      return;
+    }
+
+    // ---- Plain action keys ----
+    switch (key) {
+      case 'enter':
+        event.preventDefault();
+        this.togglePlayback();
+        break;
+      case ',':
+        this.stepFrame(-1);
+        break;
+      case '.':
+        this.stepFrame(1);
+        break;
+      case 'x':
+        this.swapColors();
+        break;
+      case 'g':
+        this.showGrid = !this.showGrid;
+        this.render();
+        break;
+      case '[':
+        this.brushSize = this.clamp(this.brushSize - 1, 1, 8);
+        break;
+      case ']':
+        this.brushSize = this.clamp(this.brushSize + 1, 1, 8);
+        break;
+      case '=':
+      case '+':
+        this.zoom = this.clamp(this.zoom + 1, this.minZoom, this.maxZoom);
+        this.render();
+        break;
+      case '-':
+        this.zoom = this.clamp(this.zoom - 1, this.minZoom, this.maxZoom);
+        this.render();
+        break;
+      case 'delete':
+      case 'backspace':
+        this.cutSelection();
+        break;
     }
   }
 

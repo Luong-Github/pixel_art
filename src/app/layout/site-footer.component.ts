@@ -24,6 +24,7 @@ export class SiteFooterComponent {
     {
       title: 'Resources',
       links: [
+        { label: 'Guide', path: '/guide' },
         { label: 'Blog', path: '/blog' },
         { label: 'FAQ', path: '/faq' },
       ],
