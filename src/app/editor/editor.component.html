@@ -742,3 +742,32 @@
   <span class="menu-sep"></span>
   <button type="button" class="danger-action" (click)="deleteLayer()">Delete layer</button>
 </div>
+
+<!-- ============================================================
+     Custom dialog (prompt / confirm / alert) — replaces window.* dialogs
+     ============================================================ -->
+<div class="modal-overlay dialog-overlay" *ngIf="dialog" (click)="dialogCancel()">
+  <div class="modal dialog" (click)="$event.stopPropagation()" role="dialog" [attr.aria-label]="dialog.title">
+    <header class="modal-head"><h2>{{ dialog.title }}</h2></header>
+    <div class="modal-body">
+      <p class="dialog-msg" *ngIf="dialog.message">{{ dialog.message }}</p>
+      <input
+        *ngIf="dialog.type === 'prompt'"
+        #dlgInput
+        class="dialog-input"
+        type="text"
+        [(ngModel)]="dialog.value"
+        [placeholder]="dialog.placeholder || ''"
+        (keydown.enter)="dialogOk()"
+        (keydown.escape)="dialogCancel()" />
+    </div>
+    <footer class="modal-foot">
+      <button type="button" class="quiet-action" *ngIf="dialog.type !== 'alert'" (click)="dialogCancel()">
+        {{ dialog.cancelLabel || 'Cancel' }}
+      </button>
+      <button type="button" class="primary-action" [class.danger-action]="dialog.danger" (click)="dialogOk()">
+        {{ dialog.okLabel }}
+      </button>
+    </footer>
+  </div>
+</div>

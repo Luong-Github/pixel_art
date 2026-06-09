@@ -197,6 +197,8 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
   private zoneEls!: QueryList<ElementRef<HTMLElement>>;
   @ViewChild('layerMenuEl')
   private layerMenuRef?: ElementRef<HTMLElement>;
+  @ViewChild('dlgInput')
+  private dlgInputRef?: ElementRef<HTMLInputElement>;
 
   /** Map of panel id -> body template, populated after view init. */
   panelTemplates = new Map<PanelId, TemplateRef<unknown>>();
@@ -216,6 +218,18 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
   convertModalOpen = false;
   /** Right-click context menu for a layer row ({x,y} viewport coords + layer index). */
   layerMenu: { x: number; y: number; index: number } | null = null;
+  /** Custom prompt/confirm/alert dialog (replaces window.prompt/confirm/alert). */
+  dialog: {
+    type: 'prompt' | 'confirm' | 'alert';
+    title: string;
+    message?: string;
+    value?: string;
+    placeholder?: string;
+    okLabel: string;
+    cancelLabel?: string;
+    danger?: boolean;
+  } | null = null;
+  private dialogResolve: ((value: string | boolean | null) => void) | null = null;
   /** Where an imported image should land. */
   importTarget: 'current' | 'new' = 'current';
   /** Sanitized inline SVG icons keyed by tool id. */
@@ -293,16 +307,16 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
   }
 
   /** Triggered by the modal's "Choose image & convert"; confirms before overwriting. */
-  startImageImport(): void {
-    if (
-      this.importTarget === 'current' &&
-      this.workspaceInProgress &&
-      !window.confirm(
-        'This tab already has artwork. Overwrite it with the imported image?\n\n' +
-          'Tip: choose "New tab" to keep your current work.',
-      )
-    ) {
-      return;
+  async startImageImport(): Promise<void> {
+    if (this.importTarget === 'current' && this.workspaceInProgress) {
+      const ok = await this.askConfirm({
+        title: 'Overwrite this tab?',
+        message:
+          'This tab already has artwork — importing here will overwrite it. Choose “New tab” to keep your current work.',
+        okLabel: 'Overwrite',
+        danger: true,
+      });
+      if (!ok) return;
     }
     this.triggerImport();
   }
@@ -2426,22 +2440,29 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
   }
 
   /** Free users keep PNG @1x/@2x (watermarked); the rest is Pro. */
-  private requirePro(feature: string): boolean {
+  private async requirePro(feature: string): Promise<boolean> {
     if (this.premium.isPro) return true;
-    const go = window.confirm(
-      `${feature} is a Pro feature.\n\nEnter a license key to unlock Pro? (demo key: PIXELPRO)`,
-    );
-    if (go) this.promptActivatePro();
-    return false;
+    const go = await this.askConfirm({
+      title: `${feature} is a Pro feature`,
+      message: 'Unlock Pro to use it. Enter a license key? (demo key: PIXELPRO)',
+      okLabel: 'Enter key',
+    });
+    if (go) await this.promptActivatePro();
+    return this.premium.isPro;
   }
 
-  promptActivatePro(): void {
-    const key = window.prompt('Enter your Pro license key (demo: PIXELPRO):', '');
+  async promptActivatePro(): Promise<void> {
+    const key = await this.askPrompt({
+      title: 'Unlock Pro',
+      message: 'Enter your Pro license key (demo: PIXELPRO).',
+      placeholder: 'License key',
+      okLabel: 'Activate',
+    });
     if (key == null) return;
     if (this.premium.activate(key)) {
-      window.alert('Pro unlocked. Thank you! ✦');
+      await this.showAlert({ title: 'Pro unlocked', message: 'Thank you! ✦' });
     } else {
-      window.alert('That key was not recognised.');
+      await this.showAlert({ title: 'Invalid key', message: 'That key was not recognised.' });
     }
   }
 
@@ -2500,9 +2521,9 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
   }
 
   /** Export the current frame as PNG at the given scale (1/2/4/8). */
-  exportPngScale(scale: number): void {
+  async exportPngScale(scale: number): Promise<void> {
     this.exportMenuOpen = false;
-    if (scale > 2 && !this.requirePro(`PNG @${scale}x export`)) return;
+    if (scale > 2 && !(await this.requirePro(`PNG @${scale}x export`))) return;
     const canvas = this.renderFrameCanvas(this.activeFrameIndex, scale);
     const ctx = canvas.getContext('2d');
     if (ctx) this.stampWatermark(ctx, canvas.width, canvas.height);
@@ -2510,9 +2531,9 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
   }
 
   /** Pack every (visible) frame into a sprite sheet PNG + engine-ready JSON atlas. */
-  exportSpriteSheet(layout: 'grid' | 'row' = 'grid', scale = 1): void {
+  async exportSpriteSheet(layout: 'grid' | 'row' = 'grid', scale = 1): Promise<void> {
     this.exportMenuOpen = false;
-    if (!this.requirePro('Sprite sheet export')) return;
+    if (!(await this.requirePro('Sprite sheet export'))) return;
     const indices = this.exportFrameIndices();
     const count = indices.length;
     let cols: number;
@@ -2578,9 +2599,9 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
   }
 
   /** Export the (visible) frames as an animated GIF at the given scale. */
-  exportGif(scale = 1): void {
+  async exportGif(scale = 1): Promise<void> {
     this.exportMenuOpen = false;
-    if (!this.requirePro('Animated GIF export')) return;
+    if (!(await this.requirePro('Animated GIF export'))) return;
     const indices = this.exportFrameIndices();
     const gif = GIFEncoder();
     for (const frameIndex of indices) {
@@ -2952,9 +2973,92 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
     this.layerMenu = null;
   }
 
+  // ---- Custom dialog (prompt / confirm / alert) ----
+
+  /** Text-input dialog. Resolves to the entered string, or null if cancelled. */
+  private askPrompt(opts: {
+    title: string;
+    message?: string;
+    value?: string;
+    placeholder?: string;
+    okLabel?: string;
+  }): Promise<string | null> {
+    return new Promise((resolve) => {
+      this.dialog = {
+        type: 'prompt',
+        title: opts.title,
+        message: opts.message,
+        value: opts.value ?? '',
+        placeholder: opts.placeholder,
+        okLabel: opts.okLabel ?? 'OK',
+        cancelLabel: 'Cancel',
+      };
+      this.dialogResolve = (v) => resolve(typeof v === 'string' ? v : null);
+      if (this.isBrowser) {
+        requestAnimationFrame(() => {
+          this.dlgInputRef?.nativeElement.focus();
+          this.dlgInputRef?.nativeElement.select();
+        });
+      }
+    });
+  }
+
+  /** Yes/no dialog. Resolves true on confirm, false otherwise. */
+  private askConfirm(opts: {
+    title: string;
+    message?: string;
+    okLabel?: string;
+    danger?: boolean;
+  }): Promise<boolean> {
+    return new Promise((resolve) => {
+      this.dialog = {
+        type: 'confirm',
+        title: opts.title,
+        message: opts.message,
+        okLabel: opts.okLabel ?? 'OK',
+        cancelLabel: 'Cancel',
+        danger: opts.danger,
+      };
+      this.dialogResolve = (v) => resolve(v === true);
+    });
+  }
+
+  /** Info dialog with a single OK button. */
+  private showAlert(opts: { title: string; message?: string }): Promise<void> {
+    return new Promise((resolve) => {
+      this.dialog = { type: 'alert', title: opts.title, message: opts.message, okLabel: 'OK' };
+      this.dialogResolve = () => resolve();
+    });
+  }
+
+  dialogOk(): void {
+    const d = this.dialog;
+    const resolve = this.dialogResolve;
+    this.dialog = null;
+    this.dialogResolve = null;
+    if (!resolve) return;
+    if (d?.type === 'prompt') resolve(d.value ?? '');
+    else if (d?.type === 'confirm') resolve(true);
+    else resolve(null);
+  }
+
+  dialogCancel(): void {
+    const d = this.dialog;
+    const resolve = this.dialogResolve;
+    this.dialog = null;
+    this.dialogResolve = null;
+    if (!resolve) return;
+    resolve(d?.type === 'confirm' ? false : null);
+  }
+
   /** Rename a layer via a prompt (used from the context menu). */
-  renameLayerPrompt(layerIndex: number): void {
-    const name = window.prompt('Layer name:', this.layerNameAt(layerIndex));
+  async renameLayerPrompt(layerIndex: number): Promise<void> {
+    const name = await this.askPrompt({
+      title: 'Rename layer',
+      value: this.layerNameAt(layerIndex),
+      placeholder: 'Layer name',
+      okLabel: 'Rename',
+    });
     if (name == null) return;
     const trimmed = name.trim();
     if (!trimmed) return;
@@ -2972,6 +3076,7 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
   @HostListener('document:keydown.escape')
   onEscape(): void {
     this.layerMenu = null;
+    if (this.dialog) this.dialogCancel();
   }
 
   selectTimelineCell(frameIndex: number, layerIndex: number): void {
@@ -3111,8 +3216,13 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
   }
 
   /** Save the current palette to localStorage under a user-supplied name. */
-  saveCurrentPalette(): void {
-    const name = window.prompt('Name this palette:', `Palette ${this.savedPalettes.length + 1}`);
+  async saveCurrentPalette(): Promise<void> {
+    const name = await this.askPrompt({
+      title: 'Save palette',
+      value: `Palette ${this.savedPalettes.length + 1}`,
+      placeholder: 'Palette name',
+      okLabel: 'Save',
+    });
     if (!name) return;
     const entry: NamedPalette = {
       id: `saved-${name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`,
