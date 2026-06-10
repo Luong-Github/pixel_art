@@ -845,6 +845,143 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
     this.applyWorkspace(copy);
   }
 
+  /** Load a small demo tree that shows off Multiply / Screen / Add blend layers. */
+  loadBlendTreeExample(): void {
+    this.fileMenuOpen = false;
+    this.saveCurrentWorkspace();
+    const id = this.workspaceIdSeed;
+    this.workspaceIdSeed += 1;
+    const workspace = this.buildBlendTree(id);
+    this.workspaces.push(workspace);
+    this.activeWorkspaceIndex = this.workspaces.length - 1;
+    this.applyWorkspace(workspace);
+  }
+
+  private buildBlendTree(id: number): WorkspaceState {
+    const W = 32;
+    const H = 32;
+    const N = W * H;
+    const idx = (x: number, y: number) => y * W + x;
+    const inB = (x: number, y: number) => x >= 0 && y >= 0 && x < W && y < H;
+    const blank = () => new Array<Pixel>(N).fill(null);
+    const set = (buf: Pixel[], x: number, y: number, c: string) => {
+      if (inB(x, y)) buf[idx(x, y)] = c;
+    };
+    const rect = (
+      buf: Pixel[],
+      x0: number,
+      y0: number,
+      x1: number,
+      y1: number,
+      c: string,
+    ) => {
+      for (let y = y0; y <= y1; y += 1)
+        for (let x = x0; x <= x1; x += 1) set(buf, x, y, c);
+    };
+    const disc = (
+      buf: Pixel[],
+      cx: number,
+      cy: number,
+      r: number,
+      c: string,
+      pred?: (x: number, y: number) => boolean,
+    ) => {
+      for (let y = cy - r; y <= cy + r; y += 1)
+        for (let x = cx - r; x <= cx + r; x += 1) {
+          const dx = x - cx;
+          const dy = y - cy;
+          if (dx * dx + dy * dy <= r * r && (!pred || pred(x, y)))
+            set(buf, x, y, c);
+        }
+    };
+
+    const cx = 16;
+    const cy = 13;
+    const r = 10;
+
+    // Base layer: green crown + brown trunk (Normal).
+    const base = blank();
+    rect(base, 14, 21, 17, 30, '#6b4a2b');
+    disc(base, cx, cy, r, '#3e8948');
+
+    // Shadow layer (Multiply): lower-right of the crown + right of the trunk.
+    const shadow = blank();
+    disc(shadow, cx, cy, r, '#9a8fc0', (x, y) => x + y > cx + cy + 2);
+    rect(shadow, 16, 21, 17, 30, '#9a8fc0');
+
+    // Highlight layer (Screen): top-left rim of the crown.
+    const highlight = blank();
+    disc(highlight, cx, cy, r, '#fff2c0', (x, y) => x + y < cx + cy - 8);
+
+    // Glow layer (Add): a few bright sparkles where the light hits hardest.
+    const glow = blank();
+    for (const [x, y] of [
+      [11, 6],
+      [12, 6],
+      [11, 7],
+      [13, 5],
+    ]) {
+      set(glow, x, y, '#bfffa0');
+    }
+
+    const gid = 1;
+    const layer = (
+      name: string,
+      pixels: Pixel[],
+      blend: BlendMode,
+      opacity: number,
+      groupId: number | null,
+    ): Layer => ({
+      name,
+      visible: true,
+      locked: false,
+      opacity,
+      blend,
+      groupId,
+      pixels,
+    });
+
+    const frame: Frame = {
+      name: 'Frame 1',
+      duration: 160,
+      visible: true,
+      layers: [
+        layer('Base', base, 'normal', 1, null),
+        layer('Shadow ×', shadow, 'multiply', 0.75, gid),
+        layer('Highlight', highlight, 'screen', 0.9, gid),
+        layer('Glow +', glow, 'add', 1, gid),
+      ],
+    };
+
+    return {
+      id,
+      name: 'Tree example',
+      width: W,
+      height: H,
+      frames: [frame],
+      tags: [],
+      groups: [
+        {
+          id: gid,
+          name: 'Shading',
+          visible: true,
+          locked: false,
+          collapsed: false,
+          opacity: 1,
+          color: this.groupColors[0],
+        },
+      ],
+      activeFrameIndex: 0,
+      activeLayerIndex: 1,
+      palette: [
+        '#3e8948', '#265c42', '#6b4a2b', '#9a8fc0', '#fff2c0', '#bfffa0',
+        '#ffffff', '#1a1530',
+      ],
+      primaryColor: '#9a8fc0',
+      secondaryColor: '#fff2c0',
+    };
+  }
+
   selectWorkspace(index: number): void {
     if (index === this.activeWorkspaceIndex) {
       return;

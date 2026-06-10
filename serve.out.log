@@ -7576,3 +7576,361 @@ chunk-M2RC2TDH.mjs  | guide-component | 39.04 kB |
 Application bundle generation complete. [0.516 seconds]
 
 Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Application bundle generation failed. [2.887 seconds]
+
+X [ERROR] TS2551: Property 'blendScratch' does not exist on type 'EditorComponent'. Did you mean 'getBlendScratch'? [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:4756:14:
+      4756 │     if (!this.blendScratch) {
+           ╵               ~~~~~~~~~~~~
+
+  'getBlendScratch' is declared here.
+
+    src/app/editor/editor.component.ts:4751:10:
+      4751 │   private getBlendScratch(
+           ╵           ~~~~~~~~~~~~~~~
+
+
+X [ERROR] TS2551: Property 'blendScratch' does not exist on type 'EditorComponent'. Did you mean 'getBlendScratch'? [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:4760:11:
+      4760 │       this.blendScratch = { canvas, ctx };
+           ╵            ~~~~~~~~~~~~
+
+  'getBlendScratch' is declared here.
+
+    src/app/editor/editor.component.ts:4751:10:
+      4751 │   private getBlendScratch(
+           ╵           ~~~~~~~~~~~~~~~
+
+
+X [ERROR] TS2551: Property 'blendScratch' does not exist on type 'EditorComponent'. Did you mean 'getBlendScratch'? [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:4762:33:
+      4762 │     const { canvas, ctx } = this.blendScratch;
+           ╵                                  ~~~~~~~~~~~~
+
+  'getBlendScratch' is declared here.
+
+    src/app/editor/editor.component.ts:4751:10:
+      4751 │   private getBlendScratch(
+           ╵           ~~~~~~~~~~~~~~~
+
+
+X [ERROR] TS2551: Property 'blendScratch' does not exist on type 'EditorComponent'. Did you mean 'getBlendScratch'? [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:4768:16:
+      4768 │     return this.blendScratch;
+           ╵                 ~~~~~~~~~~~~
+
+  'getBlendScratch' is declared here.
+
+    src/app/editor/editor.component.ts:4751:10:
+      4751 │   private getBlendScratch(
+           ╵           ~~~~~~~~~~~~~~~
+
+
+- Changes detected. Rebuilding...
+
+Browser bundles        
+Initial chunk files     | Names               |  Raw size
+polyfills.js            | polyfills           |  88.09 kB | 
+main.js                 | main                |  21.54 kB | 
+styles.css              | styles              |   4.81 kB | 
+chunk-NJ5HVBCL.js       | -                   |   3.17 kB | 
+chunk-4WXVOEFY.js       | -                   |   1.46 kB | 
+chunk-3OSS3HON.js       | -                   | 652 bytes | 
+
+                        | Initial total       | 119.70 kB
+
+Lazy chunk files        | Names               |  Raw size
+chunk-TWTSDMQQ.js       | editor-component    | 357.50 kB | 
+chunk-O57JCTF5.js       | guide-component     |  40.59 kB | 
+chunk-W5CCP3ZS.js       | landing-component   |  16.89 kB | 
+chunk-EWQNQPX5.js       | contact-component   |   9.10 kB | 
+chunk-CIVRPHXR.js       | pricing-component   |   8.03 kB | 
+chunk-GIECJVF4.js       | features-component  |   7.82 kB | 
+chunk-LTE4XX4C.js       | blog-post-component |   6.55 kB | 
+chunk-DOZPUEIV.js       | faq-component       |   5.99 kB | 
+chunk-XP5ZG5Q4.js       | blog-list-component |   5.46 kB | 
+chunk-5C2M5NFJ.js       | about-component     |   4.67 kB | 
+chunk-UVVVIIEP.js       | -                   |   3.47 kB | 
+chunk-C6JU3WVH.js       | not-found-component |   2.47 kB | 
+
+
+Server bundles         
+Initial chunk files     | Names               |  Raw size
+chunk-3KVU5QX2.mjs      | -                   |   1.08 MB | 
+chunk-MM2SGXET.mjs      | -                   | 663.58 kB | 
+polyfills.server.mjs    | polyfills.server    | 559.49 kB | 
+chunk-ESQLRAC5.mjs      | -                   | 194.65 kB | 
+main.server.mjs         | main.server         |  21.08 kB | 
+chunk-AKEZM5SL.mjs      | -                   |   3.11 kB | 
+chunk-VPSODEBW.mjs      | -                   |   2.51 kB | 
+chunk-C42IF335.mjs      | -                   | 687 bytes | 
+render-utils.server.mjs | render-utils.server | 462 bytes | 
+
+Lazy chunk files        | Names               |  Raw size
+chunk-QIIN5QDJ.mjs      | editor-component    | 629.10 kB | 
+chunk-OSTPOPH7.mjs      | -                   | 193.75 kB | 
+chunk-P3UOPGAK.mjs      | xhr2                |  39.09 kB | 
+chunk-M2RC2TDH.mjs      | guide-component     |  39.04 kB | 
+chunk-6S4MS7AO.mjs      | landing-component   |  16.63 kB | 
+chunk-JBYRA3XA.mjs      | contact-component   |   9.22 kB | 
+chunk-ITW4OT2Z.mjs      | pricing-component   |   7.98 kB | 
+chunk-5KGCPH36.mjs      | features-component  |   7.78 kB | 
+chunk-7TG2CDFJ.mjs      | blog-post-component |   6.65 kB | 
+chunk-YZMUJTXQ.mjs      | faq-component       |   6.01 kB | 
+chunk-EUON4EGE.mjs      | blog-list-component |   5.52 kB | 
+chunk-NT3RS6MI.mjs      | about-component     |   4.67 kB | 
+chunk-ROHT27OW.mjs      | -                   |   3.50 kB | 
+chunk-GJH5DQF4.mjs      | not-found-component |   2.54 kB | 
+
+Application bundle generation complete. [2.563 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.54 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-XRIKVHWM.js   | editor-component | 357.39 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  21.08 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-PH4AETRB.mjs  | editor-component | 629.00 kB | 
+
+Application bundle generation complete. [1.818 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.54 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-CDYO2JRH.js   | editor-component | 357.27 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  21.08 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-3JKLJ3G3.mjs  | editor-component | 628.87 kB | 
+
+Application bundle generation complete. [1.903 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.54 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-7XBUL5AJ.js   | editor-component | 357.18 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  21.08 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-BNSBQ6AO.mjs  | editor-component | 628.78 kB | 
+
+Application bundle generation complete. [1.665 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.54 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-ZEFP24NF.js   | editor-component | 357.61 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  21.08 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-BSSBBF7B.mjs  | editor-component | 629.21 kB | 
+
+Application bundle generation complete. [1.111 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Application bundle generation failed. [2.696 seconds]
+
+▲ [WARNING] Duplicate member "loadTreeExample" in class body [duplicate-class-member]
+
+    src/app/editor/editor.component.ts:2326:4:
+      2326 │     loadTreeExample() {
+           ╵     ~~~~~~~~~~~~~~~
+
+  The original member "loadTreeExample" is here:
+
+    src/app/editor/editor.component.ts:2119:4:
+      2119 │     loadTreeExample() {
+           ╵     ~~~~~~~~~~~~~~~
+
+
+▲ [WARNING] Duplicate member "loadTreeExample" in class body [duplicate-class-member]
+
+    src/app/editor/editor.component.ts:2326:4:
+      2326 │     loadTreeExample() {
+           ╵     ~~~~~~~~~~~~~~~
+
+  The original member "loadTreeExample" is here:
+
+    src/app/editor/editor.component.ts:2119:4:
+      2119 │     loadTreeExample() {
+           ╵     ~~~~~~~~~~~~~~~
+
+
+X [ERROR] TS2393: Duplicate function implementation. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:849:2:
+      849 │   loadTreeExample(): void {
+          ╵   ~~~~~~~~~~~~~~~
+
+
+X [ERROR] TS2393: Duplicate function implementation. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:1109:2:
+      1109 │   loadTreeExample(): void {
+           ╵   ~~~~~~~~~~~~~~~
+
+
+- Changes detected. Rebuilding...
+
+Browser bundles        
+Initial chunk files     | Names               |  Raw size
+polyfills.js            | polyfills           |  88.09 kB | 
+main.js                 | main                |  21.54 kB | 
+styles.css              | styles              |   4.81 kB | 
+chunk-NJ5HVBCL.js       | -                   |   3.17 kB | 
+chunk-4WXVOEFY.js       | -                   |   1.46 kB | 
+chunk-3OSS3HON.js       | -                   | 652 bytes | 
+
+                        | Initial total       | 119.70 kB
+
+Lazy chunk files        | Names               |  Raw size
+chunk-XB52MV7R.js       | editor-component    | 360.54 kB | 
+chunk-O57JCTF5.js       | guide-component     |  40.59 kB | 
+chunk-W5CCP3ZS.js       | landing-component   |  16.89 kB | 
+chunk-EWQNQPX5.js       | contact-component   |   9.10 kB | 
+chunk-CIVRPHXR.js       | pricing-component   |   8.03 kB | 
+chunk-GIECJVF4.js       | features-component  |   7.82 kB | 
+chunk-LTE4XX4C.js       | blog-post-component |   6.55 kB | 
+chunk-DOZPUEIV.js       | faq-component       |   5.99 kB | 
+chunk-XP5ZG5Q4.js       | blog-list-component |   5.46 kB | 
+chunk-5C2M5NFJ.js       | about-component     |   4.67 kB | 
+chunk-UVVVIIEP.js       | -                   |   3.47 kB | 
+chunk-C6JU3WVH.js       | not-found-component |   2.47 kB | 
+
+
+Server bundles         
+Initial chunk files     | Names               |  Raw size
+chunk-3KVU5QX2.mjs      | -                   |   1.08 MB | 
+chunk-MM2SGXET.mjs      | -                   | 663.58 kB | 
+polyfills.server.mjs    | polyfills.server    | 559.49 kB | 
+chunk-ESQLRAC5.mjs      | -                   | 194.65 kB | 
+main.server.mjs         | main.server         |  21.08 kB | 
+chunk-AKEZM5SL.mjs      | -                   |   3.11 kB | 
+chunk-VPSODEBW.mjs      | -                   |   2.51 kB | 
+chunk-C42IF335.mjs      | -                   | 687 bytes | 
+render-utils.server.mjs | render-utils.server | 462 bytes | 
+
+Lazy chunk files        | Names               |  Raw size
+chunk-KPZSGR5M.mjs      | editor-component    | 632.15 kB | 
+chunk-OSTPOPH7.mjs      | -                   | 193.75 kB | 
+chunk-P3UOPGAK.mjs      | xhr2                |  39.09 kB | 
+chunk-M2RC2TDH.mjs      | guide-component     |  39.04 kB | 
+chunk-6S4MS7AO.mjs      | landing-component   |  16.63 kB | 
+chunk-JBYRA3XA.mjs      | contact-component   |   9.22 kB | 
+chunk-ITW4OT2Z.mjs      | pricing-component   |   7.98 kB | 
+chunk-5KGCPH36.mjs      | features-component  |   7.78 kB | 
+chunk-7TG2CDFJ.mjs      | blog-post-component |   6.65 kB | 
+chunk-YZMUJTXQ.mjs      | faq-component       |   6.01 kB | 
+chunk-EUON4EGE.mjs      | blog-list-component |   5.52 kB | 
+chunk-NT3RS6MI.mjs      | about-component     |   4.67 kB | 
+chunk-ROHT27OW.mjs      | -                   |   3.50 kB | 
+chunk-GJH5DQF4.mjs      | not-found-component |   2.54 kB | 
+
+Application bundle generation complete. [2.302 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.54 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-GX5AJDF4.js   | editor-component | 360.96 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  21.08 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-5VFL6XAJ.mjs  | editor-component | 632.54 kB | 
+
+Application bundle generation complete. [1.609 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names           | Raw size
+main.js             | main            | 21.54 kB | 
+
+Lazy chunk files    | Names           | Raw size
+chunk-ELPBU53W.js   | guide-component | 40.80 kB | 
+
+
+Server bundles     
+Initial chunk files | Names           | Raw size
+main.server.mjs     | main.server     | 21.08 kB | 
+
+Lazy chunk files    | Names           | Raw size
+chunk-QYNMDWZ4.mjs  | guide-component | 39.24 kB | 
+
+Application bundle generation complete. [1.377 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names           | Raw size
+main.js             | main            | 21.54 kB | 
+
+Lazy chunk files    | Names           | Raw size
+chunk-EBGMHBMJ.js   | guide-component | 41.09 kB | 
+
+
+Server bundles     
+Initial chunk files | Names           | Raw size
+main.server.mjs     | main.server     | 21.08 kB | 
+
+Lazy chunk files    | Names           | Raw size
+chunk-QABZPIPX.mjs  | guide-component | 39.52 kB | 
+
+Application bundle generation complete. [0.495 seconds]
+
+Page reload sent to client(s).

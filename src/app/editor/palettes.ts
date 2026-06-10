@@ -45,6 +45,16 @@ export const BUILTIN_PALETTES: NamedPalette[] = [
     ],
   },
   {
+    id: 'shadowramp',
+    name: 'Shadow Ramp',
+    // Light → dark, hue-shifting warm highlights toward cool/purple shadows
+    // (classic shading practice). Click left→right to ramp from light to dark.
+    colors: [
+      '#fff6e0', '#ffe9c0', '#ffd9a0', '#f0b988', '#d99877', '#b87a6e',
+      '#8f5e6b', '#6a4663', '#4a3357', '#2e2140', '#1a1530', '#ffffff',
+    ],
+  },
+  {
     id: 'endesga32',
     name: 'ENDESGA 32',
     colors: [
