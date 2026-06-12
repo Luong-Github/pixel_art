@@ -57,7 +57,8 @@ export class GuideComponent {
   ];
 
   readonly shortcuts: Shortcut[] = [
-    { keys: 'P E B I L R O S W Q M', action: 'Pick a tool' },
+    { keys: 'Ctrl + K', action: 'Command palette (search every action)' },
+    { keys: 'P E B D A I L R O S W Q M T', action: 'Pick a tool' },
     { keys: 'Shift / Alt + Wand·Lasso', action: 'Add to / subtract from selection' },
     { keys: 'T then drag handles', action: 'Transform: scale / rotate / move' },
     { keys: 'Enter / Esc', action: 'Commit / cancel a transform' },

@@ -44,6 +44,13 @@
       <label class="opt-check" title="Pixel-perfect freehand (brush size 1)">
         <input type="checkbox" [(ngModel)]="pixelPerfect" /> Pixel-perfect
       </label>
+      <label class="opt-check" title="Lazy mouse: smooth jittery strokes">
+        <input type="checkbox" [(ngModel)]="stabilizer" /> Stabilizer
+      </label>
+      <label class="opt-row" *ngIf="stabilizer" title="Higher = smoother but laggier line">
+        <span>Strength</span>
+        <input type="range" min="0" max="0.92" step="0.04" [(ngModel)]="stabAmount" />
+      </label>
       <label class="opt-row" title="Drawing symmetry (Shift+M toggles X)">
         <span>Symmetry</span>
         <select [ngModel]="symmetry" (ngModelChange)="setSymmetry($event)">
@@ -168,6 +175,7 @@
       <button type="button" title="Add primary→secondary gradient ramp" (click)="addGradientToPalette()">Gradient</button>
       <button type="button" title="Add harmony colours of the primary" (click)="addHarmonyToPalette()">Harmony</button>
       <button type="button" title="Build palette from the current sprite" (click)="extractPaletteFromSprite()">From sprite</button>
+      <button type="button" title="Recolor the whole sprite to the nearest palette colours" (click)="remapToPalette()">Recolor sprite</button>
     </div>
   </div>
 
@@ -651,6 +659,7 @@
             <span class="menu-label">Import</span>
             <button type="button" (click)="openConvertModal()">Import / convert image…</button>
             <button type="button" (click)="extractPaletteOnly(); fileMenuOpen = false">Extract palette</button>
+            <button type="button" class="danger-action" (click)="resetEditor()">Start fresh (clear autosave)</button>
             <span class="menu-label">Examples</span>
             <button type="button" (click)="loadIdlePresetExample(); fileMenuOpen = false">Idle example</button>
             <button type="button" (click)="loadTreeExample(); fileMenuOpen = false">Tree example</button>
@@ -661,6 +670,7 @@
             </button>
             <button type="button" [disabled]="timelapseFrames.length < 2" (click)="exportTimelapse()">Export timelapse (GIF)</button>
             <span class="menu-label">Edit</span>
+            <button type="button" (click)="openAdjust(); fileMenuOpen = false">Adjust colours (HSB)…</button>
             <button type="button" (click)="outlineLayer(); fileMenuOpen = false">Outline layer (secondary)</button>
             <button type="button" (click)="replaceColor(); fileMenuOpen = false">Replace secondary → primary</button>
             <button type="button" class="danger-action" (click)="clearLayer(); fileMenuOpen = false">Clear active layer</button>
@@ -760,6 +770,7 @@
         (pointermove)="onCanvasWrapPointerMove($event)"
         (pointerup)="onCanvasWrapPointerUp($event)"
         (pointercancel)="onCanvasWrapPointerUp($event)"
+        (scroll)="onCanvasScroll()"
         (wheel)="onCanvasWheel($event)">
         <canvas
           #stage
@@ -772,6 +783,18 @@
           (pointercancel)="onPointerUp($event)"
           (contextmenu)="$event.preventDefault()">
         </canvas>
+      </div>
+
+      <div class="minimap" *ngIf="minimapVisible">
+        <canvas
+          #minimapCanvas
+          class="minimap-canvas"
+          (pointerdown)="onMinimapDown($event)"
+          (pointermove)="onMinimapMove($event)"
+          (pointerup)="onMinimapUp($event)"
+          (pointercancel)="onMinimapUp($event)"
+          (lostpointercapture)="onMinimapUp($event)"></canvas>
+        <button type="button" class="minimap-close" title="Hide minimap" (click)="minimapOn = false">✕</button>
       </div>
 
       <footer class="statusbar">
@@ -1066,6 +1089,63 @@
   </label>
   <span class="menu-sep"></span>
   <button type="button" class="danger-action" (click)="ungroup(groupMenu.id)">Ungroup</button>
+</div>
+
+<!-- ============================================================
+     Command palette (Ctrl+K)
+     ============================================================ -->
+<div class="modal-overlay palette-overlay" *ngIf="paletteOpen" (click)="closeCommandPalette()">
+  <div class="command-palette" (click)="$event.stopPropagation()" role="dialog" aria-label="Command palette">
+    <input
+      #cmdInput
+      class="command-input"
+      type="text"
+      placeholder="Search commands…  (↑↓ to move, Enter to run, Esc to close)"
+      [(ngModel)]="commandQuery"
+      (ngModelChange)="onCommandQueryChange()"
+      (keydown)="commandKeydown($event)" />
+    <div class="command-list">
+      <button
+        *ngFor="let cmd of filteredCommands; let i = index"
+        type="button"
+        class="command-item"
+        [class.active]="i === commandIndex"
+        (mouseenter)="commandIndex = i"
+        (click)="runCommandAt(i)">
+        <span class="command-label">{{ cmd.label }}</span>
+        <span class="command-hint" *ngIf="cmd.hint">{{ cmd.hint }}</span>
+      </button>
+      <p class="command-empty" *ngIf="!filteredCommands.length">No matching command</p>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     Colour adjustments (Hue / Saturation / Brightness)
+     ============================================================ -->
+<div class="modal-overlay" *ngIf="adjustOpen" (click)="cancelAdjust()">
+  <div class="modal" (click)="$event.stopPropagation()" role="dialog" aria-label="Colour adjustments">
+    <header class="modal-head">
+      <h2>Adjust colours</h2>
+      <button type="button" class="dock-btn" title="Close" (click)="cancelAdjust()">✕</button>
+    </header>
+    <div class="modal-body">
+      <div class="modal-row">
+        <span class="modal-label">Scope</span>
+        <div class="seg">
+          <button type="button" [class.on]="adjustScope === 'layer'" (click)="adjustScope = 'layer'; applyAdjustPreview()">Layer</button>
+          <button type="button" [class.on]="adjustScope === 'selection'" [disabled]="!hasSelection" (click)="adjustScope = 'selection'; applyAdjustPreview()">Selection</button>
+        </div>
+      </div>
+      <label><span>Hue · {{ adjustHue }}°</span><input type="range" min="-180" max="180" [(ngModel)]="adjustHue" (input)="applyAdjustPreview()" /></label>
+      <label><span>Saturation · {{ adjustSat }}%</span><input type="range" min="-100" max="100" [(ngModel)]="adjustSat" (input)="applyAdjustPreview()" /></label>
+      <label><span>Brightness · {{ adjustBright }}%</span><input type="range" min="-100" max="100" [(ngModel)]="adjustBright" (input)="applyAdjustPreview()" /></label>
+    </div>
+    <footer class="modal-foot">
+      <button type="button" class="quiet-action" (click)="cancelAdjust()">Cancel</button>
+      <button type="button" class="primary-action" (click)="commitAdjust()">Apply</button>
+    </footer>
+  </div>
 </div>
 
 <!-- ============================================================

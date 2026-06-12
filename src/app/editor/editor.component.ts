@@ -257,6 +257,12 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
   tilemapRef?: ElementRef<HTMLCanvasElement>;
   private tilemapCanvasEl?: HTMLCanvasElement;
   private tilemapCtx?: CanvasRenderingContext2D;
+  @ViewChild('minimapCanvas')
+  minimapRef?: ElementRef<HTMLCanvasElement>;
+  private minimapEl?: HTMLCanvasElement;
+  private minimapCtx?: CanvasRenderingContext2D;
+  minimapOn = true;
+  private minimapDragging = false;
   @ViewChild('canvasWrap', { static: true })
   canvasWrapRef!: ElementRef<HTMLDivElement>;
   @ViewChild('importInput', { static: true })
@@ -456,6 +462,122 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
   /** Active tab in the Color & Palette panel. */
   colorTab: 'color' | 'palette' = 'color';
 
+  /** Command palette (Ctrl+K). */
+  paletteOpen = false;
+  commandQuery = '';
+  commandIndex = 0;
+  @ViewChild('cmdInput')
+  private cmdInputRef?: ElementRef<HTMLInputElement>;
+
+  get commands(): { label: string; hint?: string; run: () => void }[] {
+    return [
+      ...this.tools.map((t) => ({
+        label: `Tool: ${t.label}`,
+        hint: t.key,
+        run: () => this.setTool(t.id),
+      })),
+      { label: 'Undo', hint: 'Ctrl+Z', run: () => this.undo() },
+      { label: 'Redo', hint: 'Ctrl+Y', run: () => this.redo() },
+      { label: 'New sprite', run: () => this.newSprite() },
+      { label: 'Fit to screen', run: () => this.fitToScreen() },
+      {
+        label: 'Toggle grid',
+        hint: 'G',
+        run: () => {
+          this.showGrid = !this.showGrid;
+          this.render();
+        },
+      },
+      {
+        label: 'Toggle onion skin',
+        run: () => {
+          this.onionSkin = !this.onionSkin;
+          this.render();
+        },
+      },
+      { label: 'Add layer', run: () => this.addLayer() },
+      { label: 'Add frame', run: () => this.addFrame() },
+      { label: 'Duplicate frame', run: () => this.duplicateFrame() },
+      { label: 'Outline layer (secondary)', run: () => this.outlineLayer() },
+      { label: 'Replace secondary → primary', run: () => this.replaceColor() },
+      { label: 'Recolor sprite to palette', run: () => this.remapToPalette() },
+      { label: 'Color adjustments…', run: () => this.openAdjust() },
+      { label: 'Export PNG ×1', run: () => this.exportPngScale(1) },
+      { label: 'Export PNG ×2', run: () => this.exportPngScale(2) },
+      { label: 'Export animated GIF', run: () => this.exportGif(1) },
+      {
+        label: 'Export sprite sheet',
+        run: () => this.exportSpriteSheet('grid', 1),
+      },
+      { label: 'Export project (.json)', run: () => this.exportProject() },
+      { label: 'Import / convert image…', run: () => this.openConvertModal() },
+      { label: 'Record timelapse', run: () => this.toggleRecording() },
+      {
+        label: 'Toggle minimap',
+        run: () => {
+          this.minimapOn = !this.minimapOn;
+          this.render();
+        },
+      },
+      {
+        label: 'Toggle brush stabilizer',
+        run: () => {
+          this.stabilizer = !this.stabilizer;
+        },
+      },
+      { label: 'Reset layout', run: () => this.resetLayout() },
+    ];
+  }
+
+  get filteredCommands(): { label: string; hint?: string; run: () => void }[] {
+    const q = this.commandQuery.trim().toLowerCase();
+    const list = this.commands;
+    return q ? list.filter((c) => c.label.toLowerCase().includes(q)) : list;
+  }
+
+  toggleCommandPalette(): void {
+    this.paletteOpen = !this.paletteOpen;
+    if (this.paletteOpen) {
+      this.commandQuery = '';
+      this.commandIndex = 0;
+      if (this.isBrowser) {
+        requestAnimationFrame(() => this.cmdInputRef?.nativeElement.focus());
+      }
+    }
+  }
+  closeCommandPalette(): void {
+    this.paletteOpen = false;
+  }
+  onCommandQueryChange(): void {
+    this.commandIndex = 0;
+  }
+  commandKeydown(event: KeyboardEvent): void {
+    const list = this.filteredCommands;
+    if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k') {
+      event.preventDefault();
+      this.closeCommandPalette();
+      return;
+    }
+    if (event.key === 'ArrowDown') {
+      event.preventDefault();
+      this.commandIndex = Math.min(this.commandIndex + 1, list.length - 1);
+    } else if (event.key === 'ArrowUp') {
+      event.preventDefault();
+      this.commandIndex = Math.max(this.commandIndex - 1, 0);
+    } else if (event.key === 'Enter') {
+      event.preventDefault();
+      this.runCommandAt(this.commandIndex);
+    } else if (event.key === 'Escape') {
+      this.closeCommandPalette();
+    }
+  }
+  runCommandAt(i: number): void {
+    const list = this.filteredCommands;
+    const cmd = list[this.clamp(i, 0, list.length - 1)];
+    this.paletteOpen = false;
+    if (cmd) cmd.run();
+  }
+
   width = 32;
   height = 32;
   leftPanelWidth = 220;
@@ -576,6 +698,11 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
   /** In-progress lasso polygon points (canvas pixel coords). */
   private lassoPoints: { x: number; y: number }[] = [];
   private lassoMode: 'replace' | 'add' | 'subtract' = 'replace';
+  /** Brush stabilizer (lazy mouse): smooth jittery freehand strokes. */
+  stabilizer = false;
+  stabAmount = 0.5;
+  private stabX = 0;
+  private stabY = 0;
   /** Pixel-perfect stroke path + pre-stroke values (for corner removal). */
   private ppPath: { x: number; y: number }[] = [];
   private ppOriginal = new Map<number, Pixel>();
@@ -815,7 +942,10 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
     });
     this.panelDefs.changes.subscribe(() => this.buildPanelTemplates());
     this.render();
-    void this.loadIdlePresetExample();
+    // Restore the auto-saved project; fall back to the idle demo for newcomers.
+    if (!this.restoreAutosave()) {
+      void this.loadIdlePresetExample();
+    }
   }
 
   ngAfterViewChecked(): void {
@@ -842,6 +972,16 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
         this.tilemapCanvasEl = tel;
         this.refreshTiles();
         this.renderTilemap();
+      }
+    }
+    // Minimap canvas appears/disappears with zoom; bind + draw when it mounts.
+    const mel = this.minimapRef?.nativeElement;
+    if (mel && mel !== this.minimapEl) {
+      const mctx = mel.getContext('2d');
+      if (mctx) {
+        this.minimapCtx = mctx;
+        this.minimapEl = mel;
+        this.drawMinimap();
       }
     }
   }
@@ -2435,6 +2575,8 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
     }
     if (this.activeTool === 'pen' || this.activeTool === 'eraser') {
       this.resetPixelPerfect();
+      this.stabX = point.x;
+      this.stabY = point.y;
       this.strokeTo(point.x, point.y);
     } else if (this.activeTool === 'fill') {
       this.fillMirrored(point.x, point.y, this.effectivePrimary);
@@ -2602,11 +2744,21 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
     }
 
     if (this.activeTool === 'pen' || this.activeTool === 'eraser') {
-      this.drawLine(this.pointer.x, this.pointer.y, point.x, point.y, (x, y) =>
+      let tx = point.x;
+      let ty = point.y;
+      if (this.stabilizer) {
+        // Lazy mouse: the pen trails the cursor, smoothing out jitter.
+        const k = 1 - this.clamp(this.stabAmount, 0, 0.92);
+        this.stabX += (point.x - this.stabX) * k;
+        this.stabY += (point.y - this.stabY) * k;
+        tx = Math.round(this.stabX);
+        ty = Math.round(this.stabY);
+      }
+      this.drawLine(this.pointer.x, this.pointer.y, tx, ty, (x, y) =>
         this.strokeTo(x, y),
       );
-      this.pointer.x = point.x;
-      this.pointer.y = point.y;
+      this.pointer.x = tx;
+      this.pointer.y = ty;
     } else if (this.activeTool === 'shade') {
       this.drawLine(this.pointer.x, this.pointer.y, point.x, point.y, (x, y) =>
         this.shadeAt(x, y),
@@ -3185,9 +3337,9 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
     );
   }
 
-  exportProject(): void {
+  private buildProjectFile(): PixelArtProjectFile {
     this.saveCurrentWorkspace();
-    const project: PixelArtProjectFile = {
+    return {
       app: 'Pixel Studio',
       version: 1,
       exportedAt: new Date().toISOString(),
@@ -3213,6 +3365,10 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
         importContrast: this.importContrast,
       },
     };
+  }
+
+  exportProject(): void {
+    const project = this.buildProjectFile();
     const blob = new Blob([JSON.stringify(project, null, 2)], {
       type: 'application/json',
     });
@@ -3226,6 +3382,60 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
     link.href = URL.createObjectURL(blob);
     link.click();
     URL.revokeObjectURL(link.href);
+  }
+
+  // ===================== Autosave =====================
+
+  private readonly autosaveKey = 'pixelart.autosave.v1';
+  private autosaveTimer?: number;
+
+  /** Debounced full-project autosave to localStorage (fires ~1.5s after idle). */
+  private scheduleAutosave(): void {
+    if (!this.isBrowser) return;
+    window.clearTimeout(this.autosaveTimer);
+    this.autosaveTimer = window.setTimeout(() => {
+      try {
+        localStorage.setItem(
+          this.autosaveKey,
+          JSON.stringify(this.buildProjectFile()),
+        );
+      } catch {
+        /* storage quota / private mode — ignore */
+      }
+    }, 1500);
+  }
+
+  private restoreAutosave(): boolean {
+    try {
+      if (typeof localStorage === 'undefined') return false;
+      const raw = localStorage.getItem(this.autosaveKey);
+      if (!raw) return false;
+      this.loadProject(JSON.parse(raw) as PixelArtProjectFile);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  /** Wipe the autosave and start from a clean sprite. */
+  async resetEditor(): Promise<void> {
+    this.fileMenuOpen = false;
+    const ok = await this.askConfirm({
+      title: 'Start fresh?',
+      message: 'This clears the auto-saved project and starts a blank sprite.',
+      okLabel: 'Start fresh',
+      danger: true,
+    });
+    if (!ok) return;
+    try {
+      localStorage.removeItem(this.autosaveKey);
+    } catch {
+      /* ignore */
+    }
+    this.workspaces = [this.createBlankWorkspace('Workspace 1', 1)];
+    this.workspaceIdSeed = 2;
+    this.activeWorkspaceIndex = 0;
+    this.applyWorkspace(this.workspaces[0]);
   }
 
   triggerProjectImport(): void {
@@ -4325,6 +4535,117 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
     this.palette = this.dedupeColors([this.primaryColor, ...this.palette, ...cols]).slice(0, 64);
   }
 
+  /** Nearest palette colour to a hex (ignores palette-lock state). */
+  private nearestPaletteHex(hex: string): string {
+    if (!this.palette.length) return hex;
+    const [r, g, b] = this.hexToRgb(hex);
+    let best = this.palette[0];
+    let bestD = Infinity;
+    for (const c of this.palette) {
+      const [cr, cg, cb] = this.hexToRgb(c);
+      const d = (r - cr) ** 2 + (g - cg) ** 2 + (b - cb) ** 2;
+      if (d < bestD) {
+        bestD = d;
+        best = c;
+      }
+    }
+    return best;
+  }
+
+  /** Recolour the whole sprite to the nearest colours in the current palette. */
+  remapToPalette(): void {
+    if (!this.palette.length) return;
+    this.pushUndo();
+    const cache = new Map<string, string>();
+    for (const frame of this.frames) {
+      for (const layer of frame.layers) {
+        for (let i = 0; i < layer.pixels.length; i += 1) {
+          const c = layer.pixels[i];
+          if (!c) continue;
+          let mapped = cache.get(c);
+          if (mapped === undefined) {
+            mapped = this.nearestPaletteHex(c);
+            cache.set(c, mapped);
+          }
+          layer.pixels[i] = mapped;
+        }
+      }
+    }
+    this.refreshAllFrameThumbnails();
+    this.render();
+  }
+
+  // ----- Colour adjustments (Hue / Saturation / Brightness) -----
+
+  adjustOpen = false;
+  adjustHue = 0;
+  adjustSat = 0;
+  adjustBright = 0;
+  adjustScope: 'layer' | 'selection' = 'layer';
+  private adjustBase: Pixel[] | null = null;
+
+  openAdjust(): void {
+    if (this.activeLayerLocked) return;
+    this.adjustHue = 0;
+    this.adjustSat = 0;
+    this.adjustBright = 0;
+    this.adjustScope = this.selection ? 'selection' : 'layer';
+    this.adjustBase = [...this.activeLayer.pixels];
+    this.adjustOpen = true;
+    this.applyAdjustPreview();
+  }
+
+  applyAdjustPreview(): void {
+    if (!this.adjustBase) return;
+    const buf = [...this.adjustBase];
+    const apply = (x: number, y: number) => {
+      const i = this.index(x, y);
+      const c = buf[i];
+      if (c) buf[i] = this.adjustPixel(c);
+    };
+    if (this.adjustScope === 'selection' && this.selection) {
+      this.eachSelectionPixel(this.selection, apply);
+    } else {
+      for (let i = 0; i < buf.length; i += 1) {
+        if (buf[i]) buf[i] = this.adjustPixel(buf[i]!);
+      }
+    }
+    this.previewPixels = buf;
+    this.render();
+  }
+
+  private adjustPixel(hex: string): string {
+    const [r, g, b] = this.hexToRgb(hex);
+    let [h, s, v] = this.rgbToHsv(r, g, b);
+    h = (h + this.adjustHue + 360) % 360;
+    s = this.clamp(s * (1 + this.adjustSat / 100), 0, 1);
+    v = this.clamp(v * (1 + this.adjustBright / 100), 0, 1);
+    const [nr, ng, nb] = this.hsvToRgb(h, s, v);
+    return this.rgbToHex(nr, ng, nb);
+  }
+
+  commitAdjust(): void {
+    if (!this.adjustBase || !this.previewPixels) {
+      this.cancelAdjust();
+      return;
+    }
+    const result = [...this.previewPixels];
+    this.pushUndo();
+    this.activeLayer.pixels = result;
+    this.previewPixels = null;
+    this.adjustBase = null;
+    this.adjustOpen = false;
+    this.refreshAllFrameThumbnails();
+    this.render();
+  }
+
+  cancelAdjust(): void {
+    this.previewPixels = null;
+    this.adjustBase = null;
+    this.adjustOpen = false;
+    this.render();
+  }
+
   /** Build the palette from the distinct colours used in the active frame. */
   extractPaletteFromSprite(): void {
     const seen = new Set<string>();
@@ -4841,7 +5162,10 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
 
     // ---- Ctrl/Cmd combos ----
     if (event.ctrlKey || event.metaKey) {
-      if (key === 'z') {
+      if (key === 'k') {
+        event.preventDefault();
+        this.toggleCommandPalette();
+      } else if (key === 'z') {
         event.preventDefault();
         event.shiftKey ? this.redo() : this.undo();
       } else if (key === 'y') {
@@ -5707,6 +6031,8 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
     if (this.tf) this.drawTransformHandles();
     this.renderDisplay();
     this.refreshActiveFrameThumbnail();
+    this.drawMinimap();
+    this.scheduleAutosave();
   }
 
   private drawReference(): void {
@@ -5736,6 +6062,92 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
   clearReference(): void {
     this.referenceImage = null;
     this.render();
+  }
+
+  // ===================== Minimap navigator =====================
+
+  get minimapVisible(): boolean {
+    if (!this.minimapOn || !this.canvasWrapRef) return false;
+    const wrap = this.canvasWrapRef.nativeElement;
+    return (
+      this.canvasWidth > wrap.clientWidth + 4 ||
+      this.canvasHeight > wrap.clientHeight + 4
+    );
+  }
+
+  /** Re-draw the minimap when the canvas is scrolled. */
+  onCanvasScroll(): void {
+    this.drawMinimap();
+  }
+
+  private drawMinimap(): void {
+    if (!this.isBrowser || !this.minimapVisible) return;
+    const cv = this.minimapRef?.nativeElement;
+    const ctx = this.minimapCtx;
+    if (!cv || !ctx || !this.canvasWrapRef) return;
+    const wrap = this.canvasWrapRef.nativeElement;
+    const MAX = 120;
+    const mscale = Math.min(MAX / this.width, MAX / this.height);
+    const mw = Math.max(1, Math.round(this.width * mscale));
+    const mh = Math.max(1, Math.round(this.height * mscale));
+    if (cv.width !== mw) cv.width = mw;
+    if (cv.height !== mh) cv.height = mh;
+    ctx.imageSmoothingEnabled = false;
+    ctx.fillStyle = '#0c0f14';
+    ctx.fillRect(0, 0, mw, mh);
+    ctx.drawImage(
+      this.renderFrameCanvas(this.activePreviewFrameIndex, 1),
+      0,
+      0,
+      this.width,
+      this.height,
+      0,
+      0,
+      mw,
+      mh,
+    );
+    // Visible-region rectangle.
+    const sx = wrap.scrollLeft / this.canvasWidth;
+    const sy = wrap.scrollTop / this.canvasHeight;
+    const vw = Math.min(1, wrap.clientWidth / this.canvasWidth);
+    const vh = Math.min(1, wrap.clientHeight / this.canvasHeight);
+    ctx.strokeStyle = '#34e0c6';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(
+      Math.round(sx * mw) + 0.5,
+      Math.round(sy * mh) + 0.5,
+      Math.max(2, Math.round(vw * mw)),
+      Math.max(2, Math.round(vh * mh)),
+    );
+  }
+
+  onMinimapDown(event: PointerEvent): void {
+    event.preventDefault();
+    this.minimapDragging = true;
+    (event.target as HTMLElement).setPointerCapture?.(event.pointerId);
+    this.minimapPanTo(event);
+  }
+  onMinimapMove(event: PointerEvent): void {
+    if (this.minimapDragging) this.minimapPanTo(event);
+  }
+  onMinimapUp(event: PointerEvent): void {
+    this.minimapDragging = false;
+    try {
+      (event.target as HTMLElement).releasePointerCapture?.(event.pointerId);
+    } catch {
+      /* already released */
+    }
+  }
+  private minimapPanTo(event: PointerEvent): void {
+    const cv = this.minimapRef?.nativeElement;
+    if (!cv || !this.canvasWrapRef) return;
+    const r = cv.getBoundingClientRect();
+    const fx = this.clamp((event.clientX - r.left) / r.width, 0, 1);
+    const fy = this.clamp((event.clientY - r.top) / r.height, 0, 1);
+    const wrap = this.canvasWrapRef.nativeElement;
+    wrap.scrollLeft = fx * this.canvasWidth - wrap.clientWidth / 2;
+    wrap.scrollTop = fy * this.canvasHeight - wrap.clientHeight / 2;
+    this.drawMinimap();
   }
 
   private renderDisplay(): void {
