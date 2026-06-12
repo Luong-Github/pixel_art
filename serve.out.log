@@ -7934,3 +7934,3276 @@ chunk-QABZPIPX.mjs  | guide-component | 39.52 kB |
 Application bundle generation complete. [0.495 seconds]
 
 Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Application bundle generation failed. [1.252 seconds]
+
+X [ERROR] TS2307: Cannot find module '@vercel/speed-insights/next' or its corresponding type declarations. [plugin angular-compiler]
+
+    src/main.ts:4:30:
+      4 │ import { SpeedInsights } from "@vercel/speed-insights/next"
+        ╵                               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+- Changes detected. Rebuilding...
+
+Application bundle generation failed. [0.315 seconds]
+
+X [ERROR] TS2307: Cannot find module '@vercel/speed-insights/next' or its corresponding type declarations. [plugin angular-compiler]
+
+    src/main.ts:4:30:
+      4 │ import { SpeedInsights } from "@vercel/speed-insights/next"
+        ╵                               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+- Changes detected. Rebuilding...
+
+Application bundle generation failed. [4.776 seconds]
+
+X [ERROR] TS2307: Cannot find module '@vercel/speed-insights/next' or its corresponding type declarations. [plugin angular-compiler]
+
+    src/main.ts:4:30:
+      4 │ import { SpeedInsights } from "@vercel/speed-insights/next"
+        ╵                               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+- Changes detected. Rebuilding...
+
+Application bundle generation failed. [2.070 seconds]
+
+X [ERROR] TS2307: Cannot find module '@vercel/speed-insights/next' or its corresponding type declarations. [plugin angular-compiler]
+
+    src/main.ts:4:30:
+      4 │ import { SpeedInsights } from "@vercel/speed-insights/next"
+        ╵                               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+- Changes detected. Rebuilding...
+
+Application bundle generation failed. [1.902 seconds]
+
+X [ERROR] TS2307: Cannot find module '@vercel/speed-insights/next' or its corresponding type declarations. [plugin angular-compiler]
+
+    src/main.ts:4:30:
+      4 │ import { SpeedInsights } from "@vercel/speed-insights/next"
+        ╵                               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+- Changes detected. Rebuilding...
+
+Application bundle generation failed. [1.988 seconds]
+
+X [ERROR] TS2307: Cannot find module '@vercel/speed-insights/next' or its corresponding type declarations. [plugin angular-compiler]
+
+    src/main.ts:4:30:
+      4 │ import { SpeedInsights } from "@vercel/speed-insights/next"
+        ╵                               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+- Changes detected. Rebuilding...
+
+Application bundle generation failed. [2.529 seconds]
+
+X [ERROR] TS2307: Cannot find module '@vercel/speed-insights/next' or its corresponding type declarations. [plugin angular-compiler]
+
+    src/main.ts:4:30:
+      4 │ import { SpeedInsights } from "@vercel/speed-insights/next"
+        ╵                               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+- Changes detected. Rebuilding...
+
+Application bundle generation failed. [1.749 seconds]
+
+X [ERROR] TS2339: Property 'selectByWand' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:2228:11:
+      2228 │       this.selectByWand(point.x, point.y, event.shiftKey, event....
+           ╵            ~~~~~~~~~~~~
+
+
+X [ERROR] TS2339: Property 'lassoMode' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:2235:11:
+      2235 │       this.lassoMode = event.shiftKey ? 'add' : event.altKey ? '...
+           ╵            ~~~~~~~~~
+
+
+X [ERROR] TS2307: Cannot find module '@vercel/speed-insights/next' or its corresponding type declarations. [plugin angular-compiler]
+
+    src/main.ts:4:30:
+      4 │ import { SpeedInsights } from "@vercel/speed-insights/next"
+        ╵                               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+- Changes detected. Rebuilding...
+
+Application bundle generation failed. [2.424 seconds]
+
+X [ERROR] TS2339: Property 'selectByWand' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:2229:11:
+      2229 │       this.selectByWand(point.x, point.y, event.shiftKey, event....
+           ╵            ~~~~~~~~~~~~
+
+
+X [ERROR] TS2307: Cannot find module '@vercel/speed-insights/next' or its corresponding type declarations. [plugin angular-compiler]
+
+    src/main.ts:4:30:
+      4 │ import { SpeedInsights } from "@vercel/speed-insights/next"
+        ╵                               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+- Changes detected. Rebuilding...
+
+Application bundle generation failed. [1.800 seconds]
+
+X [ERROR] TS2339: Property 'selectByWand' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:2229:11:
+      2229 │       this.selectByWand(point.x, point.y, event.shiftKey, event....
+           ╵            ~~~~~~~~~~~~
+
+
+X [ERROR] TS2307: Cannot find module '@vercel/speed-insights/next' or its corresponding type declarations. [plugin angular-compiler]
+
+    src/main.ts:4:30:
+      4 │ import { SpeedInsights } from "@vercel/speed-insights/next"
+        ╵                               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+- Changes detected. Rebuilding...
+
+Application bundle generation failed. [1.495 seconds]
+
+X [ERROR] TS2339: Property 'selectByWand' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:2229:11:
+      2229 │       this.selectByWand(point.x, point.y, event.shiftKey, event....
+           ╵            ~~~~~~~~~~~~
+
+
+X [ERROR] TS2339: Property 'finishLasso' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:2475:11:
+      2475 │       this.finishLasso();
+           ╵            ~~~~~~~~~~~
+
+
+X [ERROR] TS2307: Cannot find module '@vercel/speed-insights/next' or its corresponding type declarations. [plugin angular-compiler]
+
+    src/main.ts:4:30:
+      4 │ import { SpeedInsights } from "@vercel/speed-insights/next"
+        ╵                               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+- Changes detected. Rebuilding...
+
+Application bundle generation failed. [1.684 seconds]
+
+X [ERROR] TS2339: Property 'selectByWand' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:2229:11:
+      2229 │       this.selectByWand(point.x, point.y, event.shiftKey, event....
+           ╵            ~~~~~~~~~~~~
+
+
+X [ERROR] TS2339: Property 'finishLasso' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:2475:11:
+      2475 │       this.finishLasso();
+           ╵            ~~~~~~~~~~~
+
+
+X [ERROR] TS2307: Cannot find module '@vercel/speed-insights/next' or its corresponding type declarations. [plugin angular-compiler]
+
+    src/main.ts:4:30:
+      4 │ import { SpeedInsights } from "@vercel/speed-insights/next"
+        ╵                               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+- Changes detected. Rebuilding...
+
+Application bundle generation failed. [1.938 seconds]
+
+X [ERROR] TS2339: Property 'selectByWand' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:2229:11:
+      2229 │       this.selectByWand(point.x, point.y, event.shiftKey, event....
+           ╵            ~~~~~~~~~~~~
+
+
+X [ERROR] TS2339: Property 'finishLasso' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:2475:11:
+      2475 │       this.finishLasso();
+           ╵            ~~~~~~~~~~~
+
+
+X [ERROR] TS2307: Cannot find module '@vercel/speed-insights/next' or its corresponding type declarations. [plugin angular-compiler]
+
+    src/main.ts:4:30:
+      4 │ import { SpeedInsights } from "@vercel/speed-insights/next"
+        ╵                               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+- Changes detected. Rebuilding...
+
+Application bundle generation failed. [2.513 seconds]
+
+X [ERROR] TS2307: Cannot find module '@vercel/speed-insights/next' or its corresponding type declarations. [plugin angular-compiler]
+
+    src/main.ts:4:30:
+      4 │ import { SpeedInsights } from "@vercel/speed-insights/next"
+        ╵                               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+- Changes detected. Rebuilding...
+
+Application bundle generation failed. [2.424 seconds]
+
+X [ERROR] TS2307: Cannot find module '@vercel/speed-insights/next' or its corresponding type declarations. [plugin angular-compiler]
+
+    src/main.ts:4:30:
+      4 │ import { SpeedInsights } from "@vercel/speed-insights/next"
+        ╵                               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+- Changes detected. Rebuilding...
+
+Application bundle generation failed. [1.928 seconds]
+
+X [ERROR] TS2307: Cannot find module '@vercel/speed-insights/next' or its corresponding type declarations. [plugin angular-compiler]
+
+    src/main.ts:4:30:
+      4 │ import { SpeedInsights } from "@vercel/speed-insights/next"
+        ╵                               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+- Changes detected. Rebuilding...
+
+Application bundle generation failed. [2.466 seconds]
+
+X [ERROR] TS2307: Cannot find module '@vercel/speed-insights/next' or its corresponding type declarations. [plugin angular-compiler]
+
+    src/main.ts:4:30:
+      4 │ import { SpeedInsights } from "@vercel/speed-insights/next"
+        ╵                               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+- Changes detected. Rebuilding...
+
+Application bundle generation failed. [2.169 seconds]
+
+X [ERROR] TS2307: Cannot find module '@vercel/speed-insights/next' or its corresponding type declarations. [plugin angular-compiler]
+
+    src/main.ts:4:30:
+      4 │ import { SpeedInsights } from "@vercel/speed-insights/next"
+        ╵                               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+- Changes detected. Rebuilding...
+
+Application bundle generation failed. [0.591 seconds]
+
+X [ERROR] TS2307: Cannot find module '@vercel/speed-insights/next' or its corresponding type declarations. [plugin angular-compiler]
+
+    src/main.ts:4:30:
+      4 │ import { SpeedInsights } from "@vercel/speed-insights/next"
+        ╵                               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+- Changes detected. Rebuilding...
+
+Application bundle generation failed. [0.517 seconds]
+
+X [ERROR] TS2307: Cannot find module '@vercel/speed-insights/next' or its corresponding type declarations. [plugin angular-compiler]
+
+    src/main.ts:4:30:
+      4 │ import { SpeedInsights } from "@vercel/speed-insights/next"
+        ╵                               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+- Changes detected. Rebuilding...
+
+Application bundle generation failed. [0.523 seconds]
+
+X [ERROR] TS2307: Cannot find module '@vercel/speed-insights/next' or its corresponding type declarations. [plugin angular-compiler]
+
+    src/main.ts:4:30:
+      4 │ import { SpeedInsights } from "@vercel/speed-insights/next"
+        ╵                               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+- Changes detected. Rebuilding...
+
+Application bundle generation failed. [2.742 seconds]
+
+X [ERROR] TS2307: Cannot find module '@vercel/speed-insights/next' or its corresponding type declarations. [plugin angular-compiler]
+
+    src/main.ts:4:30:
+      4 │ import { SpeedInsights } from "@vercel/speed-insights/next"
+        ╵                               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+- Changes detected. Rebuilding...
+
+Application bundle generation failed. [2.655 seconds]
+
+X [ERROR] TS2307: Cannot find module '@vercel/speed-insights/next' or its corresponding type declarations. [plugin angular-compiler]
+
+    src/main.ts:4:30:
+      4 │ import { SpeedInsights } from "@vercel/speed-insights/next"
+        ╵                               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+- Changes detected. Rebuilding...
+
+Browser bundles        
+Initial chunk files     | Names               |  Raw size
+polyfills.js            | polyfills           |  88.09 kB | 
+main.js                 | main                |  21.54 kB | 
+styles.css              | styles              |   4.81 kB | 
+chunk-NJ5HVBCL.js       | -                   |   3.17 kB | 
+chunk-4WXVOEFY.js       | -                   |   1.46 kB | 
+chunk-3OSS3HON.js       | -                   | 652 bytes | 
+
+                        | Initial total       | 119.70 kB
+
+Lazy chunk files        | Names               |  Raw size
+chunk-4QLPLVPR.js       | editor-component    | 369.12 kB | 
+chunk-YK2DGNDW.js       | guide-component     |  42.33 kB | 
+chunk-W5CCP3ZS.js       | landing-component   |  16.89 kB | 
+chunk-EWQNQPX5.js       | contact-component   |   9.10 kB | 
+chunk-CIVRPHXR.js       | pricing-component   |   8.03 kB | 
+chunk-GIECJVF4.js       | features-component  |   7.82 kB | 
+chunk-LTE4XX4C.js       | blog-post-component |   6.55 kB | 
+chunk-DOZPUEIV.js       | faq-component       |   5.99 kB | 
+chunk-XP5ZG5Q4.js       | blog-list-component |   5.46 kB | 
+chunk-5C2M5NFJ.js       | about-component     |   4.67 kB | 
+chunk-UVVVIIEP.js       | -                   |   3.47 kB | 
+chunk-C6JU3WVH.js       | not-found-component |   2.47 kB | 
+
+
+Server bundles         
+Initial chunk files     | Names               |  Raw size
+chunk-3KVU5QX2.mjs      | -                   |   1.08 MB | 
+chunk-MM2SGXET.mjs      | -                   | 663.58 kB | 
+polyfills.server.mjs    | polyfills.server    | 559.49 kB | 
+chunk-ESQLRAC5.mjs      | -                   | 194.65 kB | 
+main.server.mjs         | main.server         |  21.08 kB | 
+chunk-AKEZM5SL.mjs      | -                   |   3.11 kB | 
+chunk-VPSODEBW.mjs      | -                   |   2.51 kB | 
+chunk-C42IF335.mjs      | -                   | 687 bytes | 
+render-utils.server.mjs | render-utils.server | 462 bytes | 
+
+Lazy chunk files        | Names               |  Raw size
+chunk-FVB4V62A.mjs      | editor-component    | 640.71 kB | 
+chunk-OSTPOPH7.mjs      | -                   | 193.75 kB | 
+chunk-IPBZDYT6.mjs      | guide-component     |  40.70 kB | 
+chunk-P3UOPGAK.mjs      | xhr2                |  39.09 kB | 
+chunk-6S4MS7AO.mjs      | landing-component   |  16.63 kB | 
+chunk-JBYRA3XA.mjs      | contact-component   |   9.22 kB | 
+chunk-ITW4OT2Z.mjs      | pricing-component   |   7.98 kB | 
+chunk-5KGCPH36.mjs      | features-component  |   7.78 kB | 
+chunk-7TG2CDFJ.mjs      | blog-post-component |   6.65 kB | 
+chunk-YZMUJTXQ.mjs      | faq-component       |   6.01 kB | 
+chunk-EUON4EGE.mjs      | blog-list-component |   5.52 kB | 
+chunk-NT3RS6MI.mjs      | about-component     |   4.67 kB | 
+chunk-ROHT27OW.mjs      | -                   |   3.50 kB | 
+chunk-GJH5DQF4.mjs      | not-found-component |   2.54 kB | 
+
+Application bundle generation complete. [0.607 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.54 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-VCGINGRT.js   | editor-component | 368.41 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  21.08 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-Y2R6BL3U.mjs  | editor-component | 640.00 kB | 
+
+Application bundle generation complete. [2.795 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.54 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-3LXE44NB.js   | editor-component | 369.53 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  21.08 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-VFPIXU4C.mjs  | editor-component | 641.08 kB | 
+
+Application bundle generation complete. [1.507 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.54 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-TCSVTBUW.js   | editor-component | 370.75 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  21.08 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-YOUSYIDP.mjs  | editor-component | 642.25 kB | 
+
+Application bundle generation complete. [2.252 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.54 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-TM7VDMMR.js   | editor-component | 370.75 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  21.08 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-MLMVJUDT.mjs  | editor-component | 642.25 kB | 
+
+Application bundle generation complete. [2.332 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Application bundle generation failed. [2.512 seconds]
+
+X [ERROR] NG9: Property 'mirrorX' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.html:137:93:
+      137 │ ...ype="checkbox" [(ngModel)]="mirrorX" (change)="render()" /> Mi...
+          ╵                                ~~~~~~~
+
+  Error occurs in the template of component EditorComponent.
+
+    src/app/editor/editor.component.ts:222:15:
+      222 │   templateUrl: './editor.component.html',
+          ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] NG9: Property 'mirrorX' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.html:137:93:
+      137 │ ...ype="checkbox" [(ngModel)]="mirrorX" (change)="render()" /> Mi...
+          ╵                                ~~~~~~~
+
+  Error occurs in the template of component EditorComponent.
+
+    src/app/editor/editor.component.ts:222:15:
+      222 │   templateUrl: './editor.component.html',
+          ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] NG9: Property 'mirrorX' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.html:604:21:
+      604 │         <span *ngIf="mirrorX" class="status-accent"><strong>Mirro...
+          ╵                      ~~~~~~~
+
+  Error occurs in the template of component EditorComponent.
+
+    src/app/editor/editor.component.ts:222:15:
+      222 │   templateUrl: './editor.component.html',
+          ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] TS2339: Property 'mirrorX' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:2976:22:
+      2976 │         mirrorX: this.mirrorX,
+           ╵                       ~~~~~~~
+
+
+X [ERROR] TS2339: Property 'mirrorX' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:4126:13:
+      4126 │         this.mirrorX = !this.mirrorX;
+           ╵              ~~~~~~~
+
+
+X [ERROR] TS2339: Property 'mirrorX' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:4126:29:
+      4126 │         this.mirrorX = !this.mirrorX;
+           ╵                              ~~~~~~~
+
+
+X [ERROR] TS2339: Property 'mirrorX' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:4303:11:
+      4303 │       this.mirrorX = settings.mirrorX ?? this.mirrorX;
+           ╵            ~~~~~~~
+
+
+X [ERROR] TS2339: Property 'mirrorX' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:4303:46:
+      4303 │       this.mirrorX = settings.mirrorX ?? this.mirrorX;
+           ╵                                               ~~~~~~~
+
+
+X [ERROR] TS2339: Property 'mirrorX' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:4564:14:
+      4564 │     if (!this.mirrorX) {
+           ╵               ~~~~~~~
+
+
+X [ERROR] TS2339: Property 'mirrorX' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:4747:13:
+      4747 │     if (this.mirrorX) {
+           ╵              ~~~~~~~
+
+
+X [ERROR] TS2339: Property 'mirrorX' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:5799:20:
+      5799 │       mirrorX: this.mirrorX,
+           ╵                     ~~~~~~~
+
+
+X [ERROR] TS2339: Property 'mirrorX' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:5815:9:
+      5815 │     this.mirrorX = state.mirrorX ?? this.mirrorX;
+           ╵          ~~~~~~~
+
+
+X [ERROR] TS2339: Property 'mirrorX' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:5815:41:
+      5815 │     this.mirrorX = state.mirrorX ?? this.mirrorX;
+           ╵                                          ~~~~~~~
+
+
+X [ERROR] TS2339: Property 'mirrorX' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:5954:13:
+      5954 │     if (this.mirrorX) {
+           ╵              ~~~~~~~
+
+
+- Changes detected. Rebuilding...
+
+Application bundle generation failed. [2.685 seconds]
+
+X [ERROR] NG9: Property 'mirrorX' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.html:137:93:
+      137 │ ...ype="checkbox" [(ngModel)]="mirrorX" (change)="render()" /> Mi...
+          ╵                                ~~~~~~~
+
+  Error occurs in the template of component EditorComponent.
+
+    src/app/editor/editor.component.ts:222:15:
+      222 │   templateUrl: './editor.component.html',
+          ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] NG9: Property 'mirrorX' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.html:137:93:
+      137 │ ...ype="checkbox" [(ngModel)]="mirrorX" (change)="render()" /> Mi...
+          ╵                                ~~~~~~~
+
+  Error occurs in the template of component EditorComponent.
+
+    src/app/editor/editor.component.ts:222:15:
+      222 │   templateUrl: './editor.component.html',
+          ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] NG9: Property 'mirrorX' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.html:604:21:
+      604 │         <span *ngIf="mirrorX" class="status-accent"><strong>Mirro...
+          ╵                      ~~~~~~~
+
+  Error occurs in the template of component EditorComponent.
+
+    src/app/editor/editor.component.ts:222:15:
+      222 │   templateUrl: './editor.component.html',
+          ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] TS2339: Property 'mirrorX' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:2976:22:
+      2976 │         mirrorX: this.mirrorX,
+           ╵                       ~~~~~~~
+
+
+X [ERROR] TS2339: Property 'mirrorX' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:4126:13:
+      4126 │         this.mirrorX = !this.mirrorX;
+           ╵              ~~~~~~~
+
+
+X [ERROR] TS2339: Property 'mirrorX' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:4126:29:
+      4126 │         this.mirrorX = !this.mirrorX;
+           ╵                              ~~~~~~~
+
+
+X [ERROR] TS2339: Property 'mirrorX' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:4303:11:
+      4303 │       this.mirrorX = settings.mirrorX ?? this.mirrorX;
+           ╵            ~~~~~~~
+
+
+X [ERROR] TS2339: Property 'mirrorX' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:4303:46:
+      4303 │       this.mirrorX = settings.mirrorX ?? this.mirrorX;
+           ╵                                               ~~~~~~~
+
+
+X [ERROR] TS2339: Property 'mirrorX' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:4564:14:
+      4564 │     if (!this.mirrorX) {
+           ╵               ~~~~~~~
+
+
+X [ERROR] TS2339: Property 'mirrorX' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:4747:13:
+      4747 │     if (this.mirrorX) {
+           ╵              ~~~~~~~
+
+
+X [ERROR] TS2339: Property 'mirrorX' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:5799:20:
+      5799 │       mirrorX: this.mirrorX,
+           ╵                     ~~~~~~~
+
+
+X [ERROR] TS2339: Property 'mirrorX' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:5815:9:
+      5815 │     this.mirrorX = state.mirrorX ?? this.mirrorX;
+           ╵          ~~~~~~~
+
+
+X [ERROR] TS2339: Property 'mirrorX' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:5815:41:
+      5815 │     this.mirrorX = state.mirrorX ?? this.mirrorX;
+           ╵                                          ~~~~~~~
+
+
+- Changes detected. Rebuilding...
+
+Application bundle generation failed. [1.606 seconds]
+
+X [ERROR] NG9: Property 'mirrorX' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.html:137:93:
+      137 │ ...ype="checkbox" [(ngModel)]="mirrorX" (change)="render()" /> Mi...
+          ╵                                ~~~~~~~
+
+  Error occurs in the template of component EditorComponent.
+
+    src/app/editor/editor.component.ts:222:15:
+      222 │   templateUrl: './editor.component.html',
+          ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] NG9: Property 'mirrorX' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.html:137:93:
+      137 │ ...ype="checkbox" [(ngModel)]="mirrorX" (change)="render()" /> Mi...
+          ╵                                ~~~~~~~
+
+  Error occurs in the template of component EditorComponent.
+
+    src/app/editor/editor.component.ts:222:15:
+      222 │   templateUrl: './editor.component.html',
+          ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] NG9: Property 'mirrorX' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.html:604:21:
+      604 │         <span *ngIf="mirrorX" class="status-accent"><strong>Mirro...
+          ╵                      ~~~~~~~
+
+  Error occurs in the template of component EditorComponent.
+
+    src/app/editor/editor.component.ts:222:15:
+      222 │   templateUrl: './editor.component.html',
+          ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] TS2339: Property 'mirrorX' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:2976:22:
+      2976 │         mirrorX: this.mirrorX,
+           ╵                       ~~~~~~~
+
+
+X [ERROR] TS2339: Property 'mirrorX' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:4126:13:
+      4126 │         this.mirrorX = !this.mirrorX;
+           ╵              ~~~~~~~
+
+
+X [ERROR] TS2339: Property 'mirrorX' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:4126:29:
+      4126 │         this.mirrorX = !this.mirrorX;
+           ╵                              ~~~~~~~
+
+
+X [ERROR] TS2339: Property 'mirrorX' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:4303:11:
+      4303 │       this.mirrorX = settings.mirrorX ?? this.mirrorX;
+           ╵            ~~~~~~~
+
+
+X [ERROR] TS2339: Property 'mirrorX' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:4303:46:
+      4303 │       this.mirrorX = settings.mirrorX ?? this.mirrorX;
+           ╵                                               ~~~~~~~
+
+
+X [ERROR] TS2339: Property 'mirrorX' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:4738:13:
+      4738 │     if (this.mirrorX) {
+           ╵              ~~~~~~~
+
+
+X [ERROR] TS2339: Property 'mirrorX' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:5790:20:
+      5790 │       mirrorX: this.mirrorX,
+           ╵                     ~~~~~~~
+
+
+X [ERROR] TS2339: Property 'mirrorX' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:5806:9:
+      5806 │     this.mirrorX = state.mirrorX ?? this.mirrorX;
+           ╵          ~~~~~~~
+
+
+X [ERROR] TS2339: Property 'mirrorX' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:5806:41:
+      5806 │     this.mirrorX = state.mirrorX ?? this.mirrorX;
+           ╵                                          ~~~~~~~
+
+
+- Changes detected. Rebuilding...
+
+Application bundle generation failed. [2.700 seconds]
+
+X [ERROR] NG9: Property 'mirrorX' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.html:137:93:
+      137 │ ...ype="checkbox" [(ngModel)]="mirrorX" (change)="render()" /> Mi...
+          ╵                                ~~~~~~~
+
+  Error occurs in the template of component EditorComponent.
+
+    src/app/editor/editor.component.ts:222:15:
+      222 │   templateUrl: './editor.component.html',
+          ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] NG9: Property 'mirrorX' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.html:137:93:
+      137 │ ...ype="checkbox" [(ngModel)]="mirrorX" (change)="render()" /> Mi...
+          ╵                                ~~~~~~~
+
+  Error occurs in the template of component EditorComponent.
+
+    src/app/editor/editor.component.ts:222:15:
+      222 │   templateUrl: './editor.component.html',
+          ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] NG9: Property 'mirrorX' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.html:604:21:
+      604 │         <span *ngIf="mirrorX" class="status-accent"><strong>Mirro...
+          ╵                      ~~~~~~~
+
+  Error occurs in the template of component EditorComponent.
+
+    src/app/editor/editor.component.ts:222:15:
+      222 │   templateUrl: './editor.component.html',
+          ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] TS2339: Property 'mirrorX' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:2976:22:
+      2976 │         mirrorX: this.mirrorX,
+           ╵                       ~~~~~~~
+
+
+X [ERROR] TS2339: Property 'mirrorX' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:4126:13:
+      4126 │         this.mirrorX = !this.mirrorX;
+           ╵              ~~~~~~~
+
+
+X [ERROR] TS2339: Property 'mirrorX' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:4126:29:
+      4126 │         this.mirrorX = !this.mirrorX;
+           ╵                              ~~~~~~~
+
+
+X [ERROR] TS2339: Property 'mirrorX' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:4303:11:
+      4303 │       this.mirrorX = settings.mirrorX ?? this.mirrorX;
+           ╵            ~~~~~~~
+
+
+X [ERROR] TS2339: Property 'mirrorX' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:4303:46:
+      4303 │       this.mirrorX = settings.mirrorX ?? this.mirrorX;
+           ╵                                               ~~~~~~~
+
+
+X [ERROR] TS2339: Property 'mirrorX' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:4738:13:
+      4738 │     if (this.mirrorX) {
+           ╵              ~~~~~~~
+
+
+X [ERROR] TS2339: Property 'drawMirrorGuide' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:4739:11:
+      4739 │       this.drawMirrorGuide();
+           ╵            ~~~~~~~~~~~~~~~
+
+
+X [ERROR] TS2339: Property 'mirrorX' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:5807:20:
+      5807 │       mirrorX: this.mirrorX,
+           ╵                     ~~~~~~~
+
+
+X [ERROR] TS2339: Property 'mirrorX' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:5823:9:
+      5823 │     this.mirrorX = state.mirrorX ?? this.mirrorX;
+           ╵          ~~~~~~~
+
+
+X [ERROR] TS2339: Property 'mirrorX' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:5823:41:
+      5823 │     this.mirrorX = state.mirrorX ?? this.mirrorX;
+           ╵                                          ~~~~~~~
+
+
+- Changes detected. Rebuilding...
+
+Application bundle generation failed. [1.925 seconds]
+
+X [ERROR] NG9: Property 'mirrorX' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.html:137:93:
+      137 │ ...ype="checkbox" [(ngModel)]="mirrorX" (change)="render()" /> Mi...
+          ╵                                ~~~~~~~
+
+  Error occurs in the template of component EditorComponent.
+
+    src/app/editor/editor.component.ts:222:15:
+      222 │   templateUrl: './editor.component.html',
+          ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] NG9: Property 'mirrorX' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.html:137:93:
+      137 │ ...ype="checkbox" [(ngModel)]="mirrorX" (change)="render()" /> Mi...
+          ╵                                ~~~~~~~
+
+  Error occurs in the template of component EditorComponent.
+
+    src/app/editor/editor.component.ts:222:15:
+      222 │   templateUrl: './editor.component.html',
+          ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] NG9: Property 'mirrorX' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.html:604:21:
+      604 │         <span *ngIf="mirrorX" class="status-accent"><strong>Mirro...
+          ╵                      ~~~~~~~
+
+  Error occurs in the template of component EditorComponent.
+
+    src/app/editor/editor.component.ts:222:15:
+      222 │   templateUrl: './editor.component.html',
+          ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] TS2339: Property 'mirrorX' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:2976:22:
+      2976 │         mirrorX: this.mirrorX,
+           ╵                       ~~~~~~~
+
+
+X [ERROR] TS2339: Property 'mirrorX' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:4126:13:
+      4126 │         this.mirrorX = !this.mirrorX;
+           ╵              ~~~~~~~
+
+
+X [ERROR] TS2339: Property 'mirrorX' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:4126:29:
+      4126 │         this.mirrorX = !this.mirrorX;
+           ╵                              ~~~~~~~
+
+
+X [ERROR] TS2339: Property 'mirrorX' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:4303:11:
+      4303 │       this.mirrorX = settings.mirrorX ?? this.mirrorX;
+           ╵            ~~~~~~~
+
+
+X [ERROR] TS2339: Property 'mirrorX' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:4303:46:
+      4303 │       this.mirrorX = settings.mirrorX ?? this.mirrorX;
+           ╵                                               ~~~~~~~
+
+
+X [ERROR] TS2339: Property 'mirrorX' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:5807:20:
+      5807 │       mirrorX: this.mirrorX,
+           ╵                     ~~~~~~~
+
+
+X [ERROR] TS2339: Property 'mirrorX' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:5823:9:
+      5823 │     this.mirrorX = state.mirrorX ?? this.mirrorX;
+           ╵          ~~~~~~~
+
+
+X [ERROR] TS2339: Property 'mirrorX' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:5823:41:
+      5823 │     this.mirrorX = state.mirrorX ?? this.mirrorX;
+           ╵                                          ~~~~~~~
+
+
+- Changes detected. Rebuilding...
+
+Application bundle generation failed. [1.881 seconds]
+
+X [ERROR] NG9: Property 'mirrorX' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.html:137:93:
+      137 │ ...ype="checkbox" [(ngModel)]="mirrorX" (change)="render()" /> Mi...
+          ╵                                ~~~~~~~
+
+  Error occurs in the template of component EditorComponent.
+
+    src/app/editor/editor.component.ts:222:15:
+      222 │   templateUrl: './editor.component.html',
+          ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] NG9: Property 'mirrorX' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.html:137:93:
+      137 │ ...ype="checkbox" [(ngModel)]="mirrorX" (change)="render()" /> Mi...
+          ╵                                ~~~~~~~
+
+  Error occurs in the template of component EditorComponent.
+
+    src/app/editor/editor.component.ts:222:15:
+      222 │   templateUrl: './editor.component.html',
+          ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] NG9: Property 'mirrorX' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.html:604:21:
+      604 │         <span *ngIf="mirrorX" class="status-accent"><strong>Mirro...
+          ╵                      ~~~~~~~
+
+  Error occurs in the template of component EditorComponent.
+
+    src/app/editor/editor.component.ts:222:15:
+      222 │   templateUrl: './editor.component.html',
+          ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] TS2353: Object literal may only specify known properties, and 'symmetry' does not exist in type '{ zoom: number; displayZoom: number; showGrid: boolean; onionSkin: boolean; mirrorX?: boolean | undefined; brushSize: number; importResizeCanvas: boolean; importLongSide: number; importFit: ImportFit; importPaletteSize: number; importDither: boolean; importSharpen: number; importContrast: number; }'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:2976:8:
+      2976 │         symmetry: this.symmetry,
+           ╵         ~~~~~~~~
+
+  The expected type comes from property 'settings' which is declared here on type 'PixelArtProjectFile'
+
+    src/app/editor/editor.component.ts:201:2:
+      201 │   settings: {
+          ╵   ~~~~~~~~
+
+
+X [ERROR] TS2339: Property 'mirrorX' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:4127:13:
+      4127 │         this.mirrorX = !this.mirrorX;
+           ╵              ~~~~~~~
+
+
+X [ERROR] TS2339: Property 'mirrorX' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:4127:29:
+      4127 │         this.mirrorX = !this.mirrorX;
+           ╵                              ~~~~~~~
+
+
+X [ERROR] TS2339: Property 'mirrorX' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:4304:11:
+      4304 │       this.mirrorX = settings.mirrorX ?? this.mirrorX;
+           ╵            ~~~~~~~
+
+
+X [ERROR] TS2339: Property 'mirrorX' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:4304:46:
+      4304 │       this.mirrorX = settings.mirrorX ?? this.mirrorX;
+           ╵                                               ~~~~~~~
+
+
+X [ERROR] TS2339: Property 'mirrorX' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:5808:20:
+      5808 │       mirrorX: this.mirrorX,
+           ╵                     ~~~~~~~
+
+
+X [ERROR] TS2339: Property 'mirrorX' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:5824:9:
+      5824 │     this.mirrorX = state.mirrorX ?? this.mirrorX;
+           ╵          ~~~~~~~
+
+
+X [ERROR] TS2339: Property 'mirrorX' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:5824:41:
+      5824 │     this.mirrorX = state.mirrorX ?? this.mirrorX;
+           ╵                                          ~~~~~~~
+
+
+- Changes detected. Rebuilding...
+
+Application bundle generation failed. [1.904 seconds]
+
+X [ERROR] NG9: Property 'mirrorX' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.html:137:93:
+      137 │ ...ype="checkbox" [(ngModel)]="mirrorX" (change)="render()" /> Mi...
+          ╵                                ~~~~~~~
+
+  Error occurs in the template of component EditorComponent.
+
+    src/app/editor/editor.component.ts:224:15:
+      224 │   templateUrl: './editor.component.html',
+          ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] NG9: Property 'mirrorX' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.html:137:93:
+      137 │ ...ype="checkbox" [(ngModel)]="mirrorX" (change)="render()" /> Mi...
+          ╵                                ~~~~~~~
+
+  Error occurs in the template of component EditorComponent.
+
+    src/app/editor/editor.component.ts:224:15:
+      224 │   templateUrl: './editor.component.html',
+          ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] NG9: Property 'mirrorX' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.html:604:21:
+      604 │         <span *ngIf="mirrorX" class="status-accent"><strong>Mirro...
+          ╵                      ~~~~~~~
+
+  Error occurs in the template of component EditorComponent.
+
+    src/app/editor/editor.component.ts:224:15:
+      224 │   templateUrl: './editor.component.html',
+          ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] TS2339: Property 'mirrorX' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:4129:13:
+      4129 │         this.mirrorX = !this.mirrorX;
+           ╵              ~~~~~~~
+
+
+X [ERROR] TS2339: Property 'mirrorX' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:4129:29:
+      4129 │         this.mirrorX = !this.mirrorX;
+           ╵                              ~~~~~~~
+
+
+X [ERROR] TS2339: Property 'mirrorX' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:4306:11:
+      4306 │       this.mirrorX = settings.mirrorX ?? this.mirrorX;
+           ╵            ~~~~~~~
+
+
+X [ERROR] TS2339: Property 'mirrorX' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:4306:46:
+      4306 │       this.mirrorX = settings.mirrorX ?? this.mirrorX;
+           ╵                                               ~~~~~~~
+
+
+X [ERROR] TS2339: Property 'mirrorX' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:5810:20:
+      5810 │       mirrorX: this.mirrorX,
+           ╵                     ~~~~~~~
+
+
+X [ERROR] TS2339: Property 'mirrorX' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:5826:9:
+      5826 │     this.mirrorX = state.mirrorX ?? this.mirrorX;
+           ╵          ~~~~~~~
+
+
+X [ERROR] TS2339: Property 'mirrorX' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:5826:41:
+      5826 │     this.mirrorX = state.mirrorX ?? this.mirrorX;
+           ╵                                          ~~~~~~~
+
+
+- Changes detected. Rebuilding...
+
+Application bundle generation failed. [1.628 seconds]
+
+X [ERROR] NG9: Property 'mirrorX' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.html:137:93:
+      137 │ ...ype="checkbox" [(ngModel)]="mirrorX" (change)="render()" /> Mi...
+          ╵                                ~~~~~~~
+
+  Error occurs in the template of component EditorComponent.
+
+    src/app/editor/editor.component.ts:224:15:
+      224 │   templateUrl: './editor.component.html',
+          ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] NG9: Property 'mirrorX' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.html:137:93:
+      137 │ ...ype="checkbox" [(ngModel)]="mirrorX" (change)="render()" /> Mi...
+          ╵                                ~~~~~~~
+
+  Error occurs in the template of component EditorComponent.
+
+    src/app/editor/editor.component.ts:224:15:
+      224 │   templateUrl: './editor.component.html',
+          ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] NG9: Property 'mirrorX' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.html:604:21:
+      604 │         <span *ngIf="mirrorX" class="status-accent"><strong>Mirro...
+          ╵                      ~~~~~~~
+
+  Error occurs in the template of component EditorComponent.
+
+    src/app/editor/editor.component.ts:224:15:
+      224 │   templateUrl: './editor.component.html',
+          ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] TS2339: Property 'mirrorX' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:4306:11:
+      4306 │       this.mirrorX = settings.mirrorX ?? this.mirrorX;
+           ╵            ~~~~~~~
+
+
+X [ERROR] TS2339: Property 'mirrorX' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:4306:46:
+      4306 │       this.mirrorX = settings.mirrorX ?? this.mirrorX;
+           ╵                                               ~~~~~~~
+
+
+X [ERROR] TS2339: Property 'mirrorX' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:5810:20:
+      5810 │       mirrorX: this.mirrorX,
+           ╵                     ~~~~~~~
+
+
+X [ERROR] TS2339: Property 'mirrorX' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:5826:9:
+      5826 │     this.mirrorX = state.mirrorX ?? this.mirrorX;
+           ╵          ~~~~~~~
+
+
+X [ERROR] TS2339: Property 'mirrorX' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:5826:41:
+      5826 │     this.mirrorX = state.mirrorX ?? this.mirrorX;
+           ╵                                          ~~~~~~~
+
+
+- Changes detected. Rebuilding...
+
+Application bundle generation failed. [1.643 seconds]
+
+X [ERROR] NG9: Property 'mirrorX' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.html:137:93:
+      137 │ ...ype="checkbox" [(ngModel)]="mirrorX" (change)="render()" /> Mi...
+          ╵                                ~~~~~~~
+
+  Error occurs in the template of component EditorComponent.
+
+    src/app/editor/editor.component.ts:224:15:
+      224 │   templateUrl: './editor.component.html',
+          ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] NG9: Property 'mirrorX' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.html:137:93:
+      137 │ ...ype="checkbox" [(ngModel)]="mirrorX" (change)="render()" /> Mi...
+          ╵                                ~~~~~~~
+
+  Error occurs in the template of component EditorComponent.
+
+    src/app/editor/editor.component.ts:224:15:
+      224 │   templateUrl: './editor.component.html',
+          ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] NG9: Property 'mirrorX' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.html:604:21:
+      604 │         <span *ngIf="mirrorX" class="status-accent"><strong>Mirro...
+          ╵                      ~~~~~~~
+
+  Error occurs in the template of component EditorComponent.
+
+    src/app/editor/editor.component.ts:224:15:
+      224 │   templateUrl: './editor.component.html',
+          ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] TS2339: Property 'mirrorX' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:5813:20:
+      5813 │       mirrorX: this.mirrorX,
+           ╵                     ~~~~~~~
+
+
+X [ERROR] TS2339: Property 'mirrorX' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:5829:9:
+      5829 │     this.mirrorX = state.mirrorX ?? this.mirrorX;
+           ╵          ~~~~~~~
+
+
+X [ERROR] TS2339: Property 'mirrorX' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:5829:41:
+      5829 │     this.mirrorX = state.mirrorX ?? this.mirrorX;
+           ╵                                          ~~~~~~~
+
+
+- Changes detected. Rebuilding...
+
+Application bundle generation failed. [1.609 seconds]
+
+X [ERROR] NG9: Property 'mirrorX' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.html:137:93:
+      137 │ ...ype="checkbox" [(ngModel)]="mirrorX" (change)="render()" /> Mi...
+          ╵                                ~~~~~~~
+
+  Error occurs in the template of component EditorComponent.
+
+    src/app/editor/editor.component.ts:224:15:
+      224 │   templateUrl: './editor.component.html',
+          ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] NG9: Property 'mirrorX' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.html:137:93:
+      137 │ ...ype="checkbox" [(ngModel)]="mirrorX" (change)="render()" /> Mi...
+          ╵                                ~~~~~~~
+
+  Error occurs in the template of component EditorComponent.
+
+    src/app/editor/editor.component.ts:224:15:
+      224 │   templateUrl: './editor.component.html',
+          ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] NG9: Property 'mirrorX' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.html:604:21:
+      604 │         <span *ngIf="mirrorX" class="status-accent"><strong>Mirro...
+          ╵                      ~~~~~~~
+
+  Error occurs in the template of component EditorComponent.
+
+    src/app/editor/editor.component.ts:224:15:
+      224 │   templateUrl: './editor.component.html',
+          ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] TS2339: Property 'mirrorX' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:5829:9:
+      5829 │     this.mirrorX = state.mirrorX ?? this.mirrorX;
+           ╵          ~~~~~~~
+
+
+X [ERROR] TS2339: Property 'mirrorX' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:5829:41:
+      5829 │     this.mirrorX = state.mirrorX ?? this.mirrorX;
+           ╵                                          ~~~~~~~
+
+
+- Changes detected. Rebuilding...
+
+Application bundle generation failed. [1.711 seconds]
+
+X [ERROR] NG9: Property 'mirrorX' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.html:137:93:
+      137 │ ...ype="checkbox" [(ngModel)]="mirrorX" (change)="render()" /> Mi...
+          ╵                                ~~~~~~~
+
+  Error occurs in the template of component EditorComponent.
+
+    src/app/editor/editor.component.ts:224:15:
+      224 │   templateUrl: './editor.component.html',
+          ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] NG9: Property 'mirrorX' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.html:137:93:
+      137 │ ...ype="checkbox" [(ngModel)]="mirrorX" (change)="render()" /> Mi...
+          ╵                                ~~~~~~~
+
+  Error occurs in the template of component EditorComponent.
+
+    src/app/editor/editor.component.ts:224:15:
+      224 │   templateUrl: './editor.component.html',
+          ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] NG9: Property 'mirrorX' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.html:604:21:
+      604 │         <span *ngIf="mirrorX" class="status-accent"><strong>Mirro...
+          ╵                      ~~~~~~~
+
+  Error occurs in the template of component EditorComponent.
+
+    src/app/editor/editor.component.ts:224:15:
+      224 │   templateUrl: './editor.component.html',
+          ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+- Changes detected. Rebuilding...
+
+Application bundle generation failed. [2.844 seconds]
+
+X [ERROR] NG9: Property 'mirrorX' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.html:137:93:
+      137 │ ...ype="checkbox" [(ngModel)]="mirrorX" (change)="render()" /> Mi...
+          ╵                                ~~~~~~~
+
+  Error occurs in the template of component EditorComponent.
+
+    src/app/editor/editor.component.ts:224:15:
+      224 │   templateUrl: './editor.component.html',
+          ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] NG9: Property 'mirrorX' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.html:137:93:
+      137 │ ...ype="checkbox" [(ngModel)]="mirrorX" (change)="render()" /> Mi...
+          ╵                                ~~~~~~~
+
+  Error occurs in the template of component EditorComponent.
+
+    src/app/editor/editor.component.ts:224:15:
+      224 │   templateUrl: './editor.component.html',
+          ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] NG9: Property 'mirrorX' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.html:604:21:
+      604 │         <span *ngIf="mirrorX" class="status-accent"><strong>Mirro...
+          ╵                      ~~~~~~~
+
+  Error occurs in the template of component EditorComponent.
+
+    src/app/editor/editor.component.ts:224:15:
+      224 │   templateUrl: './editor.component.html',
+          ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+- Changes detected. Rebuilding...
+
+Application bundle generation failed. [2.456 seconds]
+
+X [ERROR] NG9: Property 'mirrorX' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.html:137:93:
+      137 │ ...ype="checkbox" [(ngModel)]="mirrorX" (change)="render()" /> Mi...
+          ╵                                ~~~~~~~
+
+  Error occurs in the template of component EditorComponent.
+
+    src/app/editor/editor.component.ts:224:15:
+      224 │   templateUrl: './editor.component.html',
+          ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] NG9: Property 'mirrorX' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.html:137:93:
+      137 │ ...ype="checkbox" [(ngModel)]="mirrorX" (change)="render()" /> Mi...
+          ╵                                ~~~~~~~
+
+  Error occurs in the template of component EditorComponent.
+
+    src/app/editor/editor.component.ts:224:15:
+      224 │   templateUrl: './editor.component.html',
+          ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] NG9: Property 'mirrorX' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.html:604:21:
+      604 │         <span *ngIf="mirrorX" class="status-accent"><strong>Mirro...
+          ╵                      ~~~~~~~
+
+  Error occurs in the template of component EditorComponent.
+
+    src/app/editor/editor.component.ts:224:15:
+      224 │   templateUrl: './editor.component.html',
+          ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+- Changes detected. Rebuilding...
+
+Application bundle generation failed. [1.506 seconds]
+
+X [ERROR] NG9: Property 'mirrorX' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.html:137:93:
+      137 │ ...ype="checkbox" [(ngModel)]="mirrorX" (change)="render()" /> Mi...
+          ╵                                ~~~~~~~
+
+  Error occurs in the template of component EditorComponent.
+
+    src/app/editor/editor.component.ts:224:15:
+      224 │   templateUrl: './editor.component.html',
+          ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] NG9: Property 'mirrorX' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.html:137:93:
+      137 │ ...ype="checkbox" [(ngModel)]="mirrorX" (change)="render()" /> Mi...
+          ╵                                ~~~~~~~
+
+  Error occurs in the template of component EditorComponent.
+
+    src/app/editor/editor.component.ts:224:15:
+      224 │   templateUrl: './editor.component.html',
+          ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] NG9: Property 'mirrorX' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.html:604:21:
+      604 │         <span *ngIf="mirrorX" class="status-accent"><strong>Mirro...
+          ╵                      ~~~~~~~
+
+  Error occurs in the template of component EditorComponent.
+
+    src/app/editor/editor.component.ts:224:15:
+      224 │   templateUrl: './editor.component.html',
+          ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+- Changes detected. Rebuilding...
+
+Application bundle generation failed. [1.735 seconds]
+
+X [ERROR] NG9: Property 'mirrorX' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.html:137:93:
+      137 │ ...ype="checkbox" [(ngModel)]="mirrorX" (change)="render()" /> Mi...
+          ╵                                ~~~~~~~
+
+  Error occurs in the template of component EditorComponent.
+
+    src/app/editor/editor.component.ts:224:15:
+      224 │   templateUrl: './editor.component.html',
+          ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] NG9: Property 'mirrorX' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.html:137:93:
+      137 │ ...ype="checkbox" [(ngModel)]="mirrorX" (change)="render()" /> Mi...
+          ╵                                ~~~~~~~
+
+  Error occurs in the template of component EditorComponent.
+
+    src/app/editor/editor.component.ts:224:15:
+      224 │   templateUrl: './editor.component.html',
+          ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] NG9: Property 'mirrorX' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.html:604:21:
+      604 │         <span *ngIf="mirrorX" class="status-accent"><strong>Mirro...
+          ╵                      ~~~~~~~
+
+  Error occurs in the template of component EditorComponent.
+
+    src/app/editor/editor.component.ts:224:15:
+      224 │   templateUrl: './editor.component.html',
+          ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+- Changes detected. Rebuilding...
+
+Application bundle generation failed. [1.686 seconds]
+
+X [ERROR] NG1: Property 'setSymmetry' does not exist on type 'EditorComponent'. Did you mean 'symmetry'? [plugin angular-compiler]
+
+    src/app/editor/editor.component.html:141:50:
+      141 │ ...elect [ngModel]="symmetry" (ngModelChange)="setSymmetry($event)">
+          ╵                                                ~~~~~~~~~~~
+
+  Error occurs in the template of component EditorComponent.
+
+    src/app/editor/editor.component.ts:224:15:
+      224 │   templateUrl: './editor.component.html',
+          ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] NG9: Property 'mirrorX' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.html:614:21:
+      614 │         <span *ngIf="mirrorX" class="status-accent"><strong>Mirro...
+          ╵                      ~~~~~~~
+
+  Error occurs in the template of component EditorComponent.
+
+    src/app/editor/editor.component.ts:224:15:
+      224 │   templateUrl: './editor.component.html',
+          ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+- Changes detected. Rebuilding...
+
+Application bundle generation failed. [2.059 seconds]
+
+X [ERROR] NG1: Property 'setSymmetry' does not exist on type 'EditorComponent'. Did you mean 'symmetry'? [plugin angular-compiler]
+
+    src/app/editor/editor.component.html:141:50:
+      141 │ ...elect [ngModel]="symmetry" (ngModelChange)="setSymmetry($event)">
+          ╵                                                ~~~~~~~~~~~
+
+  Error occurs in the template of component EditorComponent.
+
+    src/app/editor/editor.component.ts:224:15:
+      224 │   templateUrl: './editor.component.html',
+          ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+- Changes detected. Rebuilding...
+
+Browser bundles        
+Initial chunk files     | Names               |  Raw size
+polyfills.js            | polyfills           |  88.09 kB | 
+main.js                 | main                |  21.54 kB | 
+styles.css              | styles              |   4.81 kB | 
+chunk-NJ5HVBCL.js       | -                   |   3.17 kB | 
+chunk-4WXVOEFY.js       | -                   |   1.46 kB | 
+chunk-3OSS3HON.js       | -                   | 652 bytes | 
+
+                        | Initial total       | 119.70 kB
+
+Lazy chunk files        | Names               |  Raw size
+chunk-EMPPYXNZ.js       | editor-component    | 375.71 kB | 
+chunk-YK2DGNDW.js       | guide-component     |  42.33 kB | 
+chunk-W5CCP3ZS.js       | landing-component   |  16.89 kB | 
+chunk-EWQNQPX5.js       | contact-component   |   9.10 kB | 
+chunk-CIVRPHXR.js       | pricing-component   |   8.03 kB | 
+chunk-GIECJVF4.js       | features-component  |   7.82 kB | 
+chunk-LTE4XX4C.js       | blog-post-component |   6.55 kB | 
+chunk-DOZPUEIV.js       | faq-component       |   5.99 kB | 
+chunk-XP5ZG5Q4.js       | blog-list-component |   5.46 kB | 
+chunk-5C2M5NFJ.js       | about-component     |   4.67 kB | 
+chunk-UVVVIIEP.js       | -                   |   3.47 kB | 
+chunk-C6JU3WVH.js       | not-found-component |   2.47 kB | 
+
+
+Server bundles         
+Initial chunk files     | Names               |  Raw size
+chunk-3KVU5QX2.mjs      | -                   |   1.08 MB | 
+chunk-MM2SGXET.mjs      | -                   | 663.58 kB | 
+polyfills.server.mjs    | polyfills.server    | 559.49 kB | 
+chunk-ESQLRAC5.mjs      | -                   | 194.65 kB | 
+main.server.mjs         | main.server         |  21.08 kB | 
+chunk-AKEZM5SL.mjs      | -                   |   3.11 kB | 
+chunk-VPSODEBW.mjs      | -                   |   2.51 kB | 
+chunk-C42IF335.mjs      | -                   | 687 bytes | 
+render-utils.server.mjs | render-utils.server | 462 bytes | 
+
+Lazy chunk files        | Names               |  Raw size
+chunk-CZXMYLM7.mjs      | editor-component    | 647.09 kB | 
+chunk-OSTPOPH7.mjs      | -                   | 193.75 kB | 
+chunk-IPBZDYT6.mjs      | guide-component     |  40.70 kB | 
+chunk-P3UOPGAK.mjs      | xhr2                |  39.09 kB | 
+chunk-6S4MS7AO.mjs      | landing-component   |  16.63 kB | 
+chunk-JBYRA3XA.mjs      | contact-component   |   9.22 kB | 
+chunk-ITW4OT2Z.mjs      | pricing-component   |   7.98 kB | 
+chunk-5KGCPH36.mjs      | features-component  |   7.78 kB | 
+chunk-7TG2CDFJ.mjs      | blog-post-component |   6.65 kB | 
+chunk-YZMUJTXQ.mjs      | faq-component       |   6.01 kB | 
+chunk-EUON4EGE.mjs      | blog-list-component |   5.52 kB | 
+chunk-NT3RS6MI.mjs      | about-component     |   4.67 kB | 
+chunk-ROHT27OW.mjs      | -                   |   3.50 kB | 
+chunk-GJH5DQF4.mjs      | not-found-component |   2.54 kB | 
+
+Application bundle generation complete. [2.540 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.54 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-2USFUXDV.js   | editor-component | 376.16 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  21.08 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-4RNXLMZW.mjs  | editor-component | 647.54 kB | 
+
+Application bundle generation complete. [1.822 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names           | Raw size
+main.js             | main            | 21.54 kB | 
+
+Lazy chunk files    | Names           | Raw size
+chunk-OPHLVX6O.js   | guide-component | 42.93 kB | 
+
+
+Server bundles     
+Initial chunk files | Names           | Raw size
+main.server.mjs     | main.server     | 21.08 kB | 
+
+Lazy chunk files    | Names           | Raw size
+chunk-IIK6N77W.mjs  | guide-component | 41.28 kB | 
+
+Application bundle generation complete. [0.519 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names           | Raw size
+main.js             | main            | 21.54 kB | 
+
+Lazy chunk files    | Names           | Raw size
+chunk-WGM43VKW.js   | guide-component | 42.94 kB | 
+
+
+Server bundles     
+Initial chunk files | Names           | Raw size
+main.server.mjs     | main.server     | 21.08 kB | 
+
+Lazy chunk files    | Names           | Raw size
+chunk-SWKWLLBC.mjs  | guide-component | 41.29 kB | 
+
+Application bundle generation complete. [0.574 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.54 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-SR6NYMRX.js   | editor-component | 376.16 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  21.08 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-EO362RO4.mjs  | editor-component | 647.54 kB | 
+
+Application bundle generation complete. [3.272 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.54 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-66PYV2TW.js   | editor-component | 378.07 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  21.08 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-RWFOVLQ3.mjs  | editor-component | 649.46 kB | 
+
+Application bundle generation complete. [3.341 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.54 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-2GMLCQPL.js   | editor-component | 378.14 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  21.08 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-P34NBLOS.mjs  | editor-component | 649.52 kB | 
+
+Application bundle generation complete. [2.089 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.54 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-PNZAYHVC.js   | editor-component | 378.28 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  21.08 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-JGQITCPY.mjs  | editor-component | 649.67 kB | 
+
+Application bundle generation complete. [2.018 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.54 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-YD5CBL7S.js   | editor-component | 378.38 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  21.08 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-YSWAYCCA.mjs  | editor-component | 649.76 kB | 
+
+Application bundle generation complete. [2.245 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.54 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-GA3ZIIRP.js   | editor-component | 378.38 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  21.08 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-P6E3C62S.mjs  | editor-component | 649.76 kB | 
+
+Application bundle generation complete. [2.994 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.54 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-7DMKBO6V.js   | editor-component | 378.79 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  21.08 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-H7HQ65X7.mjs  | editor-component | 650.18 kB | 
+
+Application bundle generation complete. [1.681 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.54 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-I5S7KPA6.js   | editor-component | 378.85 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  21.08 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-GQHY7HYU.mjs  | editor-component | 650.23 kB | 
+
+Application bundle generation complete. [1.950 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.54 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-CZ5C5XAD.js   | editor-component | 378.94 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  21.08 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-ND2EBJNY.mjs  | editor-component | 650.33 kB | 
+
+Application bundle generation complete. [2.463 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.54 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-Y2FURADC.js   | editor-component | 386.61 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  21.08 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-NQSJV3JX.mjs  | editor-component | 657.99 kB | 
+
+Application bundle generation complete. [3.087 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.54 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-MCU63UXY.js   | editor-component | 386.52 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  21.08 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-XLDLCVFT.mjs  | editor-component | 657.91 kB | 
+
+Application bundle generation complete. [1.753 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.54 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-NSXBOERG.js   | editor-component | 386.71 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  21.08 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-LY6N27WI.mjs  | editor-component | 658.09 kB | 
+
+Application bundle generation complete. [2.258 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.54 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-YX3VRKPR.js   | editor-component | 386.81 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  21.08 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-WAEC5TYM.mjs  | editor-component | 658.20 kB | 
+
+Application bundle generation complete. [1.681 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.54 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-UT33F26A.js   | editor-component | 386.91 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  21.08 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-EYTHLGEQ.mjs  | editor-component | 658.29 kB | 
+
+Application bundle generation complete. [2.010 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.54 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-YN7PGAQZ.js   | editor-component | 387.11 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  21.08 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-WAKL3Y75.mjs  | editor-component | 658.50 kB | 
+
+Application bundle generation complete. [2.031 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Application bundle generation failed. [2.141 seconds]
+
+X [ERROR] TS2339: Property 'drawTransformHandles' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:4949:22:
+      4949 │     if (this.tf) this.drawTransformHandles();
+           ╵                       ~~~~~~~~~~~~~~~~~~~~
+
+
+- Changes detected. Rebuilding...
+
+Browser bundles        
+Initial chunk files     | Names               |  Raw size
+polyfills.js            | polyfills           |  88.09 kB | 
+main.js                 | main                |  21.54 kB | 
+styles.css              | styles              |   4.81 kB | 
+chunk-NJ5HVBCL.js       | -                   |   3.17 kB | 
+chunk-4WXVOEFY.js       | -                   |   1.46 kB | 
+chunk-3OSS3HON.js       | -                   | 652 bytes | 
+
+                        | Initial total       | 119.70 kB
+
+Lazy chunk files        | Names               |  Raw size
+chunk-AST3XK36.js       | editor-component    | 388.70 kB | 
+chunk-WGM43VKW.js       | guide-component     |  42.94 kB | 
+chunk-W5CCP3ZS.js       | landing-component   |  16.89 kB | 
+chunk-EWQNQPX5.js       | contact-component   |   9.10 kB | 
+chunk-CIVRPHXR.js       | pricing-component   |   8.03 kB | 
+chunk-GIECJVF4.js       | features-component  |   7.82 kB | 
+chunk-LTE4XX4C.js       | blog-post-component |   6.55 kB | 
+chunk-DOZPUEIV.js       | faq-component       |   5.99 kB | 
+chunk-XP5ZG5Q4.js       | blog-list-component |   5.46 kB | 
+chunk-5C2M5NFJ.js       | about-component     |   4.67 kB | 
+chunk-UVVVIIEP.js       | -                   |   3.47 kB | 
+chunk-C6JU3WVH.js       | not-found-component |   2.47 kB | 
+
+
+Server bundles         
+Initial chunk files     | Names               |  Raw size
+chunk-3KVU5QX2.mjs      | -                   |   1.08 MB | 
+chunk-MM2SGXET.mjs      | -                   | 663.58 kB | 
+polyfills.server.mjs    | polyfills.server    | 559.49 kB | 
+chunk-ESQLRAC5.mjs      | -                   | 194.65 kB | 
+main.server.mjs         | main.server         |  21.08 kB | 
+chunk-AKEZM5SL.mjs      | -                   |   3.11 kB | 
+chunk-VPSODEBW.mjs      | -                   |   2.51 kB | 
+chunk-C42IF335.mjs      | -                   | 687 bytes | 
+render-utils.server.mjs | render-utils.server | 462 bytes | 
+
+Lazy chunk files        | Names               |  Raw size
+chunk-XURJMCYA.mjs      | editor-component    | 660.09 kB | 
+chunk-OSTPOPH7.mjs      | -                   | 193.75 kB | 
+chunk-SWKWLLBC.mjs      | guide-component     |  41.29 kB | 
+chunk-P3UOPGAK.mjs      | xhr2                |  39.09 kB | 
+chunk-6S4MS7AO.mjs      | landing-component   |  16.63 kB | 
+chunk-JBYRA3XA.mjs      | contact-component   |   9.22 kB | 
+chunk-ITW4OT2Z.mjs      | pricing-component   |   7.98 kB | 
+chunk-5KGCPH36.mjs      | features-component  |   7.78 kB | 
+chunk-7TG2CDFJ.mjs      | blog-post-component |   6.65 kB | 
+chunk-YZMUJTXQ.mjs      | faq-component       |   6.01 kB | 
+chunk-EUON4EGE.mjs      | blog-list-component |   5.52 kB | 
+chunk-NT3RS6MI.mjs      | about-component     |   4.67 kB | 
+chunk-ROHT27OW.mjs      | -                   |   3.50 kB | 
+chunk-GJH5DQF4.mjs      | not-found-component |   2.54 kB | 
+
+Application bundle generation complete. [2.732 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.54 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-WQWCLIVH.js   | editor-component | 388.77 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  21.08 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-Z4GVXOY3.mjs  | editor-component | 660.15 kB | 
+
+Application bundle generation complete. [1.689 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.54 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-33Z4A7RD.js   | editor-component | 388.81 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  21.08 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-MFWMG737.mjs  | editor-component | 660.20 kB | 
+
+Application bundle generation complete. [1.861 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names           | Raw size
+main.js             | main            | 21.54 kB | 
+
+Lazy chunk files    | Names           | Raw size
+chunk-CNSTZF5I.js   | guide-component | 43.04 kB | 
+
+
+Server bundles     
+Initial chunk files | Names           | Raw size
+main.server.mjs     | main.server     | 21.08 kB | 
+
+Lazy chunk files    | Names           | Raw size
+chunk-2RUWIFBC.mjs  | guide-component | 41.38 kB | 
+
+Application bundle generation complete. [0.517 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names           | Raw size
+main.js             | main            | 21.54 kB | 
+
+Lazy chunk files    | Names           | Raw size
+chunk-6LFOZIC3.js   | guide-component | 43.19 kB | 
+
+
+Server bundles     
+Initial chunk files | Names           | Raw size
+main.server.mjs     | main.server     | 21.08 kB | 
+
+Lazy chunk files    | Names           | Raw size
+chunk-RLUBCS3P.mjs  | guide-component | 41.53 kB | 
+
+Application bundle generation complete. [0.488 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names           | Raw size
+main.js             | main            | 21.54 kB | 
+
+Lazy chunk files    | Names           | Raw size
+chunk-UO6I4LKX.js   | guide-component | 44.39 kB | 
+
+
+Server bundles     
+Initial chunk files | Names           | Raw size
+main.server.mjs     | main.server     | 21.08 kB | 
+
+Lazy chunk files    | Names           | Raw size
+chunk-KVA5246K.mjs  | guide-component | 42.66 kB | 
+
+Application bundle generation complete. [0.532 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.54 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-VSGY7NWL.js   | editor-component | 388.89 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  21.08 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-B3GAHOVC.mjs  | editor-component | 660.28 kB | 
+
+Application bundle generation complete. [2.916 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.54 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-6QGPCFQD.js   | editor-component | 394.42 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  21.08 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-JJ6BBG6W.mjs  | editor-component | 665.80 kB | 
+
+Application bundle generation complete. [2.910 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.54 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-B7FBJBDL.js   | editor-component | 394.62 kB | 
+
+Application bundle generation complete. [3.413 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.54 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-GC5FD6DQ.js   | editor-component | 401.58 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  21.08 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-RR5ESA33.mjs  | editor-component | 672.58 kB | 
+
+Application bundle generation complete. [1.871 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.54 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-K5IIYYHS.js   | editor-component | 404.00 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  21.08 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-QD3EMB3X.mjs  | editor-component | 674.86 kB | 
+
+Application bundle generation complete. [2.666 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.54 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-LOFWU5RV.js   | editor-component | 404.00 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  21.08 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-3U5NTIMB.mjs  | editor-component | 674.86 kB | 
+
+Application bundle generation complete. [3.076 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.54 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-5B2A6HLE.js   | editor-component | 406.70 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  21.08 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-NC57J225.mjs  | editor-component | 677.56 kB | 
+
+Application bundle generation complete. [3.776 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names           | Raw size
+main.js             | main            | 21.54 kB | 
+
+Lazy chunk files    | Names           | Raw size
+chunk-3HMXMBOY.js   | guide-component | 46.11 kB | 
+
+
+Server bundles     
+Initial chunk files | Names           | Raw size
+main.server.mjs     | main.server     | 21.08 kB | 
+
+Lazy chunk files    | Names           | Raw size
+chunk-NJFCZVGJ.mjs  | guide-component | 44.28 kB | 
+
+Application bundle generation complete. [0.883 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Application bundle generation failed. [2.948 seconds]
+
+X [ERROR] TS2741: Property 'tilemap' is missing in type '{ tools: string; color: string; display: string; canvas: string; timeline: string; }' but required in type 'Record<PanelId, string>'. [plugin angular-compiler]
+
+    src/app/editor/dock/dock.types.ts:47:13:
+      47 │ export const PANEL_TITLES: Record<PanelId, string> = {
+         ╵              ~~~~~~~~~~~~
+
+
+- Changes detected. Rebuilding...
+
+Browser bundles        
+Initial chunk files     | Names               |  Raw size
+polyfills.js            | polyfills           |  88.09 kB | 
+main.js                 | main                |  21.54 kB | 
+styles.css              | styles              |   4.81 kB | 
+chunk-NJ5HVBCL.js       | -                   |   3.17 kB | 
+chunk-4WXVOEFY.js       | -                   |   1.46 kB | 
+chunk-3OSS3HON.js       | -                   | 652 bytes | 
+
+                        | Initial total       | 119.70 kB
+
+Lazy chunk files        | Names               |  Raw size
+chunk-QIGORDQ4.js       | editor-component    | 406.82 kB | 
+chunk-3HMXMBOY.js       | guide-component     |  46.11 kB | 
+chunk-W5CCP3ZS.js       | landing-component   |  16.89 kB | 
+chunk-EWQNQPX5.js       | contact-component   |   9.10 kB | 
+chunk-CIVRPHXR.js       | pricing-component   |   8.03 kB | 
+chunk-GIECJVF4.js       | features-component  |   7.82 kB | 
+chunk-LTE4XX4C.js       | blog-post-component |   6.55 kB | 
+chunk-DOZPUEIV.js       | faq-component       |   5.99 kB | 
+chunk-XP5ZG5Q4.js       | blog-list-component |   5.46 kB | 
+chunk-5C2M5NFJ.js       | about-component     |   4.67 kB | 
+chunk-UVVVIIEP.js       | -                   |   3.47 kB | 
+chunk-C6JU3WVH.js       | not-found-component |   2.47 kB | 
+
+
+Server bundles         
+Initial chunk files     | Names               |  Raw size
+chunk-3KVU5QX2.mjs      | -                   |   1.08 MB | 
+chunk-MM2SGXET.mjs      | -                   | 663.58 kB | 
+polyfills.server.mjs    | polyfills.server    | 559.49 kB | 
+chunk-ESQLRAC5.mjs      | -                   | 194.65 kB | 
+main.server.mjs         | main.server         |  21.08 kB | 
+chunk-AKEZM5SL.mjs      | -                   |   3.11 kB | 
+chunk-VPSODEBW.mjs      | -                   |   2.51 kB | 
+chunk-C42IF335.mjs      | -                   | 687 bytes | 
+render-utils.server.mjs | render-utils.server | 462 bytes | 
+
+Lazy chunk files        | Names               |  Raw size
+chunk-S4BLEQKT.mjs      | editor-component    | 677.68 kB | 
+chunk-OSTPOPH7.mjs      | -                   | 193.75 kB | 
+chunk-NJFCZVGJ.mjs      | guide-component     |  44.28 kB | 
+chunk-P3UOPGAK.mjs      | xhr2                |  39.09 kB | 
+chunk-6S4MS7AO.mjs      | landing-component   |  16.63 kB | 
+chunk-JBYRA3XA.mjs      | contact-component   |   9.22 kB | 
+chunk-ITW4OT2Z.mjs      | pricing-component   |   7.98 kB | 
+chunk-5KGCPH36.mjs      | features-component  |   7.78 kB | 
+chunk-7TG2CDFJ.mjs      | blog-post-component |   6.65 kB | 
+chunk-YZMUJTXQ.mjs      | faq-component       |   6.01 kB | 
+chunk-EUON4EGE.mjs      | blog-list-component |   5.52 kB | 
+chunk-NT3RS6MI.mjs      | about-component     |   4.67 kB | 
+chunk-ROHT27OW.mjs      | -                   |   3.50 kB | 
+chunk-GJH5DQF4.mjs      | not-found-component |   2.54 kB | 
+
+Application bundle generation complete. [1.618 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.54 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-SJ73LVTV.js   | editor-component | 406.99 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  21.08 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-3LF3XWQN.mjs  | editor-component | 677.84 kB | 
+
+Application bundle generation complete. [2.596 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Application bundle generation failed. [1.786 seconds]
+
+X [ERROR] TS2339: Property 'refreshTiles' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:781:13:
+      781 │         this.refreshTiles();
+          ╵              ~~~~~~~~~~~~
+
+
+X [ERROR] TS2339: Property 'renderTilemap' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:782:13:
+      782 │         this.renderTilemap();
+          ╵              ~~~~~~~~~~~~~
+
+
+- Changes detected. Rebuilding...
+
+Application bundle generation failed. [2.376 seconds]
+
+X [ERROR] TS2339: Property 'refreshTiles' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:797:13:
+      797 │         this.refreshTiles();
+          ╵              ~~~~~~~~~~~~
+
+
+X [ERROR] TS2339: Property 'renderTilemap' does not exist on type 'EditorComponent'. [plugin angular-compiler]
+
+    src/app/editor/editor.component.ts:798:13:
+      798 │         this.renderTilemap();
+          ╵              ~~~~~~~~~~~~~
+
+
+- Changes detected. Rebuilding...
+
+Browser bundles        
+Initial chunk files     | Names               |  Raw size
+polyfills.js            | polyfills           |  88.09 kB | 
+main.js                 | main                |  21.54 kB | 
+styles.css              | styles              |   4.81 kB | 
+chunk-NJ5HVBCL.js       | -                   |   3.17 kB | 
+chunk-4WXVOEFY.js       | -                   |   1.46 kB | 
+chunk-3OSS3HON.js       | -                   | 652 bytes | 
+
+                        | Initial total       | 119.70 kB
+
+Lazy chunk files        | Names               |  Raw size
+chunk-DGYD4CG5.js       | editor-component    | 413.91 kB | 
+chunk-3HMXMBOY.js       | guide-component     |  46.11 kB | 
+chunk-W5CCP3ZS.js       | landing-component   |  16.89 kB | 
+chunk-EWQNQPX5.js       | contact-component   |   9.10 kB | 
+chunk-CIVRPHXR.js       | pricing-component   |   8.03 kB | 
+chunk-GIECJVF4.js       | features-component  |   7.82 kB | 
+chunk-LTE4XX4C.js       | blog-post-component |   6.55 kB | 
+chunk-DOZPUEIV.js       | faq-component       |   5.99 kB | 
+chunk-XP5ZG5Q4.js       | blog-list-component |   5.46 kB | 
+chunk-5C2M5NFJ.js       | about-component     |   4.67 kB | 
+chunk-UVVVIIEP.js       | -                   |   3.47 kB | 
+chunk-C6JU3WVH.js       | not-found-component |   2.47 kB | 
+
+
+Server bundles         
+Initial chunk files     | Names               |  Raw size
+chunk-3KVU5QX2.mjs      | -                   |   1.08 MB | 
+chunk-MM2SGXET.mjs      | -                   | 663.58 kB | 
+polyfills.server.mjs    | polyfills.server    | 559.49 kB | 
+chunk-ESQLRAC5.mjs      | -                   | 194.65 kB | 
+main.server.mjs         | main.server         |  21.08 kB | 
+chunk-AKEZM5SL.mjs      | -                   |   3.11 kB | 
+chunk-VPSODEBW.mjs      | -                   |   2.51 kB | 
+chunk-C42IF335.mjs      | -                   | 687 bytes | 
+render-utils.server.mjs | render-utils.server | 462 bytes | 
+
+Lazy chunk files        | Names               |  Raw size
+chunk-N5BS6KW5.mjs      | editor-component    | 684.77 kB | 
+chunk-OSTPOPH7.mjs      | -                   | 193.75 kB | 
+chunk-NJFCZVGJ.mjs      | guide-component     |  44.28 kB | 
+chunk-P3UOPGAK.mjs      | xhr2                |  39.09 kB | 
+chunk-6S4MS7AO.mjs      | landing-component   |  16.63 kB | 
+chunk-JBYRA3XA.mjs      | contact-component   |   9.22 kB | 
+chunk-ITW4OT2Z.mjs      | pricing-component   |   7.98 kB | 
+chunk-5KGCPH36.mjs      | features-component  |   7.78 kB | 
+chunk-7TG2CDFJ.mjs      | blog-post-component |   6.65 kB | 
+chunk-YZMUJTXQ.mjs      | faq-component       |   6.01 kB | 
+chunk-EUON4EGE.mjs      | blog-list-component |   5.52 kB | 
+chunk-NT3RS6MI.mjs      | about-component     |   4.67 kB | 
+chunk-ROHT27OW.mjs      | -                   |   3.50 kB | 
+chunk-GJH5DQF4.mjs      | not-found-component |   2.54 kB | 
+
+Application bundle generation complete. [2.351 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.54 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-36VYLILN.js   | editor-component | 424.86 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  21.08 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-6WNPWOQZ.mjs  | editor-component | 695.11 kB | 
+
+Application bundle generation complete. [3.930 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.54 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-OHYNIZQD.js   | editor-component | 427.39 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  21.08 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-ZCRRGAMA.mjs  | editor-component | 697.64 kB | 
+
+Application bundle generation complete. [2.384 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names           | Raw size
+main.js             | main            | 21.54 kB | 
+
+Lazy chunk files    | Names           | Raw size
+chunk-SEBLMU7R.js   | guide-component | 46.15 kB | 
+
+
+Server bundles     
+Initial chunk files | Names           | Raw size
+main.server.mjs     | main.server     | 21.08 kB | 
+
+Lazy chunk files    | Names           | Raw size
+chunk-T7V6ZIZS.mjs  | guide-component | 44.33 kB | 
+
+Application bundle generation complete. [0.491 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names           | Raw size
+main.js             | main            | 21.54 kB | 
+
+Lazy chunk files    | Names           | Raw size
+chunk-DT6QVM66.js   | guide-component | 49.45 kB | 
+
+
+Server bundles     
+Initial chunk files | Names           | Raw size
+main.server.mjs     | main.server     | 21.08 kB | 
+
+Lazy chunk files    | Names           | Raw size
+chunk-JOVYH3YK.mjs  | guide-component | 47.44 kB | 
+
+Application bundle generation complete. [0.444 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.54 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-3QZKRCJL.js   | editor-component | 427.45 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  21.08 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-R3NW3CSB.mjs  | editor-component | 697.70 kB | 
+
+Application bundle generation complete. [3.583 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.54 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-SLDYIN6P.js   | editor-component | 427.55 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  21.08 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-X27IUWYT.mjs  | editor-component | 697.80 kB | 
+
+Application bundle generation complete. [2.061 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.54 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-MLTQ5DSA.js   | editor-component | 427.62 kB | 
+
+Application bundle generation complete. [2.413 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.54 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-D3C7ZCDW.js   | editor-component | 427.69 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  21.08 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-ZQ5CXLN3.mjs  | editor-component | 697.94 kB | 
+
+Application bundle generation complete. [1.917 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.54 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-QAZFUWCV.js   | editor-component | 429.12 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  21.08 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-JRT2QGVU.mjs  | editor-component | 699.37 kB | 
+
+Application bundle generation complete. [2.877 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.54 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-XQKF3WYN.js   | editor-component | 430.91 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  21.08 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-7T7Y72GP.mjs  | editor-component | 701.07 kB | 
+
+Application bundle generation complete. [1.756 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.54 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-OPCHQ3KD.js   | editor-component | 430.98 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  21.08 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-ELWEJ3FU.mjs  | editor-component | 701.13 kB | 
+
+Application bundle generation complete. [2.255 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names           | Raw size
+main.js             | main            | 21.54 kB | 
+
+Lazy chunk files    | Names           | Raw size
+chunk-2XI76HZV.js   | guide-component | 50.35 kB | 
+
+
+Server bundles     
+Initial chunk files | Names           | Raw size
+main.server.mjs     | main.server     | 21.08 kB | 
+
+Lazy chunk files    | Names           | Raw size
+chunk-TIREOEIN.mjs  | guide-component | 48.30 kB | 
+
+Application bundle generation complete. [0.587 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.54 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-V7R4RMEK.js   | editor-component | 431.30 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  21.08 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-QF5SFDP3.mjs  | editor-component | 701.46 kB | 
+
+Application bundle generation complete. [3.044 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.54 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-VHG3B3F3.js   | editor-component | 424.66 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  21.08 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-LDGRT66X.mjs  | editor-component | 695.20 kB | 
+
+Application bundle generation complete. [2.118 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.54 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-ZBNEKN3P.js   | editor-component | 425.22 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  21.08 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-HZ3ZMJ2D.mjs  | editor-component | 695.72 kB | 
+
+Application bundle generation complete. [2.465 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Application bundle generation failed. [2.934 seconds]
+
+X [ERROR] NG1: Property 'hasSelection' does not exist on type 'EditorComponent'. Did you mean 'pasteSelection'? [plugin angular-compiler]
+
+    src/app/editor/editor.component.html:676:84:
+      676 │ ...y (Ctrl+C)" [disabled]="!hasSelection" [innerHTML]="uiIcons.co...
+          ╵                             ~~~~~~~~~~~~
+
+  Error occurs in the template of component EditorComponent.
+
+    src/app/editor/editor.component.ts:243:15:
+      243 │   templateUrl: './editor.component.html',
+          ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] NG1: Property 'hasSelection' does not exist on type 'EditorComponent'. Did you mean 'pasteSelection'? [plugin angular-compiler]
+
+    src/app/editor/editor.component.html:677:83:
+      677 │ ...t (Ctrl+X)" [disabled]="!hasSelection" [innerHTML]="uiIcons.cu...
+          ╵                             ~~~~~~~~~~~~
+
+  Error occurs in the template of component EditorComponent.
+
+    src/app/editor/editor.component.ts:243:15:
+      243 │   templateUrl: './editor.component.html',
+          ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] NG1: Property 'hasSelection' does not exist on type 'EditorComponent'. Did you mean 'pasteSelection'? [plugin angular-compiler]
+
+    src/app/editor/editor.component.html:680:34:
+      680 │ ...span class="sel-hint">{{ hasSelection ? selectionLabel : 'No s...
+          ╵                             ~~~~~~~~~~~~
+
+  Error occurs in the template of component EditorComponent.
+
+    src/app/editor/editor.component.ts:243:15:
+      243 │   templateUrl: './editor.component.html',
+          ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+- Changes detected. Rebuilding...
+
+Browser bundles        
+Initial chunk files     | Names               |  Raw size
+polyfills.js            | polyfills           |  88.09 kB | 
+main.js                 | main                |  21.54 kB | 
+styles.css              | styles              |   4.81 kB | 
+chunk-NJ5HVBCL.js       | -                   |   3.17 kB | 
+chunk-4WXVOEFY.js       | -                   |   1.46 kB | 
+chunk-3OSS3HON.js       | -                   | 652 bytes | 
+
+                        | Initial total       | 119.70 kB
+
+Lazy chunk files        | Names               |  Raw size
+chunk-ZW6NXE6W.js       | editor-component    | 429.58 kB | 
+chunk-2XI76HZV.js       | guide-component     |  50.35 kB | 
+chunk-W5CCP3ZS.js       | landing-component   |  16.89 kB | 
+chunk-EWQNQPX5.js       | contact-component   |   9.10 kB | 
+chunk-CIVRPHXR.js       | pricing-component   |   8.03 kB | 
+chunk-GIECJVF4.js       | features-component  |   7.82 kB | 
+chunk-LTE4XX4C.js       | blog-post-component |   6.55 kB | 
+chunk-DOZPUEIV.js       | faq-component       |   5.99 kB | 
+chunk-XP5ZG5Q4.js       | blog-list-component |   5.46 kB | 
+chunk-5C2M5NFJ.js       | about-component     |   4.67 kB | 
+chunk-UVVVIIEP.js       | -                   |   3.47 kB | 
+chunk-C6JU3WVH.js       | not-found-component |   2.47 kB | 
+
+
+Server bundles         
+Initial chunk files     | Names               |  Raw size
+chunk-3KVU5QX2.mjs      | -                   |   1.08 MB | 
+chunk-MM2SGXET.mjs      | -                   | 663.58 kB | 
+polyfills.server.mjs    | polyfills.server    | 559.49 kB | 
+chunk-ESQLRAC5.mjs      | -                   | 194.65 kB | 
+main.server.mjs         | main.server         |  21.08 kB | 
+chunk-AKEZM5SL.mjs      | -                   |   3.11 kB | 
+chunk-VPSODEBW.mjs      | -                   |   2.51 kB | 
+chunk-C42IF335.mjs      | -                   | 687 bytes | 
+render-utils.server.mjs | render-utils.server | 462 bytes | 
+
+Lazy chunk files        | Names               |  Raw size
+chunk-NOVBAOMI.mjs      | editor-component    | 699.79 kB | 
+chunk-OSTPOPH7.mjs      | -                   | 193.75 kB | 
+chunk-TIREOEIN.mjs      | guide-component     |  48.30 kB | 
+chunk-P3UOPGAK.mjs      | xhr2                |  39.09 kB | 
+chunk-6S4MS7AO.mjs      | landing-component   |  16.63 kB | 
+chunk-JBYRA3XA.mjs      | contact-component   |   9.22 kB | 
+chunk-ITW4OT2Z.mjs      | pricing-component   |   7.98 kB | 
+chunk-5KGCPH36.mjs      | features-component  |   7.78 kB | 
+chunk-7TG2CDFJ.mjs      | blog-post-component |   6.65 kB | 
+chunk-YZMUJTXQ.mjs      | faq-component       |   6.01 kB | 
+chunk-EUON4EGE.mjs      | blog-list-component |   5.52 kB | 
+chunk-NT3RS6MI.mjs      | about-component     |   4.67 kB | 
+chunk-ROHT27OW.mjs      | -                   |   3.50 kB | 
+chunk-GJH5DQF4.mjs      | not-found-component |   2.54 kB | 
+
+Application bundle generation complete. [3.305 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.54 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-4WQBAY4T.js   | editor-component | 433.26 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  21.08 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-GL2IN2LD.mjs  | editor-component | 703.28 kB | 
+
+Application bundle generation complete. [2.063 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.54 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-F7ELIPFA.js   | editor-component | 427.87 kB | 
+
+Application bundle generation complete. [2.479 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.54 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-3MDHXRIH.js   | editor-component | 427.87 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  21.08 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-P6XLL4P3.mjs  | editor-component | 698.26 kB | 
+
+Application bundle generation complete. [2.267 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.54 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-BCX3PXKY.js   | editor-component | 427.87 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  21.08 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-GO3NJ4NC.mjs  | editor-component | 698.26 kB | 
+
+Application bundle generation complete. [0.791 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.54 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-C2CMHW4A.js   | editor-component | 430.70 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  21.08 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-SB6D5C55.mjs  | editor-component | 700.90 kB | 
+
+Application bundle generation complete. [2.718 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Application bundle generation failed. [1.760 seconds]
+
+X [ERROR] NG5002: Unexpected closing tag "ng-template". It may happen when the tag has already been closed by another tag. For more info see https://www.w3.org/TR/html5/syntax.html#closing-elements-that-have-implied-end-tags [plugin angular-compiler]
+
+    src/app/editor/editor.component.html:171:0:
+      171 │ </ng-template>
+          ╵ ~~~~~~~~~~~~~~
+
+  Error occurs in the template of component EditorComponent.
+
+    src/app/editor/editor.component.ts:243:15:
+      243 │   templateUrl: './editor.component.html',
+          ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+- Changes detected. Rebuilding...
+
+Application bundle generation failed. [1.020 seconds]
+
+X [ERROR] NG5002: Unexpected closing tag "ng-template". It may happen when the tag has already been closed by another tag. For more info see https://www.w3.org/TR/html5/syntax.html#closing-elements-that-have-implied-end-tags [plugin angular-compiler]
+
+    src/app/editor/editor.component.html:173:0:
+      173 │ </ng-template>
+          ╵ ~~~~~~~~~~~~~~
+
+  Error occurs in the template of component EditorComponent.
+
+    src/app/editor/editor.component.ts:243:15:
+      243 │   templateUrl: './editor.component.html',
+          ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+- Changes detected. Rebuilding...
+
+Browser bundles        
+Initial chunk files     | Names               |  Raw size
+polyfills.js            | polyfills           |  88.09 kB | 
+main.js                 | main                |  21.54 kB | 
+styles.css              | styles              |   4.81 kB | 
+chunk-NJ5HVBCL.js       | -                   |   3.17 kB | 
+chunk-4WXVOEFY.js       | -                   |   1.46 kB | 
+chunk-3OSS3HON.js       | -                   | 652 bytes | 
+
+                        | Initial total       | 119.70 kB
+
+Lazy chunk files        | Names               |  Raw size
+chunk-7YNX4K33.js       | editor-component    | 433.38 kB | 
+chunk-2XI76HZV.js       | guide-component     |  50.35 kB | 
+chunk-W5CCP3ZS.js       | landing-component   |  16.89 kB | 
+chunk-EWQNQPX5.js       | contact-component   |   9.10 kB | 
+chunk-CIVRPHXR.js       | pricing-component   |   8.03 kB | 
+chunk-GIECJVF4.js       | features-component  |   7.82 kB | 
+chunk-LTE4XX4C.js       | blog-post-component |   6.55 kB | 
+chunk-DOZPUEIV.js       | faq-component       |   5.99 kB | 
+chunk-XP5ZG5Q4.js       | blog-list-component |   5.46 kB | 
+chunk-5C2M5NFJ.js       | about-component     |   4.67 kB | 
+chunk-UVVVIIEP.js       | -                   |   3.47 kB | 
+chunk-C6JU3WVH.js       | not-found-component |   2.47 kB | 
+
+
+Server bundles         
+Initial chunk files     | Names               |  Raw size
+chunk-3KVU5QX2.mjs      | -                   |   1.08 MB | 
+chunk-MM2SGXET.mjs      | -                   | 663.58 kB | 
+polyfills.server.mjs    | polyfills.server    | 559.49 kB | 
+chunk-ESQLRAC5.mjs      | -                   | 194.65 kB | 
+main.server.mjs         | main.server         |  21.08 kB | 
+chunk-AKEZM5SL.mjs      | -                   |   3.11 kB | 
+chunk-VPSODEBW.mjs      | -                   |   2.51 kB | 
+chunk-C42IF335.mjs      | -                   | 687 bytes | 
+render-utils.server.mjs | render-utils.server | 462 bytes | 
+
+Lazy chunk files        | Names               |  Raw size
+chunk-OVYYG4TP.mjs      | editor-component    | 703.46 kB | 
+chunk-OSTPOPH7.mjs      | -                   | 193.75 kB | 
+chunk-TIREOEIN.mjs      | guide-component     |  48.30 kB | 
+chunk-P3UOPGAK.mjs      | xhr2                |  39.09 kB | 
+chunk-6S4MS7AO.mjs      | landing-component   |  16.63 kB | 
+chunk-JBYRA3XA.mjs      | contact-component   |   9.22 kB | 
+chunk-ITW4OT2Z.mjs      | pricing-component   |   7.98 kB | 
+chunk-5KGCPH36.mjs      | features-component  |   7.78 kB | 
+chunk-7TG2CDFJ.mjs      | blog-post-component |   6.65 kB | 
+chunk-YZMUJTXQ.mjs      | faq-component       |   6.01 kB | 
+chunk-EUON4EGE.mjs      | blog-list-component |   5.52 kB | 
+chunk-NT3RS6MI.mjs      | about-component     |   4.67 kB | 
+chunk-ROHT27OW.mjs      | -                   |   3.50 kB | 
+chunk-GJH5DQF4.mjs      | not-found-component |   2.54 kB | 
+
+Application bundle generation complete. [2.003 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.54 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-TZIG2D2K.js   | editor-component | 436.38 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  21.08 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-MAMJTEAY.mjs  | editor-component | 706.46 kB | 
+
+Application bundle generation complete. [2.689 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.54 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-4PJKHYLA.js   | editor-component | 436.46 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  21.08 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-SAE5FTLZ.mjs  | editor-component | 706.54 kB | 
+
+Application bundle generation complete. [1.978 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.54 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-MCLM5466.js   | editor-component | 436.01 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  21.08 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-NS7HSKKF.mjs  | editor-component | 706.09 kB | 
+
+Application bundle generation complete. [1.931 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names            |  Raw size
+main.js             | main             |  21.54 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-HT4B7VLG.js   | editor-component | 435.69 kB | 
+
+
+Server bundles     
+Initial chunk files | Names            |  Raw size
+main.server.mjs     | main.server      |  21.08 kB | 
+
+Lazy chunk files    | Names            |  Raw size
+chunk-SNABCSNX.mjs  | editor-component | 705.77 kB | 
+
+Application bundle generation complete. [1.809 seconds]
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Browser bundles    
+Initial chunk files | Names           | Raw size
+main.js             | main            | 21.54 kB | 
+
+Lazy chunk files    | Names           | Raw size
+chunk-5WBPQ2XP.js   | guide-component | 50.89 kB | 
+
+
+Server bundles     
+Initial chunk files | Names           | Raw size
+main.server.mjs     | main.server     | 21.08 kB | 
+
+Lazy chunk files    | Names           | Raw size
+chunk-S2THEUSP.mjs  | guide-component | 48.82 kB | 
+
+Application bundle generation complete. [0.564 seconds]
+
+Page reload sent to client(s).

@@ -4,7 +4,8 @@ export type PanelId =
   | 'color'
   | 'display'
   | 'canvas'
-  | 'timeline';
+  | 'timeline'
+  | 'tilemap';
 
 export const PANEL_IDS: PanelId[] = [
   'tools',
@@ -12,6 +13,7 @@ export const PANEL_IDS: PanelId[] = [
   'display',
   'canvas',
   'timeline',
+  'tilemap',
 ];
 
 /** Dockable edge zones. The center (canvas) is fixed and not a zone. */
@@ -45,9 +47,10 @@ export interface DockState {
 export const PANEL_TITLES: Record<PanelId, string> = {
   tools: 'Tools',
   color: 'Color & Palette',
-  display: 'Display',
+  display: 'Preview',
   canvas: 'Canvas',
   timeline: 'Timeline',
+  tilemap: 'Tilemap',
 };
 
 export function defaultDockState(): DockState {
@@ -59,9 +62,10 @@ export function defaultDockState(): DockState {
     },
     floating: [],
     collapsed: [],
-    hidden: [],
+    // Tilemap is an optional workflow — hidden until opened from View ▾.
+    hidden: ['tilemap'],
   };
 }
 
 // Bump this when the default layout changes so stale saved layouts are discarded.
-export const DOCK_STORAGE_KEY = 'pixelart.dock.v8';
+export const DOCK_STORAGE_KEY = 'pixelart.dock.v9';

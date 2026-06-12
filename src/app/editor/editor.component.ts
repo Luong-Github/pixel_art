@@ -48,14 +48,21 @@ type Tool =
   | 'pen'
   | 'eraser'
   | 'fill'
+  | 'gradient'
+  | 'shade'
   | 'picker'
   | 'line'
   | 'rect'
   | 'ellipse'
   | 'select'
-  | 'move';
+  | 'wand'
+  | 'lasso'
+  | 'move'
+  | 'transform';
 type Pixel = string | null;
 type ImportFit = 'contain' | 'cover' | 'stretch';
+/** Symmetry axes for drawing. 'mandala' = 8-fold radial (square canvas only). */
+type SymmetryMode = 'off' | 'x' | 'y' | 'both' | 'mandala';
 
 interface SourceRect {
   x: number;
@@ -141,6 +148,8 @@ interface Selection {
   w: number;
   h: number;
   pixels: Pixel[];
+  /** Optional per-cell mask (length w*h, row-major) for non-rectangular shapes. */
+  mask?: boolean[];
 }
 
 interface PointerState {
@@ -170,6 +179,22 @@ interface PaneResizeState {
   startBottomHeight: number;
 }
 
+/** Per-tab view/config — kept independent across workspaces. */
+interface WorkspaceView {
+  zoom: number;
+  displayZoom: number;
+  showGrid: boolean;
+  symmetry: SymmetryMode;
+  pixelPerfect: boolean;
+  brushSize: number;
+  pivotPreset: 'center' | 'feet' | 'topleft';
+  sheetColumns: number;
+  onionSkin: boolean;
+  onionTint: boolean;
+  onionPrevOpacity: number;
+  onionNextOpacity: number;
+}
+
 interface WorkspaceState {
   id: number;
   name: string;
@@ -183,6 +208,8 @@ interface WorkspaceState {
   palette: string[];
   primaryColor: string;
   secondaryColor: string;
+  /** Per-tab view config (zoom, grid, symmetry, …). */
+  view?: WorkspaceView;
 }
 
 interface PixelArtProjectFile {
@@ -198,6 +225,8 @@ interface PixelArtProjectFile {
     showGrid: boolean;
     onionSkin: boolean;
     mirrorX?: boolean;
+    symmetry?: SymmetryMode;
+    pixelPerfect?: boolean;
     brushSize: number;
     importResizeCanvas: boolean;
     importLongSide: number;
@@ -224,6 +253,10 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
   @ViewChild('display')
   displayRef?: ElementRef<HTMLCanvasElement>;
   private displayCanvasEl?: HTMLCanvasElement;
+  @ViewChild('tilemapCanvas')
+  tilemapRef?: ElementRef<HTMLCanvasElement>;
+  private tilemapCanvasEl?: HTMLCanvasElement;
+  private tilemapCtx?: CanvasRenderingContext2D;
   @ViewChild('canvasWrap', { static: true })
   canvasWrapRef!: ElementRef<HTMLDivElement>;
   @ViewChild('importInput', { static: true })
@@ -374,11 +407,16 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
       pen: `${s}<path d="M16.5 3.5l4 4L8 20l-4.5 1L4.5 16.5z"/><path d="M13.5 6.5l4 4"/></svg>`,
       eraser: `${s}<path d="M4 14.5l7-7 6.5 6.5-5 5H7z"/><path d="M3.5 21h11"/></svg>`,
       fill: `${s}<path d="M6.5 3.5l9 9-6.5 6.5a2.5 2.5 0 0 1-3.5 0l-3-3a2.5 2.5 0 0 1 0-3.5z"/><path d="M9 6l8 8"/><path d="M20 14.5s1.5 2 1.5 3.2A1.7 1.7 0 0 1 18.5 18c0-1.2 1.5-3.5 1.5-3.5z"/></svg>`,
+      gradient: `${s}<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 8h.01M11 8h.01M15 8h.01M7 12h.01M11 12h.01M9 16h.01"/></svg>`,
+      shade: `${s}<circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 0 0 18z" fill="currentColor" stroke="none"/></svg>`,
       picker: `${s}<path d="M3 21l1-4 9.5-9.5 3 3L7 20z"/><path d="M14.5 4.5l2-2a2.1 2.1 0 0 1 3 3l-2 2"/></svg>`,
       line: `${s}<line x1="5" y1="19" x2="19" y2="5"/><circle cx="5" cy="19" r="1.4" fill="currentColor"/><circle cx="19" cy="5" r="1.4" fill="currentColor"/></svg>`,
       rect: `${s}<rect x="4" y="5" width="16" height="14" rx="1"/></svg>`,
       ellipse: `${s}<circle cx="12" cy="12" r="8"/></svg>`,
       select: `${s.replace('stroke-width="2"', 'stroke-width="2" stroke-dasharray="3 3"')}<rect x="4" y="4" width="16" height="16" rx="1"/></svg>`,
+      wand: `${s}<path d="M4 20l9-9"/><path d="M14 4l1 2 2 1-2 1-1 2-1-2-2-1 2-1z"/><path d="M19 11l.6 1.4 1.4.6-1.4.6-.6 1.4-.6-1.4-1.4-.6 1.4-.6z"/></svg>`,
+      lasso: `${s.replace('stroke-width="2"', 'stroke-width="2" stroke-dasharray="3 3"')}<path d="M4 11a8 5 0 1 1 8 5c-3 0-3 3-1 3"/><path d="M11 19a1.3 1.3 0 1 1 0-.01"/></svg>`,
+      transform: `${s}<rect x="4" y="4" width="16" height="16" rx="1" stroke-dasharray="3 3"/><rect x="2" y="2" width="3.2" height="3.2" fill="currentColor" stroke="none"/><rect x="18.8" y="2" width="3.2" height="3.2" fill="currentColor" stroke="none"/><rect x="2" y="18.8" width="3.2" height="3.2" fill="currentColor" stroke="none"/><rect x="18.8" y="18.8" width="3.2" height="3.2" fill="currentColor" stroke="none"/></svg>`,
       move: `${s}<line x1="12" y1="3" x2="12" y2="21"/><line x1="3" y1="12" x2="21" y2="12"/><polyline points="9 6 12 3 15 6"/><polyline points="9 18 12 21 15 18"/><polyline points="6 9 3 12 6 15"/><polyline points="18 9 21 12 18 15"/></svg>`,
     };
     const map: Record<string, SafeHtml> = {};
@@ -392,13 +430,31 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
     { id: 'pen', label: 'Pen', key: 'P' },
     { id: 'eraser', label: 'Erase', key: 'E' },
     { id: 'fill', label: 'Fill', key: 'B' },
+    { id: 'gradient', label: 'Gradient', key: 'D' },
+    { id: 'shade', label: 'Shade', key: 'A' },
     { id: 'picker', label: 'Pick', key: 'I' },
     { id: 'line', label: 'Line', key: 'L' },
     { id: 'rect', label: 'Rect', key: 'R' },
     { id: 'ellipse', label: 'Oval', key: 'O' },
     { id: 'select', label: 'Select', key: 'S' },
+    { id: 'wand', label: 'Wand', key: 'W' },
+    { id: 'lasso', label: 'Lasso', key: 'Q' },
     { id: 'move', label: 'Move', key: 'M' },
+    { id: 'transform', label: 'Transform', key: 'T' },
   ];
+
+  /** Tools grouped for the Tools panel (separators + labels). */
+  readonly toolGroups: { label: string; ids: Tool[] }[] = [
+    { label: 'Draw', ids: ['pen', 'eraser', 'fill', 'gradient', 'shade', 'picker'] },
+    { label: 'Shape', ids: ['line', 'rect', 'ellipse'] },
+    { label: 'Select', ids: ['select', 'wand', 'lasso', 'move', 'transform'] },
+  ];
+  tool(id: Tool): { id: Tool; label: string; key: string } {
+    return this.tools.find((t) => t.id === id)!;
+  }
+
+  /** Active tab in the Color & Palette panel. */
+  colorTab: 'color' | 'palette' = 'color';
 
   width = 32;
   height = 32;
@@ -424,19 +480,66 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
   onionPrevOpacity = 0.4;
   onionNextOpacity = 0.25;
   onionTint = true;
-  mirrorX = false;
+  /** Drawing symmetry (replaces the old mirror-X toggle). */
+  symmetry: SymmetryMode = 'off';
+  /** Pixel-perfect freehand: drop redundant corner pixels (brush size 1). */
+  pixelPerfect = false;
   activeTool: Tool = 'pen';
   primaryColor = '#222831';
   secondaryColor = '#f6f1de';
+  /** Hue retained for the HSV picker when the colour is grayscale. */
+  pickerHue = 0;
+  private svDragging = false;
+  /** Recently used drawing colours (most-recent first). */
+  recentColors: string[] = [];
   brushSize = 1;
   /** Restrict drawing to the active palette's colours when on. */
   paletteLock = false;
   /** Dither brush: 'off' or fill ratio 25/50/75 (primary vs secondary). */
   ditherMode: 'off' | '25' | '50' | '75' = 'off';
+  /** Seamless 3×3 tiled preview (in the Preview panel). */
+  tiledPreview = false;
+  /** Reference image overlay (not part of layers/export). */
+  referenceImage: HTMLImageElement | null = null;
+  referenceOpacity = 0.5;
+  referenceVisible = true;
+  referenceAbove = false;
+  /** Gradient tool options. */
+  gradientShape: 'linear' | 'radial' = 'linear';
+  gradientDither = true;
+  private gradientBase: Pixel[] | null = null;
+  /** Shading ink: ramp + direction (-1 darker / +1 lighter) for the stroke. */
+  private shadeRamp: string[] = [];
+  private shadeDir = -1;
+  /** Custom brush stamp captured from a selection (pen stamps it). */
+  customBrush: { w: number; h: number; pixels: Pixel[] } | null = null;
+  /** Timelapse recording of the drawing process. */
+  recording = false;
+  timelapseFrames: HTMLCanvasElement[] = [];
   /** Pivot/anchor for sprite-sheet export (and on-canvas marker). */
   pivotPreset: 'center' | 'feet' | 'topleft' = 'feet';
   /** Sprite-sheet columns; 0 = auto (square-ish grid). */
   sheetColumns = 0;
+
+  // ----- Tilemap editor -----
+  tileSize = 16;
+  tileMapCols = 16;
+  tileMapRows = 12;
+  /** On-screen pixels per map cell. */
+  tilemapScale = 16;
+  /** Map cells: index into the tileset, -1 = empty. Length = cols*rows. */
+  tileMapCells: number[] = [];
+  /** Selected tileset index to paint with (-1 = eraser). */
+  selectedTile = 0;
+  /** Auto-tiling: pick the tile variant from cardinal neighbours (16-tile blob). */
+  tileMapAuto = false;
+  /** Which map cells belong to the auto-tile group (parallel to tileMapCells). */
+  private tileMapFilled: boolean[] = [];
+  /** Data-URL thumbnails of each tile (for the palette). */
+  tileThumbs: string[] = [];
+  private tileSrcCanvas?: HTMLCanvasElement;
+  private tilemapPainting = false;
+  private tilemapErase = false;
   readonly builtinPalettes = BUILTIN_PALETTES;
   savedPalettes: NamedPalette[] = [];
   palette = [
@@ -470,6 +573,44 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
   private clipboard: Selection | null = null;
   private previewPixels: Pixel[] | null = null;
   private moveStartSelection: Selection | null = null;
+  /** In-progress lasso polygon points (canvas pixel coords). */
+  private lassoPoints: { x: number; y: number }[] = [];
+  private lassoMode: 'replace' | 'add' | 'subtract' = 'replace';
+  /** Pixel-perfect stroke path + pre-stroke values (for corner removal). */
+  private ppPath: { x: number; y: number }[] = [];
+  private ppOriginal = new Map<number, Pixel>();
+  /** Free-transform session for the current selection (scale / rotate / move). */
+  private tf: {
+    src: Pixel[];
+    sw: number;
+    sh: number;
+    under: Pixel[];
+    cx: number;
+    cy: number;
+    w: number;
+    h: number;
+    angle: number;
+  } | null = null;
+  private tfDrag: {
+    mode: 'move' | 'scale' | 'rotate';
+    handle: string;
+    pointerId: number;
+    startCx: number;
+    startCy: number;
+    startW: number;
+    startH: number;
+    startAngle: number;
+    anchorX: number;
+    anchorY: number;
+    grabX: number;
+    grabY: number;
+  } | null = null;
+  get isTransforming(): boolean {
+    return !!this.tf;
+  }
+  get hasSelection(): boolean {
+    return !!this.selection;
+  }
   private panState: PanState | null = null;
   private paneResizeState: PaneResizeState | null = null;
   isSpacePanning = false;
@@ -606,7 +747,8 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
   }
 
   get workspaceGridRows(): string {
-    return `auto auto minmax(0, 1fr) auto`;
+    // tabs · topbar · selection-bar · canvas · statusbar
+    return `auto auto auto minmax(0, 1fr) auto`;
   }
 
   get timelineVisible(): boolean {
@@ -691,6 +833,17 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
         this.renderDisplay();
       }
     }
+    // The Tilemap panel canvas mounts/unmounts the same way.
+    const tel = this.tilemapRef?.nativeElement;
+    if (tel && tel !== this.tilemapCanvasEl) {
+      const tctx = tel.getContext('2d');
+      if (tctx) {
+        this.tilemapCtx = tctx;
+        this.tilemapCanvasEl = tel;
+        this.refreshTiles();
+        this.renderTilemap();
+      }
+    }
   }
 
   private buildPanelTemplates(): void {
@@ -768,7 +921,11 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
     const f = this.dock.floatOf(id);
     if (!f) return;
     this.dock.bringToFront(id);
-    (event.target as HTMLElement).setPointerCapture?.(event.pointerId);
+    // Capture on the element that received the pointerdown and listen for the
+    // rest of the gesture ON THAT SAME element (pointer events are retargeted to
+    // it while captured). Mixing capture with window listeners is what left the
+    // drag stuck — the pointerup never reached the handler.
+    (event.currentTarget as HTMLElement).setPointerCapture?.(event.pointerId);
     this.floatDrag = {
       id,
       pointerId: event.pointerId,
@@ -780,8 +937,7 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
     if (mode === 'move') this.dragActive = true;
   }
 
-  @HostListener('window:pointermove', ['$event'])
-  onFloatPointerMove(event: PointerEvent): void {
+  onFloatMove(event: PointerEvent): void {
     if (!this.floatDrag || this.floatDrag.pointerId !== event.pointerId) return;
     const dx = event.clientX - this.floatDrag.startX;
     const dy = event.clientY - this.floatDrag.startY;
@@ -797,12 +953,19 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
     }
   }
 
-  @HostListener('window:pointerup', ['$event'])
-  onFloatPointerUp(event: PointerEvent): void {
+  /** End the float drag (pointerup / pointercancel / lostpointercapture). */
+  onFloatEnd(event: PointerEvent): void {
     if (!this.floatDrag || this.floatDrag.pointerId !== event.pointerId) return;
     const drag = this.floatDrag;
     this.floatDrag = null;
     this.dragActive = false;
+    try {
+      (event.currentTarget as HTMLElement).releasePointerCapture?.(
+        event.pointerId,
+      );
+    } catch {
+      /* capture may already be released */
+    }
     if (drag.mode === 'move') {
       const zone = this.zoneAtPoint(event.clientX, event.clientY);
       this.dropTargetZone = null;
@@ -979,6 +1142,7 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
       ],
       primaryColor: '#9a8fc0',
       secondaryColor: '#fff2c0',
+      view: { ...this.defaultView(), zoom: 8, displayZoom: 6 },
     };
   }
 
@@ -1999,10 +2163,24 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
     return best;
   }
 
+  setSymmetry(mode: SymmetryMode): void {
+    this.symmetry = mode;
+    this.render();
+  }
+
   setTool(tool: Tool): void {
+    // Leaving the transform tool bakes any in-progress transform.
+    if (this.activeTool === 'transform' && tool !== 'transform' && this.tf) {
+      this.commitTransform();
+    }
     this.activeTool = tool;
     if (tool !== 'move') {
       this.previewPixels = null;
+    }
+    this.lassoPoints = [];
+    // Entering transform with a selection lifts it immediately so handles show.
+    if (tool === 'transform' && this.selection && !this.tf) {
+      this.beginTransform();
     }
     this.render();
   }
@@ -2196,6 +2374,13 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
       this.beginPan(event);
       return;
     }
+    // Free-transform handles can sit outside the pixel grid, so handle it before
+    // the in-bounds point check below.
+    if (this.activeTool === 'transform') {
+      if (!this.tf && this.selection) this.beginTransform();
+      if (this.tf) this.transformPointerDown(event);
+      return;
+    }
     const point =
       this.activeTool === 'move' && this.selection && this.previewPixels
         ? this.eventToCanvasPixel(event)
@@ -2213,6 +2398,21 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
       return;
     }
 
+    // Selection tools are non-destructive — allowed even on a locked layer.
+    if (this.activeTool === 'wand') {
+      this.selectByWand(point.x, point.y, event.shiftKey, event.altKey);
+      this.render();
+      return;
+    }
+    if (this.activeTool === 'lasso') {
+      this.stageRef.nativeElement.setPointerCapture(event.pointerId);
+      this.pointer = { ...point, startX: point.x, startY: point.y };
+      this.lassoMode = event.shiftKey ? 'add' : event.altKey ? 'subtract' : 'replace';
+      this.lassoPoints = [point];
+      this.render();
+      return;
+    }
+
     // Locked layer: block all editing, including drag-painting. Don't capture
     // the pointer or set pointer state, so pointermove/up do nothing either.
     if (this.activeLayerLocked) {
@@ -2223,10 +2423,28 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
     this.pointer = { ...point, startX: point.x, startY: point.y };
 
     this.pushUndo();
+    if (
+      this.activeTool === 'pen' ||
+      this.activeTool === 'fill' ||
+      this.activeTool === 'gradient' ||
+      this.activeTool === 'line' ||
+      this.activeTool === 'rect' ||
+      this.activeTool === 'ellipse'
+    ) {
+      this.pushRecent(this.primaryColor);
+    }
     if (this.activeTool === 'pen' || this.activeTool === 'eraser') {
-      this.paint(point.x, point.y);
+      this.resetPixelPerfect();
+      this.strokeTo(point.x, point.y);
     } else if (this.activeTool === 'fill') {
       this.fillMirrored(point.x, point.y, this.effectivePrimary);
+    } else if (this.activeTool === 'gradient') {
+      this.gradientBase = [...this.activeLayer.pixels];
+      this.previewPixels = [...this.gradientBase];
+    } else if (this.activeTool === 'shade') {
+      this.shadeDir = event.button === 2 || event.altKey ? 1 : -1;
+      this.shadeRamp = this.buildShadeRamp();
+      this.shadeAt(point.x, point.y);
     } else if (this.activeTool === 'select') {
       this.selection = { x: point.x, y: point.y, w: 1, h: 1, pixels: [] };
     } else if (this.activeTool === 'move' && this.selection) {
@@ -2371,6 +2589,10 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
   }
 
   onPointerMove(event: PointerEvent): void {
+    if (this.activeTool === 'transform') {
+      this.transformPointerMove(event);
+      return;
+    }
     if (!this.pointer) {
       return;
     }
@@ -2381,10 +2603,25 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
 
     if (this.activeTool === 'pen' || this.activeTool === 'eraser') {
       this.drawLine(this.pointer.x, this.pointer.y, point.x, point.y, (x, y) =>
-        this.paint(x, y),
+        this.strokeTo(x, y),
       );
       this.pointer.x = point.x;
       this.pointer.y = point.y;
+    } else if (this.activeTool === 'shade') {
+      this.drawLine(this.pointer.x, this.pointer.y, point.x, point.y, (x, y) =>
+        this.shadeAt(x, y),
+      );
+      this.pointer.x = point.x;
+      this.pointer.y = point.y;
+    } else if (this.activeTool === 'gradient' && this.gradientBase) {
+      this.previewPixels = [...this.gradientBase];
+      this.applyGradient(
+        this.previewPixels,
+        this.pointer.startX,
+        this.pointer.startY,
+        point.x,
+        point.y,
+      );
     } else if (this.activeTool === 'select') {
       this.selection = this.rectFromPoints(
         this.pointer.startX,
@@ -2400,6 +2637,11 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
       const dx = point.x - this.pointer.startX;
       const dy = point.y - this.pointer.startY;
       this.moveSelectionPreview(dx, dy);
+    } else if (this.activeTool === 'lasso') {
+      const last = this.lassoPoints[this.lassoPoints.length - 1];
+      if (!last || last.x !== point.x || last.y !== point.y) {
+        this.lassoPoints.push(point);
+      }
     } else if (['line', 'rect', 'ellipse'].includes(this.activeTool)) {
       this.previewPixels = [...this.activeLayer.pixels];
       this.drawShape(
@@ -2415,6 +2657,10 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
   }
 
   onPointerUp(event: PointerEvent): void {
+    if (this.activeTool === 'transform') {
+      this.transformPointerUp(event);
+      return;
+    }
     if (!this.pointer) {
       return;
     }
@@ -2437,9 +2683,21 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
         this.activeTool,
       );
       this.previewPixels = null;
+    } else if (this.activeTool === 'gradient' && this.gradientBase) {
+      this.applyGradient(
+        this.activeLayer.pixels,
+        this.pointer.startX,
+        this.pointer.startY,
+        point.x,
+        point.y,
+      );
+      this.previewPixels = null;
+      this.gradientBase = null;
     } else if (this.activeTool === 'select' && this.selection) {
       this.selection = this.normalizeSelection(this.selection);
       this.selection.pixels = this.copyPixels(this.selection);
+    } else if (this.activeTool === 'lasso') {
+      this.finishLasso();
     } else if (
       this.activeTool === 'move' &&
       this.selection &&
@@ -2880,23 +3138,42 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
       const canvas = this.renderFrameCanvas(frameIndex, scale);
       const ctx = canvas.getContext('2d');
       if (!ctx) continue;
-      const { data, width, height } = ctx.getImageData(0, 0, canvas.width, canvas.height);
-      const palette = quantize(data, 256, { format: 'rgba4444' });
-      const index = applyPalette(data, palette, 'rgba4444');
       const delay = Math.max(20, Math.round(this.frames[frameIndex]?.duration ?? 100));
-      gif.writeFrame(index, width, height, {
-        palette,
-        delay,
-        transparent: true,
-        transparentIndex: 0,
-        dispose: 2,
-      });
+      this.writeGifFrame(gif, ctx, canvas.width, canvas.height, delay);
     }
     gif.finish();
     this.downloadBlob(
       new Blob([gif.bytes()], { type: 'image/gif' }),
       `${this.exportBaseName()}.gif`,
     );
+  }
+
+  /**
+   * Quantize a canvas region and write it as a GIF frame, mapping only truly
+   * transparent pixels (alpha 0) to the transparent index — so opaque black
+   * is never turned transparent.
+   */
+  private writeGifFrame(
+    gif: ReturnType<typeof GIFEncoder>,
+    ctx: CanvasRenderingContext2D,
+    width: number,
+    height: number,
+    delay: number,
+  ): void {
+    const { data } = ctx.getImageData(0, 0, width, height);
+    const palette = quantize(data, 256, { format: 'rgba4444' });
+    const index = applyPalette(data, palette, 'rgba4444');
+    // gifenc returns RGBA palette entries for rgba4444; find the transparent one.
+    const ti = (palette as number[][]).findIndex(
+      (c) => c.length >= 4 && c[3] === 0,
+    );
+    gif.writeFrame(index, width, height, {
+      palette,
+      delay,
+      transparent: ti >= 0,
+      transparentIndex: ti >= 0 ? ti : 0,
+      dispose: 2,
+    });
   }
 
   private exportBaseName(): string {
@@ -2924,7 +3201,8 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
         displayZoom: this.displayZoom,
         showGrid: this.showGrid,
         onionSkin: this.onionSkin,
-        mirrorX: this.mirrorX,
+        symmetry: this.symmetry,
+        pixelPerfect: this.pixelPerfect,
         brushSize: this.brushSize,
         importResizeCanvas: this.importResizeCanvas,
         importLongSide: this.importLongSide,
@@ -3758,6 +4036,7 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
     this.layerMenu = null;
     this.tagMenu = null;
     this.groupMenu = null;
+    if (this.tf) this.cancelTransform();
     if (this.dialog) this.dialogCancel();
   }
 
@@ -3856,6 +4135,452 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
       normalized,
       ...this.palette.filter((item) => item.toLowerCase() !== normalized),
     ].slice(0, 64);
+  }
+
+  // ===================== HSV color picker =====================
+
+  private rgbToHsv(r: number, g: number, b: number): [number, number, number] {
+    r /= 255;
+    g /= 255;
+    b /= 255;
+    const max = Math.max(r, g, b);
+    const min = Math.min(r, g, b);
+    const d = max - min;
+    let h = 0;
+    if (d !== 0) {
+      if (max === r) h = ((g - b) / d) % 6;
+      else if (max === g) h = (b - r) / d + 2;
+      else h = (r - g) / d + 4;
+      h *= 60;
+      if (h < 0) h += 360;
+    }
+    return [h, max === 0 ? 0 : d / max, max];
+  }
+
+  private hsvToRgb(h: number, s: number, v: number): [number, number, number] {
+    const c = v * s;
+    const x = c * (1 - Math.abs(((h / 60) % 2) - 1));
+    const m = v - c;
+    let r = 0;
+    let g = 0;
+    let b = 0;
+    if (h < 60) [r, g] = [c, x];
+    else if (h < 120) [r, g] = [x, c];
+    else if (h < 180) [g, b] = [c, x];
+    else if (h < 240) [g, b] = [x, c];
+    else if (h < 300) [r, b] = [x, c];
+    else [r, b] = [c, x];
+    return [(r + m) * 255, (g + m) * 255, (b + m) * 255];
+  }
+
+  /** Current primary as HSV, keeping the picker hue when grayscale. */
+  private primaryHsv(): [number, number, number] {
+    const [r, g, b] = this.hexToRgb(this.primaryColor);
+    const [h, s, v] = this.rgbToHsv(r, g, b);
+    return [s > 0.004 ? h : this.pickerHue, s, v];
+  }
+
+  get pickerHueDeg(): number {
+    return Math.round(this.primaryHsv()[0]);
+  }
+  get pickerSatPct(): number {
+    return this.primaryHsv()[1] * 100;
+  }
+  get pickerValPct(): number {
+    return this.primaryHsv()[2] * 100;
+  }
+  /** Background for the saturation/value square at the current hue. */
+  get svBackground(): string {
+    const [r, g, b] = this.hsvToRgb(this.pickerHueDeg, 1, 1);
+    return (
+      `linear-gradient(to top, #000, rgba(0,0,0,0)),` +
+      `linear-gradient(to right, #fff, rgba(255,255,255,0)),` +
+      `${this.rgbToHex(r, g, b)}`
+    );
+  }
+
+  colorChannel(i: number): number {
+    return this.hexToRgb(this.primaryColor)[i];
+  }
+  setColorChannel(i: number, event: Event): void {
+    const rgb = this.hexToRgb(this.primaryColor);
+    rgb[i] = this.clamp(
+      parseInt((event.target as HTMLInputElement).value, 10) || 0,
+      0,
+      255,
+    );
+    this.primaryColor = this.rgbToHex(rgb[0], rgb[1], rgb[2]);
+  }
+
+  onHexInput(event: Event): void {
+    const v = (event.target as HTMLInputElement).value.trim();
+    if (/^#?[0-9a-f]{6}$/i.test(v)) {
+      this.primaryColor = (v[0] === '#' ? v : '#' + v).toLowerCase();
+    }
+  }
+
+  setHue(deg: number): void {
+    this.pickerHue = deg;
+    const [, s, v] = this.primaryHsv();
+    const [r, g, b] = this.hsvToRgb(deg, s, v);
+    this.primaryColor = this.rgbToHex(r, g, b);
+  }
+
+  onSvDown(event: PointerEvent): void {
+    this.svDragging = true;
+    (event.target as HTMLElement).setPointerCapture?.(event.pointerId);
+    this.svUpdate(event);
+  }
+  onSvMove(event: PointerEvent): void {
+    if (this.svDragging) this.svUpdate(event);
+  }
+  onSvUp(event: PointerEvent): void {
+    this.svDragging = false;
+    try {
+      (event.target as HTMLElement).releasePointerCapture?.(event.pointerId);
+    } catch {
+      /* already released */
+    }
+  }
+  private svUpdate(event: PointerEvent): void {
+    const el = event.currentTarget as HTMLElement;
+    const r = el.getBoundingClientRect();
+    const s = this.clamp((event.clientX - r.left) / r.width, 0, 1);
+    const v = this.clamp(1 - (event.clientY - r.top) / r.height, 0, 1);
+    const [rr, gg, bb] = this.hsvToRgb(this.pickerHueDeg, s, v);
+    this.primaryColor = this.rgbToHex(rr, gg, bb);
+  }
+
+  // ===================== Palette helpers & tools =====================
+
+  /** Pick primary/secondary from a swatch and remember the choice. */
+  selectPrimary(color: string): void {
+    this.primaryColor = color;
+    this.pushRecent(color);
+  }
+
+  private pushRecent(color: string): void {
+    const c = color.toLowerCase();
+    this.recentColors = [c, ...this.recentColors.filter((x) => x !== c)].slice(
+      0,
+      14,
+    );
+  }
+
+  private dedupeColors(colors: string[]): string[] {
+    const seen = new Set<string>();
+    const out: string[] = [];
+    for (const c of colors) {
+      const k = c.toLowerCase();
+      if (!seen.has(k)) {
+        seen.add(k);
+        out.push(k);
+      }
+    }
+    return out;
+  }
+
+  sortPalette(by: 'hue' | 'lum'): void {
+    this.palette = [...this.palette].sort(
+      (a, b) => this.colorSortKey(a, by) - this.colorSortKey(b, by),
+    );
+  }
+  private colorSortKey(hex: string, by: 'hue' | 'lum'): number {
+    const [r, g, b] = this.hexToRgb(hex);
+    if (by === 'lum') return 0.299 * r + 0.587 * g + 0.114 * b;
+    const [h, s, v] = this.rgbToHsv(r, g, b);
+    // Group greys (no hue) at the end so the ramp reads cleanly.
+    return s < 0.05 ? 360 + v : h;
+  }
+
+  /** Append a primary→secondary gradient ramp to the palette. */
+  addGradientToPalette(steps = 6): void {
+    const [r1, g1, b1] = this.hexToRgb(this.primaryColor);
+    const [r2, g2, b2] = this.hexToRgb(this.secondaryColor);
+    const ramp: string[] = [];
+    for (let i = 0; i < steps; i += 1) {
+      const t = steps === 1 ? 0 : i / (steps - 1);
+      ramp.push(
+        this.rgbToHex(
+          r1 + (r2 - r1) * t,
+          g1 + (g2 - g1) * t,
+          b1 + (b2 - b1) * t,
+        ),
+      );
+    }
+    this.palette = this.dedupeColors([...this.palette, ...ramp]).slice(0, 64);
+  }
+
+  /** Append harmony colours (complementary + analogous + triad) of the primary. */
+  addHarmonyToPalette(): void {
+    const [r, g, b] = this.hexToRgb(this.primaryColor);
+    const [h, s, v] = this.rgbToHsv(r, g, b);
+    const ss = Math.max(0.25, s);
+    const vv = Math.max(0.25, v);
+    const hues = [180, 30, 330, 120, 240].map((d) => (h + d) % 360);
+    const cols = hues.map((hh) => {
+      const [cr, cg, cb] = this.hsvToRgb(hh, ss, vv);
+      return this.rgbToHex(cr, cg, cb);
+    });
+    this.palette = this.dedupeColors([this.primaryColor, ...this.palette, ...cols]).slice(0, 64);
+  }
+
+  /** Build the palette from the distinct colours used in the active frame. */
+  extractPaletteFromSprite(): void {
+    const seen = new Set<string>();
+    for (const layer of this.activeFrame.layers) {
+      if (!layer.visible) continue;
+      for (const px of layer.pixels) {
+        if (px) seen.add(px.toLowerCase());
+        if (seen.size >= 64) break;
+      }
+    }
+    if (seen.size) this.palette = [...seen].slice(0, 64);
+  }
+
+  // ===================== Tilemap editor =====================
+
+  get tileColumns(): number {
+    return Math.max(1, Math.floor(this.width / this.tileSize));
+  }
+  get tileRowsCount(): number {
+    return Math.max(1, Math.floor(this.height / this.tileSize));
+  }
+  get tileCount(): number {
+    return this.tileColumns * this.tileRowsCount;
+  }
+
+  /** Slice the active frame into tiles and rebuild the tileset thumbnails. */
+  refreshTiles(): void {
+    if (!this.isBrowser) return;
+    this.tileSrcCanvas = this.renderFrameCanvas(this.activeFrameIndex, 1);
+    const ts = this.tileSize;
+    const cols = this.tileColumns;
+    const rows = this.tileRowsCount;
+    const thumbs: string[] = [];
+    for (let r = 0; r < rows; r += 1) {
+      for (let c = 0; c < cols; c += 1) {
+        const t = document.createElement('canvas');
+        t.width = ts;
+        t.height = ts;
+        const tc = t.getContext('2d');
+        if (!tc) continue;
+        tc.imageSmoothingEnabled = false;
+        tc.drawImage(this.tileSrcCanvas, c * ts, r * ts, ts, ts, 0, 0, ts, ts);
+        thumbs.push(t.toDataURL());
+      }
+    }
+    this.tileThumbs = thumbs;
+    if (this.selectedTile >= thumbs.length) this.selectedTile = 0;
+  }
+
+  private ensureTilemapCells(): void {
+    const want = this.tileMapCols * this.tileMapRows;
+    if (this.tileMapCells.length !== want) {
+      this.tileMapCells = new Array<number>(want).fill(-1);
+    }
+    if (this.tileMapFilled.length !== want) {
+      this.tileMapFilled = new Array<boolean>(want).fill(false);
+    }
+  }
+
+  selectTile(i: number): void {
+    this.selectedTile = i;
+  }
+
+  /** Apply tile-size / map-size changes, then re-slice and re-render. */
+  onTilemapConfigChange(): void {
+    this.tileSize = this.clamp(Math.floor(this.tileSize) || 16, 2, 64);
+    this.tileMapCols = this.clamp(Math.floor(this.tileMapCols) || 1, 1, 128);
+    this.tileMapRows = this.clamp(Math.floor(this.tileMapRows) || 1, 1, 128);
+    this.tilemapScale = this.clamp(Math.floor(this.tilemapScale) || 16, 4, 48);
+    this.refreshTiles();
+    const n = this.tileMapCols * this.tileMapRows;
+    this.tileMapCells = new Array<number>(n).fill(-1);
+    this.tileMapFilled = new Array<boolean>(n).fill(false);
+    this.renderTilemap();
+  }
+
+  clearTilemap(): void {
+    const n = this.tileMapCols * this.tileMapRows;
+    this.tileMapCells = new Array<number>(n).fill(-1);
+    this.tileMapFilled = new Array<boolean>(n).fill(false);
+    this.renderTilemap();
+  }
+
+  renderTilemap(): void {
+    const cv = this.tilemapRef?.nativeElement;
+    const ctx = this.tilemapCtx;
+    if (!cv || !ctx) return;
+    if (!this.tileSrcCanvas) this.refreshTiles();
+    this.ensureTilemapCells();
+    const s = this.tilemapScale;
+    const cols = this.tileMapCols;
+    const rows = this.tileMapRows;
+    const ts = this.tileSize;
+    const tcols = this.tileColumns;
+    cv.width = cols * s;
+    cv.height = rows * s;
+    ctx.imageSmoothingEnabled = false;
+    for (let y = 0; y < rows; y += 1) {
+      for (let x = 0; x < cols; x += 1) {
+        ctx.fillStyle = (x + y) % 2 === 0 ? '#222a35' : '#1b212b';
+        ctx.fillRect(x * s, y * s, s, s);
+      }
+    }
+    for (let i = 0; i < this.tileMapCells.length; i += 1) {
+      const idx = this.tileMapCells[i];
+      if (idx < 0 || idx >= this.tileCount || !this.tileSrcCanvas) continue;
+      const cx = (i % cols) * s;
+      const cy = Math.floor(i / cols) * s;
+      const tx = (idx % tcols) * ts;
+      const ty = Math.floor(idx / tcols) * ts;
+      ctx.drawImage(this.tileSrcCanvas, tx, ty, ts, ts, cx, cy, s, s);
+    }
+    ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+    ctx.lineWidth = 1;
+    for (let x = 0; x <= cols; x += 1) {
+      ctx.beginPath();
+      ctx.moveTo(x * s + 0.5, 0);
+      ctx.lineTo(x * s + 0.5, rows * s);
+      ctx.stroke();
+    }
+    for (let y = 0; y <= rows; y += 1) {
+      ctx.beginPath();
+      ctx.moveTo(0, y * s + 0.5);
+      ctx.lineTo(cols * s, y * s + 0.5);
+      ctx.stroke();
+    }
+  }
+
+  onTilemapDown(event: PointerEvent): void {
+    event.preventDefault();
+    this.tilemapPainting = true;
+    this.tilemapErase = event.button === 2 || event.altKey;
+    (event.target as HTMLElement).setPointerCapture?.(event.pointerId);
+    this.paintTilemap(event);
+  }
+  onTilemapMove(event: PointerEvent): void {
+    if (this.tilemapPainting) this.paintTilemap(event);
+  }
+  onTilemapUp(event: PointerEvent): void {
+    this.tilemapPainting = false;
+    try {
+      (event.target as HTMLElement).releasePointerCapture?.(event.pointerId);
+    } catch {
+      /* already released */
+    }
+  }
+  private paintTilemap(event: PointerEvent): void {
+    const cv = this.tilemapRef?.nativeElement;
+    if (!cv) return;
+    const r = cv.getBoundingClientRect();
+    const s = this.tilemapScale;
+    const x = Math.floor((event.clientX - r.left) / s);
+    const y = Math.floor((event.clientY - r.top) / s);
+    if (x < 0 || y < 0 || x >= this.tileMapCols || y >= this.tileMapRows) return;
+    const i = y * this.tileMapCols + x;
+
+    if (this.tileMapAuto && this.autoTileReady) {
+      const fill = !this.tilemapErase;
+      if (this.tileMapFilled[i] === fill && (fill || this.tileMapCells[i] < 0)) {
+        return; // no change
+      }
+      this.tileMapFilled[i] = fill;
+      if (!fill) this.tileMapCells[i] = -1;
+      // Recompute this cell and its 4 cardinal neighbours.
+      this.recomputeAutoTile(x, y);
+      this.recomputeAutoTile(x, y - 1);
+      this.recomputeAutoTile(x + 1, y);
+      this.recomputeAutoTile(x, y + 1);
+      this.recomputeAutoTile(x - 1, y);
+      this.renderTilemap();
+      return;
+    }
+
+    const val = this.tilemapErase ? -1 : this.selectedTile;
+    if (this.tileMapCells[i] !== val) {
+      this.tileMapCells[i] = val;
+      this.tileMapFilled[i] = false; // manual cell, not part of the auto group
+      this.renderTilemap();
+    }
+  }
+
+  /** Auto-tiling needs a 16-tile block starting at the selected tile. */
+  get autoTileReady(): boolean {
+    return this.selectedTile >= 0 && this.selectedTile + 16 <= this.tileCount;
+  }
+
+  private autoFilledAt(x: number, y: number): boolean {
+    if (x < 0 || y < 0 || x >= this.tileMapCols || y >= this.tileMapRows) {
+      return false; // out of bounds reads as an edge (border tiles appear)
+    }
+    return this.tileMapFilled[y * this.tileMapCols + x];
+  }
+
+  /** Pick the variant for an auto cell from its cardinal neighbours. */
+  private recomputeAutoTile(x: number, y: number): void {
+    if (x < 0 || y < 0 || x >= this.tileMapCols || y >= this.tileMapRows) return;
+    const i = y * this.tileMapCols + x;
+    if (!this.tileMapFilled[i]) return; // only auto cells get a computed variant
+    const mask =
+      (this.autoFilledAt(x, y - 1) ? 1 : 0) | // N
+      (this.autoFilledAt(x + 1, y) ? 2 : 0) | // E
+      (this.autoFilledAt(x, y + 1) ? 4 : 0) | // S
+      (this.autoFilledAt(x - 1, y) ? 8 : 0); // W
+    this.tileMapCells[i] = this.selectedTile + mask;
+  }
+
+  /** Export the painted map as PNG + the tileset PNG + a JSON map (Pro). */
+  async exportTilemap(): Promise<void> {
+    if (!(await this.requirePro('Tilemap export'))) return;
+    this.refreshTiles();
+    const ts = this.tileSize;
+    const cols = this.tileMapCols;
+    const rows = this.tileMapRows;
+    const tcols = this.tileColumns;
+    const map = document.createElement('canvas');
+    map.width = cols * ts;
+    map.height = rows * ts;
+    const ctx = map.getContext('2d');
+    if (!ctx) return;
+    ctx.imageSmoothingEnabled = false;
+    for (let i = 0; i < this.tileMapCells.length; i += 1) {
+      const idx = this.tileMapCells[i];
+      if (idx < 0 || idx >= this.tileCount || !this.tileSrcCanvas) continue;
+      const cx = (i % cols) * ts;
+      const cy = Math.floor(i / cols) * ts;
+      const tx = (idx % tcols) * ts;
+      const ty = Math.floor(idx / tcols) * ts;
+      ctx.drawImage(this.tileSrcCanvas, tx, ty, ts, ts, cx, cy, ts, ts);
+    }
+    const base = this.exportBaseName();
+    this.stampWatermark(ctx, map.width, map.height);
+    this.downloadCanvas(map, `${base}-tilemap.png`);
+    if (this.tileSrcCanvas) {
+      this.downloadCanvas(this.tileSrcCanvas, `${base}-tileset.png`);
+    }
+    const json = {
+      app: 'Pixel Art Studio',
+      type: 'tilemap',
+      tileWidth: ts,
+      tileHeight: ts,
+      columns: cols,
+      rows,
+      tileset: {
+        image: `${base}-tileset.png`,
+        tileWidth: ts,
+        tileHeight: ts,
+        columns: tcols,
+        rows: this.tileRowsCount,
+        count: this.tileCount,
+      },
+      data: this.tileMapCells,
+    };
+    this.downloadBlob(
+      new Blob([JSON.stringify(json, null, 2)], { type: 'application/json' }),
+      `${base}-tilemap.json`,
+    );
   }
 
   // ===================== Palette management =====================
@@ -3982,6 +4707,98 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
     return this.lockColor(this.primaryColor);
   }
 
+  /** Fill the selection (or whole layer) with a primary→secondary gradient. */
+  private applyGradient(
+    buf: Pixel[],
+    ax: number,
+    ay: number,
+    bx: number,
+    by: number,
+  ): void {
+    const dx = bx - ax;
+    const dy = by - ay;
+    const lenSq = dx * dx + dy * dy;
+    const len = Math.sqrt(lenSq);
+    const p = this.hexToRgb(this.lockColor(this.primaryColor));
+    const q = this.hexToRgb(this.lockColor(this.secondaryColor));
+    const colorAt = (x: number, y: number): string => {
+      let t: number;
+      if (this.gradientShape === 'radial') {
+        t = len < 0.001 ? 0 : Math.hypot(x - ax, y - ay) / len;
+      } else {
+        t = lenSq < 0.001 ? 0 : ((x - ax) * dx + (y - ay) * dy) / lenSq;
+      }
+      t = this.clamp(t, 0, 1);
+      if (this.gradientDither) {
+        const threshold =
+          EditorComponent.BAYER4[((y % 4) + 4) % 4][((x % 4) + 4) % 4] / 16;
+        return t > threshold
+          ? this.lockColor(this.secondaryColor)
+          : this.lockColor(this.primaryColor);
+      }
+      return this.lockColor(
+        this.rgbToHex(
+          p[0] + (q[0] - p[0]) * t,
+          p[1] + (q[1] - p[1]) * t,
+          p[2] + (q[2] - p[2]) * t,
+        ),
+      );
+    };
+    if (this.selection) {
+      this.eachSelectionPixel(this.selection, (x, y) =>
+        this.setPixel(buf, x, y, colorAt(x, y)),
+      );
+    } else {
+      for (let y = 0; y < this.height; y += 1) {
+        for (let x = 0; x < this.width; x += 1) {
+          this.setPixel(buf, x, y, colorAt(x, y));
+        }
+      }
+    }
+  }
+
+  /** Palette sorted light→dark for the shading ink. */
+  private buildShadeRamp(): string[] {
+    return this.dedupeColors([...this.palette]).sort(
+      (a, b) => this.colorSortKey(b, 'lum') - this.colorSortKey(a, 'lum'),
+    );
+  }
+
+  /** Shade: shift each painted pixel one step along the palette ramp. */
+  private shadeAt(x: number, y: number): void {
+    const ramp = this.shadeRamp;
+    if (ramp.length < 2) return;
+    const radius = Math.max(1, this.brushSize);
+    for (let oy = 0; oy < radius; oy += 1) {
+      for (let ox = 0; ox < radius; ox += 1) {
+        const px = x + ox;
+        const py = y + oy;
+        if (!this.inside(px, py)) continue;
+        const cur = this.activeLayer.pixels[this.index(px, py)];
+        if (!cur) continue;
+        // Find the nearest ramp colour, then step toward darker (-1) / lighter (+1).
+        let nearest = 0;
+        let best = Infinity;
+        const [cr, cg, cb] = this.hexToRgb(cur);
+        for (let i = 0; i < ramp.length; i += 1) {
+          const [rr, rg, rb] = this.hexToRgb(ramp[i]);
+          const d = (cr - rr) ** 2 + (cg - rg) ** 2 + (cb - rb) ** 2;
+          if (d < best) {
+            best = d;
+            nearest = i;
+          }
+        }
+        // ramp is light→dark, so darker = larger index.
+        const next = this.clamp(
+          nearest + (this.shadeDir < 0 ? 1 : -1),
+          0,
+          ramp.length - 1,
+        );
+        this.setMirroredPixel(this.activeLayer.pixels, px, py, ramp[next]);
+      }
+    }
+  }
+
   setImportPreset(longSide: number): void {
     this.importLongSide = longSide;
   }
@@ -4074,13 +4891,13 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
         return;
       }
       if (key === 'm') {
-        this.mirrorX = !this.mirrorX;
+        this.symmetry = this.symmetry === 'off' ? 'x' : 'off';
         this.render();
         return;
       }
     }
 
-    // ---- Tool selection (P/E/B/I/L/R/O/S/M) ----
+    // ---- Tool selection (P/E/B/I/L/R/O/S/W/Q/M) ----
     const tool = this.tools.find((item) => item.key.toLowerCase() === key);
     if (tool) {
       this.setTool(tool.id);
@@ -4091,7 +4908,8 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
     switch (key) {
       case 'enter':
         event.preventDefault();
-        this.togglePlayback();
+        if (this.tf) this.commitTransform();
+        else this.togglePlayback();
         break;
       case ',':
         this.stepFrame(-1);
@@ -4152,7 +4970,62 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
       palette: [...this.palette],
       primaryColor: this.primaryColor,
       secondaryColor: this.secondaryColor,
+      view: this.captureView(),
     };
+  }
+
+  /** Snapshot the per-tab view config (zoom, grid, symmetry, …). */
+  private captureView(): WorkspaceView {
+    const d = this.defaultView();
+    return {
+      zoom: this.zoom ?? d.zoom,
+      displayZoom: this.displayZoom ?? d.displayZoom,
+      showGrid: this.showGrid ?? d.showGrid,
+      symmetry: this.symmetry ?? d.symmetry,
+      pixelPerfect: this.pixelPerfect ?? d.pixelPerfect,
+      brushSize: this.brushSize ?? d.brushSize,
+      pivotPreset: this.pivotPreset ?? d.pivotPreset,
+      sheetColumns: this.sheetColumns ?? d.sheetColumns,
+      onionSkin: this.onionSkin ?? d.onionSkin,
+      onionTint: this.onionTint ?? d.onionTint,
+      onionPrevOpacity: this.onionPrevOpacity ?? d.onionPrevOpacity,
+      onionNextOpacity: this.onionNextOpacity ?? d.onionNextOpacity,
+    };
+  }
+
+  /** Default view for a brand-new tab — independent of the current tab. */
+  private defaultView(): WorkspaceView {
+    return {
+      zoom: 4,
+      displayZoom: 6,
+      showGrid: true,
+      symmetry: 'off',
+      pixelPerfect: false,
+      brushSize: 1,
+      pivotPreset: 'feet',
+      sheetColumns: 0,
+      onionSkin: false,
+      onionTint: true,
+      onionPrevOpacity: 0.4,
+      onionNextOpacity: 0.25,
+    };
+  }
+
+  /** Restore a tab's view config. Missing (old files) keeps current values. */
+  private applyView(v?: WorkspaceView): void {
+    if (!v) return;
+    this.zoom = this.clamp(v.zoom ?? 4, this.minZoom, this.maxZoom);
+    this.displayZoom = this.clamp(v.displayZoom ?? 6, 2, 12);
+    this.showGrid = v.showGrid ?? true;
+    this.symmetry = v.symmetry ?? 'off';
+    this.pixelPerfect = v.pixelPerfect ?? false;
+    this.brushSize = this.clamp(v.brushSize ?? 1, 1, 8);
+    this.pivotPreset = v.pivotPreset ?? 'feet';
+    this.sheetColumns = this.clamp(v.sheetColumns ?? 0, 0, 32);
+    this.onionSkin = v.onionSkin ?? false;
+    this.onionTint = v.onionTint ?? true;
+    this.onionPrevOpacity = v.onionPrevOpacity ?? 0.4;
+    this.onionNextOpacity = v.onionNextOpacity ?? 0.25;
   }
 
   private saveCurrentWorkspace(): void {
@@ -4197,6 +5070,7 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
     this.undoStack = [];
     this.redoStack = [];
     this.previewFrameIndex = this.activeFrameIndex;
+    this.applyView(workspace.view);
     this.refreshAllFrameThumbnails();
     this.render();
   }
@@ -4215,6 +5089,7 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
       palette: [...this.palette],
       primaryColor: this.primaryColor,
       secondaryColor: this.secondaryColor,
+      view: this.defaultView(),
     };
   }
 
@@ -4251,7 +5126,10 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
       );
       this.showGrid = settings.showGrid ?? this.showGrid;
       this.onionSkin = settings.onionSkin ?? this.onionSkin;
-      this.mirrorX = settings.mirrorX ?? this.mirrorX;
+      // Migrate legacy mirrorX flag → symmetry mode.
+      this.symmetry =
+        settings.symmetry ?? (settings.mirrorX ? 'x' : this.symmetry);
+      this.pixelPerfect = settings.pixelPerfect ?? this.pixelPerfect;
       this.brushSize = this.clamp(settings.brushSize ?? this.brushSize, 1, 8);
       this.importResizeCanvas =
         settings.importResizeCanvas ?? this.importResizeCanvas;
@@ -4337,6 +5215,7 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
         workspace.secondaryColor,
         '#f6f1de',
       ),
+      view: workspace.view ? { ...workspace.view } : undefined,
     };
   }
 
@@ -4349,6 +5228,7 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
       tags: (workspace.tags ?? []).map((t) => ({ ...t })),
       groups: (workspace.groups ?? []).map((g) => ({ ...g })),
       palette: [...workspace.palette],
+      view: workspace.view ? { ...workspace.view } : undefined,
     };
   }
 
@@ -4505,22 +5385,134 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
     }
   }
 
-  private fillMirrored(x: number, y: number, replacement: Pixel): void {
-    this.floodFill(
-      x,
-      y,
-      this.activeLayer.pixels[this.index(x, y)],
-      replacement,
-    );
-    if (!this.mirrorX) {
+  /** Route a freehand stroke cell through pixel-perfect when enabled (size 1). */
+  private strokeTo(x: number, y: number): void {
+    if (this.customBrush && this.activeTool === 'pen') {
+      this.stampBrush(x, y);
       return;
     }
-    const mirrorX = this.mirrorPixelX(x);
-    if (mirrorX !== x) {
+    if (this.pixelPerfect && this.brushSize === 1) {
+      this.addPpCell(x, y);
+    } else {
+      this.paint(x, y);
+    }
+  }
+
+  // ----- Custom brush / stamp -----
+
+  setBrushFromSelection(): void {
+    if (!this.selection) return;
+    const sel = this.normalizeSelection(this.selection);
+    this.customBrush = { w: sel.w, h: sel.h, pixels: this.selectionPixels(sel) };
+  }
+  clearBrush(): void {
+    this.customBrush = null;
+  }
+  private stampBrush(x: number, y: number): void {
+    const b = this.customBrush;
+    if (!b) return;
+    const ox = x - Math.floor(b.w / 2);
+    const oy = y - Math.floor(b.h / 2);
+    for (let by = 0; by < b.h; by += 1) {
+      for (let bx = 0; bx < b.w; bx += 1) {
+        const c = b.pixels[by * b.w + bx];
+        if (c) this.setMirroredPixel(this.activeLayer.pixels, ox + bx, oy + by, c);
+      }
+    }
+  }
+
+  // ----- One-click FX -----
+
+  /** Add a 1px outline (secondary colour) around the active layer's pixels. */
+  outlineLayer(): void {
+    if (this.activeLayerLocked) return;
+    this.pushUndo();
+    const src = [...this.activeLayer.pixels];
+    const col = this.lockColor(this.secondaryColor);
+    const opaque = (x: number, y: number) =>
+      this.inside(x, y) && src[this.index(x, y)] != null;
+    for (let y = 0; y < this.height; y += 1) {
+      for (let x = 0; x < this.width; x += 1) {
+        if (src[this.index(x, y)] != null) continue;
+        if (
+          opaque(x - 1, y) ||
+          opaque(x + 1, y) ||
+          opaque(x, y - 1) ||
+          opaque(x, y + 1)
+        ) {
+          this.setPixel(this.activeLayer.pixels, x, y, col);
+        }
+      }
+    }
+    this.render();
+  }
+
+  /** Replace every secondary-coloured pixel with the primary colour. */
+  replaceColor(): void {
+    if (this.activeLayerLocked) return;
+    const from = this.secondaryColor.toLowerCase();
+    const to = this.lockColor(this.primaryColor);
+    this.pushUndo();
+    const px = this.activeLayer.pixels;
+    for (let i = 0; i < px.length; i += 1) {
+      if (px[i] && px[i]!.toLowerCase() === from) px[i] = to;
+    }
+    this.render();
+  }
+
+  /** Begin a fresh pixel-perfect stroke. */
+  private resetPixelPerfect(): void {
+    this.ppPath = [];
+    this.ppOriginal.clear();
+  }
+
+  /** Add one cell to a pixel-perfect stroke, dropping redundant L-corners. */
+  private addPpCell(x: number, y: number): void {
+    const last = this.ppPath[this.ppPath.length - 1];
+    if (last && last.x === x && last.y === y) return;
+    const color =
+      this.activeTool === 'eraser' ? null : this.brushColorAt(x, y);
+    this.paintCellSym(x, y, color);
+    this.ppPath.push({ x, y });
+    const n = this.ppPath.length;
+    if (n >= 3) {
+      const a = this.ppPath[n - 3];
+      const b = this.ppPath[n - 2];
+      const c = this.ppPath[n - 1];
+      // If a and c are diagonal neighbours, the middle b is a redundant corner.
+      if (Math.abs(a.x - c.x) === 1 && Math.abs(a.y - c.y) === 1) {
+        this.restoreCellSym(b.x, b.y);
+        this.ppPath.splice(n - 2, 1);
+      }
+    }
+  }
+
+  private paintCellSym(x: number, y: number, color: Pixel): void {
+    for (const p of this.symmetricPoints(x, y)) {
+      const i = this.index(p.x, p.y);
+      if (!this.ppOriginal.has(i)) {
+        this.ppOriginal.set(i, this.activeLayer.pixels[i] ?? null);
+      }
+      this.setPixel(this.activeLayer.pixels, p.x, p.y, color);
+    }
+  }
+
+  private restoreCellSym(x: number, y: number): void {
+    for (const p of this.symmetricPoints(x, y)) {
+      const i = this.index(p.x, p.y);
+      if (this.ppOriginal.has(i)) {
+        this.setPixel(this.activeLayer.pixels, p.x, p.y, this.ppOriginal.get(i)!);
+      }
+    }
+  }
+
+  private fillMirrored(x: number, y: number, replacement: Pixel): void {
+    // Flood from every symmetry image so fills stay symmetric too.
+    for (const p of this.symmetricPoints(x, y)) {
       this.floodFill(
-        mirrorX,
-        y,
-        this.activeLayer.pixels[this.index(mirrorX, y)],
+        p.x,
+        p.y,
+        this.activeLayer.pixels[this.index(p.x, p.y)],
         replacement,
       );
     }
@@ -4656,12 +5648,18 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
       return;
     }
     const canvas = this.stageRef.nativeElement;
-    canvas.width = this.canvasWidth;
-    canvas.height = this.canvasHeight;
+    // Only resize the backing store when it actually changes — reallocating a
+    // large canvas every pointermove is a major source of lag.
+    if (canvas.width !== this.canvasWidth) canvas.width = this.canvasWidth;
+    if (canvas.height !== this.canvasHeight) canvas.height = this.canvasHeight;
     this.ctx.imageSmoothingEnabled = false;
     this.ctx.fillStyle = '#f7f7f7';
     this.ctx.fillRect(0, 0, canvas.width, canvas.height);
     this.drawCheckerboard();
+
+    if (this.referenceImage && this.referenceVisible && !this.referenceAbove) {
+      this.drawReference();
+    }
 
     if (this.onionSkin && !this.isPlaying) {
       // Ghost the neighbouring frames beneath the active one (render-only).
@@ -4695,15 +5693,49 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
     if (this.showGrid) {
       this.drawGrid();
     }
-    if (this.mirrorX) {
-      this.drawMirrorGuide();
+    if (this.symmetry !== 'off') {
+      this.drawSymmetryGuide();
+    }
+    if (this.referenceImage && this.referenceVisible && this.referenceAbove) {
+      this.drawReference();
     }
     this.drawPivot();
     if (this.selection) {
       this.drawSelection();
     }
+    this.drawLasso();
+    if (this.tf) this.drawTransformHandles();
     this.renderDisplay();
     this.refreshActiveFrameThumbnail();
+  }
+
+  private drawReference(): void {
+    const img = this.referenceImage;
+    if (!img) return;
+    this.ctx.save();
+    this.ctx.globalAlpha = this.referenceOpacity;
+    this.ctx.imageSmoothingEnabled = true;
+    this.ctx.drawImage(img, 0, 0, this.canvasWidth, this.canvasHeight);
+    this.ctx.restore();
+  }
+
+  loadReference(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) return;
+    const img = new Image();
+    img.onload = () => {
+      this.referenceImage = img;
+      this.referenceVisible = true;
+      this.render();
+    };
+    img.src = URL.createObjectURL(file);
+    input.value = '';
+  }
+
+  clearReference(): void {
+    this.referenceImage = null;
+    this.render();
   }
 
   private renderDisplay(): void {
@@ -4711,9 +5743,35 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
       return;
     }
     const canvas = this.displayRef.nativeElement;
-    canvas.width = this.displayCanvasWidth;
-    canvas.height = this.displayCanvasHeight;
+    if (canvas.width !== this.displayCanvasWidth) {
+      canvas.width = this.displayCanvasWidth;
+    }
+    if (canvas.height !== this.displayCanvasHeight) {
+      canvas.height = this.displayCanvasHeight;
+    }
     this.displayCtx.imageSmoothingEnabled = false;
+    this.displayCtx.clearRect(0, 0, canvas.width, canvas.height);
+
+    if (this.tiledPreview) {
+      // Seamless 3×3 repeat so edges can be checked for tiling artefacts.
+      const tscale = Math.max(1, Math.floor(this.displayZoom / 3));
+      const tile = this.renderFrameCanvas(
+        this.isPlaying ? this.previewFrameIndex : this.activeFrameIndex,
+        tscale,
+      );
+      const tw = tile.width;
+      const th = tile.height;
+      const offX = Math.floor((canvas.width - tw * 3) / 2);
+      const offY = Math.floor((canvas.height - th * 3) / 2);
+      this.drawCheckerboardTo(this.displayCtx, this.displayZoom);
+      for (let j = 0; j < 3; j += 1) {
+        for (let i = 0; i < 3; i += 1) {
+          this.displayCtx.drawImage(tile, offX + i * tw, offY + j * th);
+        }
+      }
+      return;
+    }
+
     this.drawCheckerboardTo(this.displayCtx, this.displayZoom);
     this.drawComposite(
       this.displayCtx,
@@ -4949,40 +6007,97 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
     return layer.opacity * (g ? g.opacity : 1);
   }
 
+  /**
+   * Draw a pixel buffer by writing it to a 1× offscreen via ImageData and
+   * scaling with a single drawImage — far cheaper than per-pixel fillRect,
+   * especially at high zoom / large canvases.
+   */
   private drawPixels(
     ctx: CanvasRenderingContext2D,
     pixels: Pixel[],
     scale: number,
     opacity: number,
   ): void {
-    ctx.globalAlpha = opacity;
-    for (let y = 0; y < this.height; y += 1) {
-      for (let x = 0; x < this.width; x += 1) {
-        const color = pixels[this.index(x, y)];
-        if (!color) {
-          continue;
-        }
-        ctx.fillStyle = color;
-        ctx.fillRect(x * scale, y * scale, scale, scale);
-      }
+    const W = this.width;
+    const H = this.height;
+    const sc = this.getPixelScratch(W, H);
+    const d = sc.img.data;
+    d.fill(0);
+    for (let i = 0; i < pixels.length; i += 1) {
+      const color = pixels[i];
+      if (!color) continue;
+      const rgb = this.hexInt(color);
+      const o = i * 4;
+      d[o] = (rgb >> 16) & 255;
+      d[o + 1] = (rgb >> 8) & 255;
+      d[o + 2] = rgb & 255;
+      d[o + 3] = 255;
     }
-    ctx.globalAlpha = 1;
+    sc.ctx.putImageData(sc.img, 0, 0);
+    ctx.save();
+    ctx.imageSmoothingEnabled = false;
+    ctx.globalAlpha = opacity;
+    ctx.drawImage(sc.canvas, 0, 0, W, H, 0, 0, W * scale, H * scale);
+    ctx.restore();
+  }
+
+  private pixelScratch?: {
+    canvas: HTMLCanvasElement;
+    ctx: CanvasRenderingContext2D;
+    img: ImageData;
+    w: number;
+    h: number;
+  };
+  private getPixelScratch(w: number, h: number) {
+    if (
+      !this.pixelScratch ||
+      this.pixelScratch.w !== w ||
+      this.pixelScratch.h !== h
+    ) {
+      const canvas = document.createElement('canvas');
+      canvas.width = w;
+      canvas.height = h;
+      const ctx = canvas.getContext('2d')!;
+      this.pixelScratch = { canvas, ctx, img: ctx.createImageData(w, h), w, h };
+    }
+    return this.pixelScratch;
+  }
+
+  private readonly hexCache = new Map<string, number>();
+  private hexInt(hex: string): number {
+    let v = this.hexCache.get(hex);
+    if (v === undefined) {
+      v = parseInt(hex.slice(1), 16) || 0;
+      this.hexCache.set(hex, v);
+    }
+    return v;
   }
 
   private drawCheckerboard(): void {
     this.drawCheckerboardTo(this.ctx, this.zoom);
   }
 
+  /** Fill the canvas with a checkerboard using a repeating pattern (1 fill). */
   private drawCheckerboardTo(
     ctx: CanvasRenderingContext2D,
     cell: number,
   ): void {
-    for (let y = 0; y < this.height; y += 1) {
-      for (let x = 0; x < this.width; x += 1) {
-        ctx.fillStyle = (x + y) % 2 === 0 ? '#ffffff' : '#e8ecef';
-        ctx.fillRect(x * cell, y * cell, cell, cell);
-      }
-    }
+    const tile = document.createElement('canvas');
+    tile.width = cell * 2;
+    tile.height = cell * 2;
+    const tc = tile.getContext('2d');
+    if (!tc) return;
+    tc.fillStyle = '#ffffff';
+    tc.fillRect(0, 0, cell * 2, cell * 2);
+    tc.fillStyle = '#e8ecef';
+    tc.fillRect(cell, 0, cell, cell);
+    tc.fillRect(0, cell, cell, cell);
+    const pattern = ctx.createPattern(tile, 'repeat');
+    if (!pattern) return;
+    ctx.save();
+    ctx.fillStyle = pattern;
+    ctx.fillRect(0, 0, this.width * cell, this.height * cell);
+    ctx.restore();
   }
 
   private drawGrid(): void {
@@ -5025,27 +6140,44 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
     this.ctx.restore();
   }
 
-  private drawMirrorGuide(): void {
-    const centerX = this.canvasWidth / 2;
-
-    this.ctx.save();
-    this.ctx.lineWidth = 3;
-    this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)';
-    this.ctx.beginPath();
-    this.ctx.moveTo(centerX, 0);
-    this.ctx.lineTo(centerX, this.canvasHeight);
-    this.ctx.stroke();
-
-    this.ctx.lineWidth = 1;
-    this.ctx.setLineDash([
+  private drawSymmetryGuide(): void {
+    const cx = this.canvasWidth / 2;
+    const cy = this.canvasHeight / 2;
+    const dash: [number, number] = [
       Math.max(4, Math.floor(this.zoom * 0.45)),
       Math.max(3, Math.floor(this.zoom * 0.3)),
-    ]);
-    this.ctx.strokeStyle = '#e85d75';
-    this.ctx.beginPath();
-    this.ctx.moveTo(centerX + 0.5, 0);
-    this.ctx.lineTo(centerX + 0.5, this.canvasHeight);
-    this.ctx.stroke();
+    ];
+    const vertical = this.symmetry !== 'y';
+    const horizontal =
+      this.symmetry === 'y' ||
+      this.symmetry === 'both' ||
+      this.symmetry === 'mandala';
+    const diagonal = this.symmetry === 'mandala' && this.width === this.height;
+
+    const line = (x0: number, y0: number, x1: number, y1: number) => {
+      this.ctx.lineWidth = 3;
+      this.ctx.setLineDash([]);
+      this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.85)';
+      this.ctx.beginPath();
+      this.ctx.moveTo(x0, y0);
+      this.ctx.lineTo(x1, y1);
+      this.ctx.stroke();
+      this.ctx.lineWidth = 1;
+      this.ctx.setLineDash(dash);
+      this.ctx.strokeStyle = '#e85d75';
+      this.ctx.beginPath();
+      this.ctx.moveTo(x0, y0);
+      this.ctx.lineTo(x1, y1);
+      this.ctx.stroke();
+    };
+
+    this.ctx.save();
+    if (vertical) line(cx, 0, cx, this.canvasHeight);
+    if (horizontal) line(0, cy, this.canvasWidth, cy);
+    if (diagonal) {
+      line(0, 0, this.canvasWidth, this.canvasHeight);
+      line(this.canvasWidth, 0, 0, this.canvasHeight);
+    }
     this.ctx.restore();
   }
 
@@ -5053,15 +6185,101 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
     if (!this.selection) {
       return;
     }
+    const sel = this.selection;
+    const z = this.zoom;
+    // For non-rectangular (wand/lasso) selections, tint the selected cells so
+    // the actual shape is visible, then outline the bounding box.
+    if (sel.mask) {
+      this.ctx.fillStyle = 'rgba(52, 224, 198, 0.22)';
+      for (let ry = 0; ry < sel.h; ry += 1) {
+        for (let rx = 0; rx < sel.w; rx += 1) {
+          if (sel.mask[ry * sel.w + rx]) {
+            this.ctx.fillRect((sel.x + rx) * z, (sel.y + ry) * z, z, z);
+          }
+        }
+      }
+    }
     this.ctx.strokeStyle = '#111827';
     this.ctx.lineWidth = 2;
     this.ctx.setLineDash([5, 4]);
     this.ctx.strokeRect(
-      this.selection.x * this.zoom + 1,
-      this.selection.y * this.zoom + 1,
-      this.selection.w * this.zoom - 2,
-      this.selection.h * this.zoom - 2,
+      sel.x * z + 1,
+      sel.y * z + 1,
+      sel.w * z - 2,
+      sel.h * z - 2,
     );
+    this.ctx.setLineDash([]);
+  }
+
+  /** Draw the free-transform bounding box, scale handles and rotate knob. */
+  private drawTransformHandles(): void {
+    if (!this.tf) return;
+    const z = this.zoom;
+    const hw = this.tf.w / 2;
+    const hh = this.tf.h / 2;
+    const scr = (a: number, b: number) => {
+      const c = this.transformLocalToCanvas(a, b);
+      return { x: c.x * z, y: c.y * z };
+    };
+    const c1 = scr(-hw, -hh);
+    const c2 = scr(hw, -hh);
+    const c3 = scr(hw, hh);
+    const c4 = scr(-hw, hh);
+    this.ctx.save();
+    this.ctx.lineWidth = 1.5;
+    this.ctx.strokeStyle = '#34e0c6';
+    this.ctx.setLineDash([4, 3]);
+    this.ctx.beginPath();
+    this.ctx.moveTo(c1.x, c1.y);
+    this.ctx.lineTo(c2.x, c2.y);
+    this.ctx.lineTo(c3.x, c3.y);
+    this.ctx.lineTo(c4.x, c4.y);
+    this.ctx.closePath();
+    this.ctx.stroke();
+    const top = scr(0, -hh);
+    const knob = scr(0, -hh - 14 / z);
+    this.ctx.beginPath();
+    this.ctx.moveTo(top.x, top.y);
+    this.ctx.lineTo(knob.x, knob.y);
+    this.ctx.stroke();
+    this.ctx.setLineDash([]);
+    for (const h of this.transformHandleLocals()) {
+      const s = scr(h.a, h.b);
+      this.ctx.strokeStyle = '#0b0e12';
+      this.ctx.lineWidth = 1;
+      if (h.id === 'rotate') {
+        this.ctx.fillStyle = '#ffd166';
+        this.ctx.beginPath();
+        this.ctx.arc(s.x, s.y, 4, 0, Math.PI * 2);
+        this.ctx.fill();
+        this.ctx.stroke();
+      } else {
+        this.ctx.fillStyle = '#ffffff';
+        this.ctx.fillRect(s.x - 3, s.y - 3, 6, 6);
+        this.ctx.strokeRect(s.x - 3, s.y - 3, 6, 6);
+      }
+    }
+    this.ctx.restore();
+  }
+
+  /** Draw the in-progress lasso path while dragging. */
+  private drawLasso(): void {
+    if (this.activeTool !== 'lasso' || this.lassoPoints.length < 2) {
+      return;
+    }
+    const z = this.zoom;
+    this.ctx.strokeStyle = '#34e0c6';
+    this.ctx.lineWidth = 1.5;
+    this.ctx.setLineDash([4, 3]);
+    this.ctx.beginPath();
+    this.lassoPoints.forEach((p, i) => {
+      const cx = p.x * z + z / 2;
+      const cy = p.y * z + z / 2;
+      if (i === 0) this.ctx.moveTo(cx, cy);
+      else this.ctx.lineTo(cx, cy);
+    });
+    this.ctx.closePath();
+    this.ctx.stroke();
     this.ctx.setLineDash([]);
   }
 
@@ -5434,12 +6652,12 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
   ): void {
     for (let y = 0; y < selection.h; y += 1) {
       for (let x = 0; x < selection.w; x += 1) {
-        this.setPixel(
-          buffer,
-          selection.x + x,
-          selection.y + y,
-          selection.pixels[y * selection.w + x],
-        );
+        const i = y * selection.w + x;
+        if (selection.mask && !selection.mask[i]) continue;
+        const color = selection.pixels[i];
+        // Only deposit actual pixels — never punch transparent holes into art below.
+        if (color == null) continue;
+        this.setPixel(buffer, selection.x + x, selection.y + y, color);
       }
     }
   }
@@ -5448,10 +6666,12 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
     const pixels: Pixel[] = [];
     for (let y = 0; y < selection.h; y += 1) {
       for (let x = 0; x < selection.w; x += 1) {
+        const i = y * selection.w + x;
         const sourceX = selection.x + x;
         const sourceY = selection.y + y;
+        const masked = selection.mask ? selection.mask[i] : true;
         pixels.push(
-          this.inside(sourceX, sourceY)
+          masked && this.inside(sourceX, sourceY)
             ? (this.activeLayer.pixels[this.index(sourceX, sourceY)] ?? null)
             : null,
         );
@@ -5470,9 +6690,10 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
     selection: Selection,
     fn: (x: number, y: number) => void,
   ): void {
-    for (let y = selection.y; y < selection.y + selection.h; y += 1) {
-      for (let x = selection.x; x < selection.x + selection.w; x += 1) {
-        fn(x, y);
+    for (let ry = 0; ry < selection.h; ry += 1) {
+      for (let rx = 0; rx < selection.w; rx += 1) {
+        if (selection.mask && !selection.mask[ry * selection.w + rx]) continue;
+        fn(selection.x + rx, selection.y + ry);
       }
     }
   }
@@ -5504,10 +6725,502 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
     };
   }
 
+  // ===================== Magic wand & lasso =====================
+
+  /** Magic wand: select the contiguous same-color region on the active layer. */
+  private selectByWand(
+    sx: number,
+    sy: number,
+    add: boolean,
+    subtract: boolean,
+  ): void {
+    const region = this.floodRegion(sx, sy);
+    let mask = region;
+    if ((add || subtract) && this.selection) {
+      mask = this.combineMask(
+        this.selectionToCanvasMask(this.selection),
+        region,
+        subtract ? 'subtract' : 'add',
+      );
+    }
+    this.selection = this.canvasMaskToSelection(mask);
+    this.moveStartSelection = null;
+    this.previewPixels = null;
+  }
+
+  private finishLasso(): void {
+    const pts = this.lassoPoints;
+    this.lassoPoints = [];
+    if (pts.length < 3) {
+      // A click (not a drag) clears the selection.
+      this.selection = null;
+      this.render();
+      return;
+    }
+    const region = this.rasterizePolygon(pts);
+    let mask = region;
+    if (this.lassoMode !== 'replace' && this.selection) {
+      mask = this.combineMask(
+        this.selectionToCanvasMask(this.selection),
+        region,
+        this.lassoMode === 'subtract' ? 'subtract' : 'add',
+      );
+    }
+    this.selection = this.canvasMaskToSelection(mask);
+    this.moveStartSelection = null;
+    this.previewPixels = null;
+    this.render();
+  }
+
+  /** Contiguous flood of equal-color cells on the active layer (4-neighbour). */
+  private floodRegion(sx: number, sy: number): boolean[] {
+    const W = this.width;
+    const H = this.height;
+    const mask = new Array<boolean>(W * H).fill(false);
+    if (!this.inside(sx, sy)) return mask;
+    const px = this.activeLayer.pixels;
+    const target = px[this.index(sx, sy)] ?? null;
+    const stack: [number, number][] = [[sx, sy]];
+    while (stack.length) {
+      const [x, y] = stack.pop()!;
+      if (x < 0 || y < 0 || x >= W || y >= H) continue;
+      const i = this.index(x, y);
+      if (mask[i]) continue;
+      if ((px[i] ?? null) !== target) continue;
+      mask[i] = true;
+      stack.push([x + 1, y], [x - 1, y], [x, y + 1], [x, y - 1]);
+    }
+    return mask;
+  }
+
+  /** Rasterize a polygon to a full-canvas mask (even-odd, sampling pixel centers). */
+  private rasterizePolygon(pts: { x: number; y: number }[]): boolean[] {
+    const W = this.width;
+    const H = this.height;
+    const mask = new Array<boolean>(W * H).fill(false);
+    let minX = W;
+    let minY = H;
+    let maxX = 0;
+    let maxY = 0;
+    for (const p of pts) {
+      minX = Math.min(minX, p.x);
+      maxX = Math.max(maxX, p.x);
+      minY = Math.min(minY, p.y);
+      maxY = Math.max(maxY, p.y);
+    }
+    minX = this.clamp(minX, 0, W - 1);
+    maxX = this.clamp(maxX, 0, W - 1);
+    minY = this.clamp(minY, 0, H - 1);
+    maxY = this.clamp(maxY, 0, H - 1);
+    for (let y = minY; y <= maxY; y += 1) {
+      for (let x = minX; x <= maxX; x += 1) {
+        if (this.pointInPolygon(x + 0.5, y + 0.5, pts)) {
+          mask[this.index(x, y)] = true;
+        }
+      }
+    }
+    return mask;
+  }
+
+  private pointInPolygon(
+    px: number,
+    py: number,
+    pts: { x: number; y: number }[],
+  ): boolean {
+    let inside = false;
+    for (let i = 0, j = pts.length - 1; i < pts.length; j = i, i += 1) {
+      const xi = pts[i].x + 0.5;
+      const yi = pts[i].y + 0.5;
+      const xj = pts[j].x + 0.5;
+      const yj = pts[j].y + 0.5;
+      if (
+        yi > py !== yj > py &&
+        px < ((xj - xi) * (py - yi)) / (yj - yi) + xi
+      ) {
+        inside = !inside;
+      }
+    }
+    return inside;
+  }
+
+  private combineMask(
+    base: boolean[],
+    region: boolean[],
+    mode: 'add' | 'subtract',
+  ): boolean[] {
+    const out = base.slice();
+    for (let i = 0; i < out.length; i += 1) {
+      if (region[i]) out[i] = mode !== 'subtract';
+    }
+    return out;
+  }
+
+  /** Expand a selection (bbox + optional mask) to a full-canvas boolean mask. */
+  private selectionToCanvasMask(sel: Selection): boolean[] {
+    const mask = new Array<boolean>(this.width * this.height).fill(false);
+    for (let ry = 0; ry < sel.h; ry += 1) {
+      for (let rx = 0; rx < sel.w; rx += 1) {
+        if (sel.mask && !sel.mask[ry * sel.w + rx]) continue;
+        const cx = sel.x + rx;
+        const cy = sel.y + ry;
+        if (this.inside(cx, cy)) mask[this.index(cx, cy)] = true;
+      }
+    }
+    return mask;
+  }
+
+  /** Reduce a full-canvas mask to a bounding-box Selection (+ mask if not rect). */
+  private canvasMaskToSelection(canvasMask: boolean[]): Selection | null {
+    const W = this.width;
+    const H = this.height;
+    let minX = W;
+    let minY = H;
+    let maxX = -1;
+    let maxY = -1;
+    for (let y = 0; y < H; y += 1) {
+      for (let x = 0; x < W; x += 1) {
+        if (canvasMask[this.index(x, y)]) {
+          if (x < minX) minX = x;
+          if (x > maxX) maxX = x;
+          if (y < minY) minY = y;
+          if (y > maxY) maxY = y;
+        }
+      }
+    }
+    if (maxX < 0) return null;
+    const w = maxX - minX + 1;
+    const h = maxY - minY + 1;
+    const mask = new Array<boolean>(w * h).fill(false);
+    let rect = true;
+    for (let y = 0; y < h; y += 1) {
+      for (let x = 0; x < w; x += 1) {
+        const on = canvasMask[this.index(minX + x, minY + y)];
+        mask[y * w + x] = on;
+        if (!on) rect = false;
+      }
+    }
+    const sel: Selection = {
+      x: minX,
+      y: minY,
+      w,
+      h,
+      pixels: [],
+      mask: rect ? undefined : mask,
+    };
+    sel.pixels = this.copyPixels(sel);
+    return sel;
+  }
+
+  // ===================== Free transform (scale / rotate / move) =====================
+
+  /** Lift the current selection into a transform session. */
+  private beginTransform(): void {
+    if (!this.selection) return;
+    const sel = this.normalizeSelection(this.selection);
+    const src = this.selectionPixels(sel);
+    const under = [...this.activeLayer.pixels];
+    this.eachSelectionPixel(sel, (x, y) => this.setPixel(under, x, y, null));
+    this.tf = {
+      src,
+      sw: sel.w,
+      sh: sel.h,
+      under,
+      cx: sel.x + sel.w / 2,
+      cy: sel.y + sel.h / 2,
+      w: sel.w,
+      h: sel.h,
+      angle: 0,
+    };
+    this.selection = null;
+    this.buildTransformPreview();
+  }
+
+  /** Bake the transform into the active layer and end the session. */
+  commitTransform(): void {
+    if (!this.tf) return;
+    const buf = [...this.tf.under];
+    this.rasterizeTransform(buf);
+    this.pushUndo();
+    this.activeLayer.pixels = buf;
+    // New selection = footprint of the transformed pixels (as a mask).
+    const canvasMask = buf.map((c, i) => c !== this.tf!.under[i] && c != null);
+    this.tf = null;
+    this.tfDrag = null;
+    this.previewPixels = null;
+    this.selection = this.canvasMaskToSelection(canvasMask);
+    this.render();
+  }
+
+  /** Discard the transform, restoring the original pixels. */
+  cancelTransform(): void {
+    if (!this.tf) return;
+    this.tf = null;
+    this.tfDrag = null;
+    this.previewPixels = null;
+    this.render();
+  }
+
+  private buildTransformPreview(): void {
+    if (!this.tf) return;
+    const buf = [...this.tf.under];
+    this.rasterizeTransform(buf);
+    this.previewPixels = buf;
+    this.render();
+  }
+
+  /** Inverse-map the source content into the rotated/scaled box. */
+  private rasterizeTransform(buf: Pixel[]): void {
+    const tf = this.tf!;
+    const ux = Math.cos(tf.angle);
+    const uy = Math.sin(tf.angle);
+    const vx = -Math.sin(tf.angle);
+    const vy = Math.cos(tf.angle);
+    const hw = tf.w / 2;
+    const hh = tf.h / 2;
+    if (hw < 0.2 || hh < 0.2) return;
+    const corners = [
+      [-hw, -hh],
+      [hw, -hh],
+      [hw, hh],
+      [-hw, hh],
+    ].map(([a, b]) => [tf.cx + a * ux + b * vx, tf.cy + a * uy + b * vy]);
+    const xs = corners.map((c) => c[0]);
+    const ys = corners.map((c) => c[1]);
+    const minX = Math.max(0, Math.floor(Math.min(...xs)));
+    const maxX = Math.min(this.width - 1, Math.ceil(Math.max(...xs)));
+    const minY = Math.max(0, Math.floor(Math.min(...ys)));
+    const maxY = Math.min(this.height - 1, Math.ceil(Math.max(...ys)));
+    for (let py = minY; py <= maxY; py += 1) {
+      for (let px = minX; px <= maxX; px += 1) {
+        const dx = px + 0.5 - tf.cx;
+        const dy = py + 0.5 - tf.cy;
+        const a = dx * ux + dy * uy;
+        const b = dx * vx + dy * vy;
+        if (a < -hw || a > hw || b < -hh || b > hh) continue;
+        let sx = Math.floor(((a + hw) / tf.w) * tf.sw);
+        let sy = Math.floor(((b + hh) / tf.h) * tf.sh);
+        sx = Math.min(tf.sw - 1, Math.max(0, sx));
+        sy = Math.min(tf.sh - 1, Math.max(0, sy));
+        const c = tf.src[sy * tf.sw + sx];
+        if (c) buf[this.index(px, py)] = c;
+      }
+    }
+  }
+
+  /** Local handle offsets (canvas units) keyed by id. */
+  private transformHandleLocals(): { id: string; a: number; b: number }[] {
+    const hw = this.tf!.w / 2;
+    const hh = this.tf!.h / 2;
+    const rot = 14 / this.zoom; // ~14px above the top edge
+    return [
+      { id: 'nw', a: -hw, b: -hh },
+      { id: 'n', a: 0, b: -hh },
+      { id: 'ne', a: hw, b: -hh },
+      { id: 'e', a: hw, b: 0 },
+      { id: 'se', a: hw, b: hh },
+      { id: 's', a: 0, b: hh },
+      { id: 'sw', a: -hw, b: hh },
+      { id: 'w', a: -hw, b: 0 },
+      { id: 'rotate', a: 0, b: -hh - rot },
+    ];
+  }
+
+  /** Convert a local (a,b) offset to canvas coords using the box angle. */
+  private transformLocalToCanvas(a: number, b: number): { x: number; y: number } {
+    const tf = this.tf!;
+    const ux = Math.cos(tf.angle);
+    const uy = Math.sin(tf.angle);
+    const vx = -Math.sin(tf.angle);
+    const vy = Math.cos(tf.angle);
+    return { x: tf.cx + a * ux + b * vx, y: tf.cy + a * uy + b * vy };
+  }
+
+  /** Pointer down while the transform tool is active. */
+  private transformPointerDown(event: PointerEvent): void {
+    if (!this.tf) return;
+    const p = this.eventToCanvasFloat(event);
+    const z = this.zoom;
+    // Hit-test handles in screen space (~10px radius).
+    let hit: string | null = null;
+    for (const h of this.transformHandleLocals()) {
+      const c = this.transformLocalToCanvas(h.a, h.b);
+      if (Math.hypot((c.x - p.x) * z, (c.y - p.y) * z) <= 10) {
+        hit = h.id;
+        break;
+      }
+    }
+    // Inside box → move; outside with no handle → commit (click-away).
+    const tf = this.tf;
+    const ux = Math.cos(tf.angle);
+    const uy = Math.sin(tf.angle);
+    const vx = -Math.sin(tf.angle);
+    const vy = Math.cos(tf.angle);
+    const la = (p.x - tf.cx) * ux + (p.y - tf.cy) * uy;
+    const lb = (p.x - tf.cx) * vx + (p.y - tf.cy) * vy;
+    const inside = Math.abs(la) <= tf.w / 2 && Math.abs(lb) <= tf.h / 2;
+    if (!hit && !inside) {
+      this.commitTransform();
+      return;
+    }
+    this.stageRef.nativeElement.setPointerCapture(event.pointerId);
+    const mode: 'move' | 'scale' | 'rotate' =
+      hit === 'rotate' ? 'rotate' : hit ? 'scale' : 'move';
+    // For scale, the anchor is the opposite corner/edge (kept fixed).
+    let anchorX = tf.cx;
+    let anchorY = tf.cy;
+    if (mode === 'scale' && hit) {
+      const opp = this.transformOppositeLocal(hit);
+      const c = this.transformLocalToCanvas(opp.a, opp.b);
+      anchorX = c.x;
+      anchorY = c.y;
+    }
+    this.tfDrag = {
+      mode,
+      handle: hit ?? 'move',
+      pointerId: event.pointerId,
+      startCx: tf.cx,
+      startCy: tf.cy,
+      startW: tf.w,
+      startH: tf.h,
+      startAngle: tf.angle,
+      anchorX,
+      anchorY,
+      grabX: p.x,
+      grabY: p.y,
+    };
+  }
+
+  private transformOppositeLocal(id: string): { a: number; b: number } {
+    const hw = this.tf!.w / 2;
+    const hh = this.tf!.h / 2;
+    const map: Record<string, [number, number]> = {
+      nw: [hw, hh],
+      n: [0, hh],
+      ne: [-hw, hh],
+      e: [-hw, 0],
+      se: [-hw, -hh],
+      s: [0, -hh],
+      sw: [hw, -hh],
+      w: [hw, 0],
+    };
+    const [a, b] = map[id] ?? [0, 0];
+    return { a, b };
+  }
+
+  private transformPointerMove(event: PointerEvent): void {
+    if (!this.tf || !this.tfDrag || this.tfDrag.pointerId !== event.pointerId)
+      return;
+    const p = this.eventToCanvasFloat(event);
+    const d = this.tfDrag;
+    const tf = this.tf;
+    if (d.mode === 'move') {
+      tf.cx = d.startCx + (p.x - d.grabX);
+      tf.cy = d.startCy + (p.y - d.grabY);
+    } else if (d.mode === 'rotate') {
+      const ang = Math.atan2(p.y - tf.cy, p.x - tf.cx) + Math.PI / 2;
+      tf.angle = ang;
+    } else {
+      // Scale: pointer offset from the fixed anchor, measured along box axes.
+      const ux = Math.cos(tf.angle);
+      const uy = Math.sin(tf.angle);
+      const vx = -Math.sin(tf.angle);
+      const vy = Math.cos(tf.angle);
+      const pa = (p.x - d.anchorX) * ux + (p.y - d.anchorY) * uy;
+      const pb = (p.x - d.anchorX) * vx + (p.y - d.anchorY) * vy;
+      const sign: Record<string, [number, number]> = {
+        nw: [-1, -1], n: [0, -1], ne: [1, -1], e: [1, 0],
+        se: [1, 1], s: [0, 1], sw: [-1, 1], w: [-1, 0],
+      };
+      const [sa, sb] = sign[d.handle] ?? [0, 0];
+      const newW = sa !== 0 ? Math.max(1, Math.abs(pa)) : d.startW;
+      const newH = sb !== 0 ? Math.max(1, Math.abs(pb)) : d.startH;
+      const dirA = sa !== 0 ? Math.sign(pa) || sa : 0;
+      const dirB = sb !== 0 ? Math.sign(pb) || sb : 0;
+      const offA = sa !== 0 ? (dirA * newW) / 2 : 0;
+      const offB = sb !== 0 ? (dirB * newH) / 2 : 0;
+      tf.w = newW;
+      tf.h = newH;
+      tf.cx = d.anchorX + offA * ux + offB * vx;
+      tf.cy = d.anchorY + offA * uy + offB * vy;
+    }
+    this.buildTransformPreview();
+  }
+
+  private transformPointerUp(event: PointerEvent): void {
+    if (this.tfDrag && this.tfDrag.pointerId === event.pointerId) {
+      this.tfDrag = null;
+    }
+  }
+
+  /** Pointer position in floating-point canvas (pixel) coordinates. */
+  private eventToCanvasFloat(event: PointerEvent): { x: number; y: number } {
+    const rect = this.stageRef.nativeElement.getBoundingClientRect();
+    return {
+      x: (event.clientX - rect.left) / this.zoom,
+      y: (event.clientY - rect.top) / this.zoom,
+    };
+  }
+
   private pushUndo(): void {
     this.undoStack.push(this.serialize());
     this.undoStack = this.undoStack.slice(-80);
     this.redoStack = [];
+    if (this.recording) this.captureTimelapseFrame();
+  }
+
+  // ===================== Timelapse recording =====================
+
+  toggleRecording(): void {
+    this.recording = !this.recording;
+    if (this.recording) {
+      this.timelapseFrames = [];
+      this.captureTimelapseFrame();
+    }
+  }
+
+  private captureTimelapseFrame(): void {
+    if (!this.isBrowser) return;
+    this.timelapseFrames.push(this.renderFrameCanvas(this.activeFrameIndex, 1));
+    if (this.timelapseFrames.length > 900) this.timelapseFrames.shift();
+  }
+
+  /** Encode the recorded frames into a shareable GIF (free, watermarked). */
+  async exportTimelapse(): Promise<void> {
+    this.fileMenuOpen = false;
+    this.captureTimelapseFrame();
+    if (this.timelapseFrames.length < 2) {
+      await this.showAlert({
+        title: 'Timelapse',
+        message: 'Turn on “Record timelapse”, draw a few edits, then export.',
+      });
+      return;
+    }
+    const first = this.timelapseFrames[0];
+    const scale = Math.max(
+      1,
+      Math.floor(384 / Math.max(first.width, first.height)),
+    );
+    const w = first.width * scale;
+    const h = first.height * scale;
+    const gif = GIFEncoder();
+    this.timelapseFrames.forEach((src, i) => {
+      const c = document.createElement('canvas');
+      c.width = w;
+      c.height = h;
+      const ctx = c.getContext('2d');
+      if (!ctx) return;
+      ctx.imageSmoothingEnabled = false;
+      ctx.drawImage(src, 0, 0, src.width, src.height, 0, 0, w, h);
+      this.stampWatermark(ctx, w, h);
+      // Linger on the final frame so the result is readable in a loop.
+      const last = i === this.timelapseFrames.length - 1;
+      this.writeGifFrame(gif, ctx, w, h, last ? 1200 : 90);
+    });
+    gif.finish();
+    this.downloadBlob(
+      new Blob([gif.bytes()], { type: 'image/gif' }),
+      `${this.exportBaseName()}-timelapse.gif`,
+    );
   }
 
   private serialize(): string {
@@ -5522,7 +7235,7 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
       palette: this.palette,
       primaryColor: this.primaryColor,
       secondaryColor: this.secondaryColor,
-      mirrorX: this.mirrorX,
+      symmetry: this.symmetry,
     });
   }
 
@@ -5538,7 +7251,7 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
     this.palette = state.palette;
     this.primaryColor = state.primaryColor;
     this.secondaryColor = state.secondaryColor;
-    this.mirrorX = state.mirrorX ?? this.mirrorX;
+    this.symmetry = state.symmetry ?? this.symmetry;
     this.selection = null;
     this.previewPixels = null;
     this.refreshAllFrameThumbnails();
@@ -5676,10 +7389,46 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
     y: number,
     color: Pixel,
   ): void {
-    this.setPixel(buffer, x, y, color);
-    if (this.mirrorX) {
-      this.setPixel(buffer, this.mirrorPixelX(x), y, color);
+    for (const p of this.symmetricPoints(x, y)) {
+      this.setPixel(buffer, p.x, p.y, color);
     }
+  }
+
+  /** All symmetry images of a cell (including itself), de-duplicated. */
+  private symmetricPoints(x: number, y: number): { x: number; y: number }[] {
+    const mx = this.width - 1 - x;
+    const my = this.height - 1 - y;
+    const pts: { x: number; y: number }[] = [{ x, y }];
+    const add = (px: number, py: number) => {
+      if (px < 0 || py < 0 || px >= this.width || py >= this.height) return;
+      if (!pts.some((q) => q.x === px && q.y === py)) pts.push({ x: px, y: py });
+    };
+    switch (this.symmetry) {
+      case 'x':
+        add(mx, y);
+        break;
+      case 'y':
+        add(x, my);
+        break;
+      case 'both':
+        add(mx, y);
+        add(x, my);
+        add(mx, my);
+        break;
+      case 'mandala':
+        add(mx, y);
+        add(x, my);
+        add(mx, my);
+        // 8-fold radial needs a square canvas to swap axes meaningfully.
+        if (this.width === this.height) {
+          add(y, x);
+          add(my, x);
+          add(y, mx);
+          add(my, mx);
+        }
+        break;
+    }
+    return pts;
   }
 
   private mirrorPixelX(x: number): number {

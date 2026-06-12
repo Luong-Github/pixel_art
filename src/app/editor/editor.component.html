@@ -3,21 +3,76 @@
      zones or floating windows by the dock layout below.
      ============================================================ -->
 <ng-template dockPanelDef="tools">
-  <div class="tools">
-    <button
-      *ngFor="let tool of tools"
-      type="button"
-      class="tool-button"
-      [class.active]="activeTool === tool.id"
-      [title]="tool.label + ' (' + tool.key + ')'"
-      [attr.aria-label]="tool.label + ' (' + tool.key + ')'"
-      (click)="setTool(tool.id)">
-      <span class="ti" [innerHTML]="toolIcons[tool.id]"></span>
-    </button>
+  <div class="tools-panel">
+    <div class="tool-group" *ngFor="let group of toolGroups">
+      <span class="tool-group-label">{{ group.label }}</span>
+      <div class="tools">
+        <button
+          *ngFor="let id of group.ids"
+          type="button"
+          class="tool-button"
+          [class.active]="activeTool === id"
+          [title]="tool(id).label + ' (' + tool(id).key + ')'"
+          [attr.aria-label]="tool(id).label + ' (' + tool(id).key + ')'"
+          (click)="setTool(id)">
+          <span class="ti" [innerHTML]="toolIcons[id]"></span>
+        </button>
+      </div>
+    </div>
+    <div class="tool-options" *ngIf="activeTool === 'gradient'">
+      <span class="tool-group-label">Gradient</span>
+      <label class="opt-row">
+        <span>Shape</span>
+        <select [(ngModel)]="gradientShape">
+          <option value="linear">Linear</option>
+          <option value="radial">Radial</option>
+        </select>
+      </label>
+      <label class="opt-check" title="Dither between primary &amp; secondary (pixel-art) vs smooth RGB">
+        <input type="checkbox" [(ngModel)]="gradientDither" /> Dither (Bayer)
+      </label>
+      <p class="opt-hint">Drag primary→secondary across the selection (or whole layer).</p>
+    </div>
+    <p class="opt-hint" *ngIf="activeTool === 'shade'">Shade: drag to darken · hold Alt to lighten (uses the palette ramp).</p>
+
+    <div class="tool-options">
+      <span class="tool-group-label">Brush</span>
+      <label class="opt-row" title="Brush size ( [ / ] )">
+        <span>Size</span>
+        <input type="number" min="1" max="8" [(ngModel)]="brushSize" />
+      </label>
+      <label class="opt-check" title="Pixel-perfect freehand (brush size 1)">
+        <input type="checkbox" [(ngModel)]="pixelPerfect" /> Pixel-perfect
+      </label>
+      <label class="opt-row" title="Drawing symmetry (Shift+M toggles X)">
+        <span>Symmetry</span>
+        <select [ngModel]="symmetry" (ngModelChange)="setSymmetry($event)">
+          <option value="off">Off</option>
+          <option value="x">Mirror X</option>
+          <option value="y">Mirror Y</option>
+          <option value="both">Both (4-way)</option>
+          <option value="mandala">Mandala (8-way)</option>
+        </select>
+      </label>
+      <button
+        type="button"
+        class="opt-btn"
+        [disabled]="!customBrush && !hasSelection"
+        title="Capture the selection as a stamp brush for the Pen"
+        (click)="customBrush ? clearBrush() : setBrushFromSelection()">
+        {{ customBrush ? 'Clear custom brush (' + customBrush.w + '×' + customBrush.h + ')' : 'Brush from selection' }}
+      </button>
+    </div>
   </div>
 </ng-template>
 
 <ng-template dockPanelDef="color">
+  <div class="panel-tabs">
+    <button type="button" [class.on]="colorTab === 'color'" (click)="colorTab = 'color'">Color</button>
+    <button type="button" [class.on]="colorTab === 'palette'" (click)="colorTab = 'palette'">Palette</button>
+  </div>
+
+  <ng-container *ngIf="colorTab === 'color'">
   <div class="swatches-large">
     <label>
       <span>Primary</span>
@@ -32,14 +87,57 @@
     </button>
     <div class="pick-row">
       <button type="button" class="action-btn labeled" title="Pick primary color from screen" (click)="pickFromScreen(false)">
-        <span [innerHTML]="uiIcons.pick"></span> Pick P
+        <span [innerHTML]="uiIcons.pick"></span> P
       </button>
       <button type="button" class="action-btn labeled" title="Pick secondary color from screen" (click)="pickFromScreen(true)">
-        <span [innerHTML]="uiIcons.pick"></span> Pick S
+        <span [innerHTML]="uiIcons.pick"></span> S
       </button>
     </div>
   </div>
 
+  <div class="hsv-picker">
+    <div
+      class="sv-square"
+      [style.background]="svBackground"
+      (pointerdown)="onSvDown($event)"
+      (pointermove)="onSvMove($event)"
+      (pointerup)="onSvUp($event)"
+      (pointercancel)="onSvUp($event)"
+      (lostpointercapture)="onSvUp($event)">
+      <span class="sv-cursor" [style.left.%]="pickerSatPct" [style.top.%]="100 - pickerValPct"></span>
+    </div>
+    <input
+      class="hue-slider"
+      type="range"
+      min="0"
+      max="360"
+      [ngModel]="pickerHueDeg"
+      (ngModelChange)="setHue($event)" />
+    <div class="color-fields">
+      <label class="hex-field"><span>HEX</span><input type="text" [ngModel]="primaryColor" (change)="onHexInput($event)" /></label>
+      <label><span>R</span><input type="number" min="0" max="255" [ngModel]="colorChannel(0)" (change)="setColorChannel(0, $event)" /></label>
+      <label><span>G</span><input type="number" min="0" max="255" [ngModel]="colorChannel(1)" (change)="setColorChannel(1, $event)" /></label>
+      <label><span>B</span><input type="number" min="0" max="255" [ngModel]="colorChannel(2)" (change)="setColorChannel(2, $event)" /></label>
+    </div>
+  </div>
+
+  <div class="recent-colors" *ngIf="recentColors.length">
+    <span class="recent-label">Recent</span>
+    <div class="recent-swatches">
+      <button
+        *ngFor="let color of recentColors"
+        type="button"
+        class="swatch"
+        [style.background]="color"
+        [title]="color"
+        (click)="selectPrimary(color)"
+        (contextmenu)="setSecondaryFromPalette($event, color)">
+      </button>
+    </div>
+  </div>
+  </ng-container>
+
+  <ng-container *ngIf="colorTab === 'palette'">
   <div class="palette-controls">
     <label class="pal-select">
       <span>Palette</span>
@@ -64,6 +162,13 @@
         {{ paletteLock ? '🔒 Locked' : '🔓 Lock' }}
       </button>
     </div>
+    <div class="pal-tools">
+      <button type="button" title="Sort by hue" (click)="sortPalette('hue')">Sort H</button>
+      <button type="button" title="Sort by brightness" (click)="sortPalette('lum')">Sort L</button>
+      <button type="button" title="Add primary→secondary gradient ramp" (click)="addGradientToPalette()">Gradient</button>
+      <button type="button" title="Add harmony colours of the primary" (click)="addHarmonyToPalette()">Harmony</button>
+      <button type="button" title="Build palette from the current sprite" (click)="extractPaletteFromSprite()">From sprite</button>
+    </div>
   </div>
 
   <div class="palette">
@@ -74,7 +179,7 @@
       [style.background]="color"
       [class.selected]="color.toLowerCase() === primaryColor.toLowerCase()"
       [title]="color"
-      (click)="primaryColor = color"
+      (click)="selectPrimary(color)"
       (contextmenu)="setSecondaryFromPalette($event, color)">
     </button>
   </div>
@@ -88,6 +193,60 @@
       <button type="button" [class.on]="ditherMode === '75'" (click)="setDither('75')">75%</button>
     </div>
     <p class="dither-hint">Uses primary + secondary colours.</p>
+  </div>
+  </ng-container>
+</ng-template>
+
+<ng-template dockPanelDef="tilemap">
+  <div class="tilemap-panel">
+    <div class="tilemap-config">
+      <label><span>Tile</span>
+        <select [(ngModel)]="tileSize" (ngModelChange)="onTilemapConfigChange()">
+          <option [ngValue]="8">8</option>
+          <option [ngValue]="16">16</option>
+          <option [ngValue]="24">24</option>
+          <option [ngValue]="32">32</option>
+        </select>
+      </label>
+      <label><span>Cols</span><input type="number" min="1" max="128" [(ngModel)]="tileMapCols" (change)="onTilemapConfigChange()" /></label>
+      <label><span>Rows</span><input type="number" min="1" max="128" [(ngModel)]="tileMapRows" (change)="onTilemapConfigChange()" /></label>
+      <label><span>Zoom</span><input type="number" min="4" max="48" [(ngModel)]="tilemapScale" (change)="onTilemapConfigChange()" /></label>
+    </div>
+    <div class="tilemap-toolbar">
+      <button type="button" (click)="refreshTiles(); renderTilemap()" title="Re-slice tiles from the current sprite">↻ Tiles</button>
+      <button type="button" [class.on]="tileMapAuto" (click)="tileMapAuto = !tileMapAuto" title="Auto-tiling: picks the tile variant from neighbours (uses 16 tiles from the selected one)">⊞ Auto</button>
+      <button type="button" [class.on]="selectedTile === -1" (click)="selectTile(-1)" title="Eraser (or right-click on the map)">⌫ Erase</button>
+      <button type="button" (click)="clearTilemap()" title="Clear the whole map">Clear</button>
+      <button type="button" class="tilemap-export" (click)="exportTilemap()" title="Export map PNG + tileset PNG + JSON">Export ⤓</button>
+    </div>
+    <p *ngIf="tileMapAuto && !autoTileReady" class="tilemap-hint warn">
+      Auto needs 16 tiles starting at the selected one — pick an earlier tile or add more.
+    </p>
+    <p *ngIf="tileMapAuto && autoTileReady" class="tilemap-hint">
+      Auto-tile base = tile {{ selectedTile }} (+15). Paint to connect; right-click erases.
+    </p>
+    <div class="tilemap-tiles">
+      <button
+        *ngFor="let thumb of tileThumbs; let i = index"
+        type="button"
+        class="tile-swatch"
+        [class.selected]="selectedTile === i"
+        [style.background-image]="'url(' + thumb + ')'"
+        [title]="'Tile ' + i"
+        (click)="selectTile(i)"></button>
+      <p *ngIf="!tileThumbs.length" class="tilemap-hint">Draw on the canvas, then ↻ Tiles to slice it.</p>
+    </div>
+    <div class="tilemap-stage">
+      <canvas
+        #tilemapCanvas
+        class="tilemap-canvas"
+        (pointerdown)="onTilemapDown($event)"
+        (pointermove)="onTilemapMove($event)"
+        (pointerup)="onTilemapUp($event)"
+        (pointercancel)="onTilemapUp($event)"
+        (lostpointercapture)="onTilemapUp($event)"
+        (contextmenu)="$event.preventDefault()"></canvas>
+    </div>
   </div>
 </ng-template>
 
@@ -103,9 +262,10 @@
     </canvas>
   </div>
   <label class="duration">
-    <span>Display zoom</span>
+    <span>Preview zoom</span>
     <input type="range" min="2" max="12" [(ngModel)]="displayZoom" (input)="render()" />
   </label>
+  <label class="check" title="Repeat 3×3 to check seamless tiling"><input type="checkbox" [(ngModel)]="tiledPreview" (change)="render()" /> Tiled (seamless) preview</label>
 </ng-template>
 
 <ng-template dockPanelDef="canvas">
@@ -118,13 +278,9 @@
       <span>Height</span>
       <input type="number" min="8" max="128" [(ngModel)]="height" />
     </label>
-    <label title="Zoom (+ / −)">
+    <label class="span-2" title="Zoom (+ / −)">
       <span>Zoom · {{ zoom }}x</span>
       <input type="range" [min]="minZoom" [max]="maxZoom" [(ngModel)]="zoom" (input)="render()" />
-    </label>
-    <label title="Brush size ( [ / ] )">
-      <span>Brush</span>
-      <input type="number" min="1" max="8" [(ngModel)]="brushSize" />
     </label>
   </div>
   <div class="btn-row">
@@ -133,8 +289,7 @@
   </div>
   <div class="check-row">
     <label class="check" title="Toggle grid (G)"><input type="checkbox" [(ngModel)]="showGrid" (change)="render()" /> Grid</label>
-    <label class="check"><input type="checkbox" [(ngModel)]="onionSkin" (change)="render()" /> Onion</label>
-    <label class="check" title="Toggle mirror (Shift+M)"><input type="checkbox" [(ngModel)]="mirrorX" (change)="render()" /> Mirror X</label>
+    <label class="check"><input type="checkbox" [(ngModel)]="onionSkin" (change)="render()" /> Onion skin</label>
   </div>
   <div class="onion-controls" *ngIf="onionSkin">
     <label class="check"><input type="checkbox" [(ngModel)]="onionTint" (change)="render()" /> Tint prev/next</label>
@@ -148,20 +303,26 @@
     </label>
   </div>
 
-  <div class="export-props">
-    <span class="props-title">Export / Anchor</span>
-    <label class="prop-row">
-      <span>Sheet columns</span>
-      <input type="number" min="0" max="32" [(ngModel)]="sheetColumns" title="0 = auto (square grid)" />
-    </label>
-    <div class="prop-row">
-      <span>Pivot</span>
-      <div class="seg">
-        <button type="button" [class.on]="pivotPreset === 'center'" (click)="setPivot('center')">Center</button>
-        <button type="button" [class.on]="pivotPreset === 'feet'" (click)="setPivot('feet')">Feet</button>
-        <button type="button" [class.on]="pivotPreset === 'topleft'" (click)="setPivot('topleft')">Top-L</button>
-      </div>
+  <div class="ref-controls">
+    <span class="tool-group-label">Reference</span>
+    <div class="btn-row" *ngIf="!referenceImage">
+      <button type="button" (click)="refInput.click()">Load image…</button>
     </div>
+    <ng-container *ngIf="referenceImage">
+      <div class="check-row">
+        <label class="check"><input type="checkbox" [(ngModel)]="referenceVisible" (change)="render()" /> Show</label>
+        <label class="check" title="Draw above the artwork"><input type="checkbox" [(ngModel)]="referenceAbove" (change)="render()" /> On top</label>
+      </div>
+      <label>
+        <span>Opacity</span>
+        <input type="range" min="0.05" max="1" step="0.05" [(ngModel)]="referenceOpacity" (input)="render()" />
+      </label>
+      <div class="btn-row">
+        <button type="button" (click)="refInput.click()">Replace…</button>
+        <button type="button" class="danger-action" (click)="clearReference()">Remove</button>
+      </div>
+    </ng-container>
+    <input #refInput hidden type="file" accept="image/*" (change)="loadReference($event)" />
   </div>
 </ng-template>
 
@@ -480,29 +641,6 @@
           <button type="button" class="icon-btn" title="Duplicate workspace" (click)="duplicateWorkspace()">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
           </button>
-          <button type="button" class="icon-btn danger" title="Clear layer" (click)="clearLayer()">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/><path d="M6 7l1 13a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-13"/></svg>
-          </button>
-        </div>
-
-        <div class="edit-group">
-          <button type="button" class="icon-btn" title="Rotate left" [innerHTML]="uiIcons.rotateL" (click)="rotateSelection(false)"></button>
-          <button type="button" class="icon-btn" title="Rotate right" [innerHTML]="uiIcons.rotateR" (click)="rotateSelection(true)"></button>
-          <button type="button" class="icon-btn" title="Flip horizontal (Shift+H)" [innerHTML]="uiIcons.flipH" (click)="flipSelection(true)"></button>
-          <button type="button" class="icon-btn" title="Flip vertical (Shift+V)" [innerHTML]="uiIcons.flipV" (click)="flipSelection(false)"></button>
-        </div>
-
-        <div class="edit-group">
-          <button type="button" class="icon-btn" title="Nudge left (←)" [innerHTML]="uiIcons.arrowL" (click)="shift(-1, 0)"></button>
-          <button type="button" class="icon-btn" title="Nudge right (→)" [innerHTML]="uiIcons.arrowR" (click)="shift(1, 0)"></button>
-          <button type="button" class="icon-btn" title="Nudge up (↑)" [innerHTML]="uiIcons.arrowU" (click)="shift(0, -1)"></button>
-          <button type="button" class="icon-btn" title="Nudge down (↓)" [innerHTML]="uiIcons.arrowD" (click)="shift(0, 1)"></button>
-        </div>
-
-        <div class="edit-group">
-          <button type="button" class="icon-btn" title="Copy (Ctrl+C)" [innerHTML]="uiIcons.copy" (click)="copySelection()"></button>
-          <button type="button" class="icon-btn" title="Cut (Ctrl+X)" [innerHTML]="uiIcons.cut" (click)="cutSelection()"></button>
-          <button type="button" class="icon-btn" title="Paste (Ctrl+V)" [innerHTML]="uiIcons.paste" (click)="pasteSelection()"></button>
         </div>
 
         <span class="topbar-spacer"></span>
@@ -517,12 +655,35 @@
             <button type="button" (click)="loadIdlePresetExample(); fileMenuOpen = false">Idle example</button>
             <button type="button" (click)="loadTreeExample(); fileMenuOpen = false">Tree example</button>
             <button type="button" (click)="loadBlendTreeExample()">Blend tree (Multiply/Screen/Add)</button>
+            <span class="menu-label">Timelapse</span>
+            <button type="button" [class.danger-action]="recording" (click)="toggleRecording()">
+              {{ recording ? '■ Stop recording (' + timelapseFrames.length + ')' : '⏺ Record timelapse' }}
+            </button>
+            <button type="button" [disabled]="timelapseFrames.length < 2" (click)="exportTimelapse()">Export timelapse (GIF)</button>
+            <span class="menu-label">Edit</span>
+            <button type="button" (click)="outlineLayer(); fileMenuOpen = false">Outline layer (secondary)</button>
+            <button type="button" (click)="replaceColor(); fileMenuOpen = false">Replace secondary → primary</button>
+            <button type="button" class="danger-action" (click)="clearLayer(); fileMenuOpen = false">Clear active layer</button>
           </div>
         </div>
 
         <div class="menu export-menu">
           <button type="button" (click)="toggleExportMenu()">Export ▾</button>
           <div class="menu-dropdown" *ngIf="exportMenuOpen">
+            <div class="export-settings" (click)="$event.stopPropagation()">
+              <label class="prop-row">
+                <span>Sheet columns</span>
+                <input type="number" min="0" max="32" [(ngModel)]="sheetColumns" title="0 = auto (square grid)" />
+              </label>
+              <div class="prop-row">
+                <span>Pivot</span>
+                <div class="seg">
+                  <button type="button" [class.on]="pivotPreset === 'center'" (click)="setPivot('center')">Center</button>
+                  <button type="button" [class.on]="pivotPreset === 'feet'" (click)="setPivot('feet')">Feet</button>
+                  <button type="button" [class.on]="pivotPreset === 'topleft'" (click)="setPivot('topleft')">Top-L</button>
+                </div>
+              </div>
+            </div>
             <span class="menu-label">Image</span>
             <button type="button" (click)="exportPngScale(1)">PNG · 1x</button>
             <button type="button" (click)="exportPngScale(2)">PNG · 2x</button>
@@ -573,6 +734,23 @@
         <input #projectInput hidden type="file" accept=".pixelart.json,application/json" (change)="importProject($event)" />
       </header>
 
+      <!-- Contextual selection / clipboard actions (operate on the selection,
+           or the whole layer when nothing is selected). -->
+      <div class="selection-bar">
+        <span class="sel-group">
+          <button type="button" class="icon-btn" title="Rotate left" [innerHTML]="uiIcons.rotateL" (click)="rotateSelection(false)"></button>
+          <button type="button" class="icon-btn" title="Rotate right" [innerHTML]="uiIcons.rotateR" (click)="rotateSelection(true)"></button>
+          <button type="button" class="icon-btn" title="Flip horizontal (Shift+H)" [innerHTML]="uiIcons.flipH" (click)="flipSelection(true)"></button>
+          <button type="button" class="icon-btn" title="Flip vertical (Shift+V)" [innerHTML]="uiIcons.flipV" (click)="flipSelection(false)"></button>
+        </span>
+        <span class="sel-group">
+          <button type="button" class="icon-btn" title="Copy (Ctrl+C)" [disabled]="!hasSelection" [innerHTML]="uiIcons.copy" (click)="copySelection()"></button>
+          <button type="button" class="icon-btn" title="Cut (Ctrl+X)" [disabled]="!hasSelection" [innerHTML]="uiIcons.cut" (click)="cutSelection()"></button>
+          <button type="button" class="icon-btn" title="Paste (Ctrl+V)" [innerHTML]="uiIcons.paste" (click)="pasteSelection()"></button>
+        </span>
+        <span class="sel-hint">{{ hasSelection ? selectionLabel : 'No selection — acts on whole layer' }}</span>
+      </div>
+
       <div
         #canvasWrap
         class="canvas-wrap"
@@ -601,7 +779,9 @@
         <span><strong>Selection</strong>{{ selectionLabel }}</span>
         <span><strong>Layer</strong>{{ activeLayer.name }}</span>
         <span><strong>Frame</strong>{{ activeFrameIndex + 1 }} / {{ frames.length }}</span>
-        <span *ngIf="mirrorX" class="status-accent"><strong>Mirror</strong>X</span>
+        <span *ngIf="symmetry !== 'off'" class="status-accent"><strong>Sym</strong>{{ symmetry }}</span>
+        <span *ngIf="pixelPerfect" class="status-accent"><strong>PP</strong>on</span>
+        <span *ngIf="recording" class="status-rec"><strong>● REC</strong>{{ timelapseFrames.length }}</span>
       </footer>
     </section>
 
@@ -712,7 +892,13 @@
     [style.height.px]="dock.isCollapsed(f.id) ? null : f.rect.h"
     [style.z-index]="f.z"
     (pointerdown)="dock.bringToFront(f.id)">
-    <header class="dock-head float-head" (pointerdown)="beginFloatDrag($event, f.id, 'move')">
+    <header
+      class="dock-head float-head"
+      (pointerdown)="beginFloatDrag($event, f.id, 'move')"
+      (pointermove)="onFloatMove($event)"
+      (pointerup)="onFloatEnd($event)"
+      (pointercancel)="onFloatEnd($event)"
+      (lostpointercapture)="onFloatEnd($event)">
       <span class="dock-title">{{ panelTitles[f.id] }}</span>
       <span class="dock-tools">
         <button type="button" class="dock-btn" [title]="dock.isCollapsed(f.id) ? 'Expand' : 'Collapse'" (pointerdown)="$event.stopPropagation()" (click)="dock.toggleCollapse(f.id)">{{ dock.isCollapsed(f.id) ? '▢' : '▬' }}</button>
@@ -723,7 +909,14 @@
     <div class="dock-body float-body" *ngIf="!dock.isCollapsed(f.id)">
       <ng-container *ngTemplateOutlet="templateFor(f.id)"></ng-container>
     </div>
-    <span class="float-resize" *ngIf="!dock.isCollapsed(f.id)" (pointerdown)="beginFloatDrag($event, f.id, 'resize')"></span>
+    <span
+      class="float-resize"
+      *ngIf="!dock.isCollapsed(f.id)"
+      (pointerdown)="beginFloatDrag($event, f.id, 'resize')"
+      (pointermove)="onFloatMove($event)"
+      (pointerup)="onFloatEnd($event)"
+      (pointercancel)="onFloatEnd($event)"
+      (lostpointercapture)="onFloatEnd($event)"></span>
   </article>
 </div>
 

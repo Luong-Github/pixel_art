@@ -701,6 +701,406 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
+.field-grid .span-2 {
+  grid-column: 1 / -1;
+}
+
+.ref-controls {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.status-rec {
+  color: #ff5a5a;
+  font-weight: 700;
+}
+
+/* Contextual selection / clipboard bar above the canvas */
+.selection-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 4px 8px;
+  border-bottom: 1px solid var(--line);
+  background: var(--chrome);
+}
+.sel-group {
+  display: inline-flex;
+  gap: 2px;
+  padding-right: 8px;
+  border-right: 1px solid var(--line);
+}
+.sel-group:last-of-type {
+  border-right: 0;
+}
+.selection-bar .icon-btn[disabled] {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+.sel-hint {
+  font-size: 11px;
+  color: var(--muted);
+  margin-left: auto;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Grouped Tools panel */
+.tools-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.tool-group-label {
+  display: block;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--dim);
+  margin-bottom: 3px;
+}
+.tool-options {
+  border-top: 1px solid var(--line);
+  padding-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.tool-options .opt-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 11px;
+  color: var(--muted);
+}
+.tool-options .opt-row input,
+.tool-options .opt-row select {
+  flex: 1;
+  min-width: 0;
+  max-width: 120px;
+  padding: 3px 5px;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  background: var(--chrome);
+  color: var(--ink);
+  font-size: 11px;
+}
+.tool-options .opt-check {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--muted);
+}
+.opt-hint {
+  margin: 2px 0 0;
+  font-size: 10px;
+  line-height: 1.35;
+  color: var(--dim);
+}
+.opt-btn {
+  padding: 5px 8px;
+  font-size: 11px;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  background: var(--chrome);
+  color: var(--ink);
+  cursor: pointer;
+}
+.opt-btn:hover:not([disabled]) {
+  background: var(--chrome-strong);
+}
+.opt-btn[disabled] {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Tabbed panel header (Color / Palette) */
+.panel-tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+.panel-tabs button {
+  flex: 1;
+  padding: 5px 8px;
+  font-size: 12px;
+  font-weight: 600;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--chrome);
+  color: var(--muted);
+  cursor: pointer;
+}
+.panel-tabs button.on {
+  background: var(--accent-soft);
+  border-color: var(--accent-line);
+  color: var(--accent-strong);
+}
+
+/* Export settings block inside the Export menu */
+.export-settings {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 6px 10px 8px;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 4px;
+}
+.export-settings .prop-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 11px;
+  color: var(--muted);
+}
+.export-settings input[type='number'] {
+  width: 60px;
+  padding: 3px 5px;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  background: var(--chrome-strong);
+  color: var(--ink);
+}
+
+/* Tilemap editor panel */
+.tilemap-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 0;
+}
+.tilemap-config {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 5px;
+}
+.tilemap-config label {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 10px;
+  color: var(--muted);
+}
+.tilemap-config input,
+.tilemap-config select {
+  width: 100%;
+  min-width: 0;
+  padding: 3px 4px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: var(--chrome);
+  color: var(--ink);
+  font-size: 11px;
+}
+.tilemap-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.tilemap-toolbar button {
+  flex: 1 1 auto;
+  padding: 4px 6px;
+  font-size: 11px;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  background: var(--chrome);
+  color: var(--ink);
+  cursor: pointer;
+}
+.tilemap-toolbar button:hover {
+  background: var(--chrome-strong);
+}
+.tilemap-toolbar button.on {
+  border-color: var(--accent-strong);
+  color: var(--accent-strong);
+}
+.tilemap-toolbar .tilemap-export {
+  flex-basis: 100%;
+  background: var(--accent);
+  color: #04110e;
+  border-color: var(--accent);
+  font-weight: 700;
+}
+.tilemap-tiles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+  max-height: 120px;
+  overflow-y: auto;
+  padding: 4px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--panel-soft);
+}
+.tile-swatch {
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background-color: #0c0f14;
+  background-size: cover;
+  background-repeat: no-repeat;
+  image-rendering: pixelated;
+  cursor: pointer;
+}
+.tile-swatch.selected {
+  outline: 2px solid var(--accent-strong);
+  outline-offset: -1px;
+}
+.tilemap-hint {
+  margin: 4px;
+  font-size: 11px;
+  color: var(--muted);
+}
+.tilemap-hint.warn {
+  color: #e0a23a;
+}
+.tilemap-stage {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: #0c0f14;
+  padding: 6px;
+}
+.tilemap-canvas {
+  display: block;
+  image-rendering: pixelated;
+  cursor: crosshair;
+  touch-action: none;
+}
+
+/* HSV color picker */
+.hsv-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  margin-bottom: 8px;
+}
+.sv-square {
+  position: relative;
+  width: 100%;
+  height: 110px;
+  border-radius: 6px;
+  border: 1px solid var(--line);
+  cursor: crosshair;
+  touch-action: none;
+}
+.sv-cursor {
+  position: absolute;
+  width: 11px;
+  height: 11px;
+  margin: -6px 0 0 -6px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.6);
+  pointer-events: none;
+}
+.hue-slider {
+  width: 100%;
+  height: 14px;
+  -webkit-appearance: none;
+  appearance: none;
+  border-radius: 7px;
+  border: 1px solid var(--line);
+  background: linear-gradient(
+    to right,
+    #f00 0%, #ff0 17%, #0f0 33%, #0ff 50%, #00f 67%, #f0f 83%, #f00 100%
+  );
+}
+.hue-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 8px;
+  height: 18px;
+  border-radius: 3px;
+  background: #fff;
+  border: 1px solid #0b0e12;
+  cursor: ew-resize;
+}
+.hue-slider::-moz-range-thumb {
+  width: 8px;
+  height: 18px;
+  border-radius: 3px;
+  background: #fff;
+  border: 1px solid #0b0e12;
+  cursor: ew-resize;
+}
+.color-fields {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr 1fr 1fr;
+  gap: 5px;
+}
+.color-fields label {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 10px;
+  color: var(--muted);
+}
+.color-fields input {
+  width: 100%;
+  min-width: 0;
+  padding: 3px 4px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: var(--chrome);
+  color: var(--ink);
+  font-size: 11px;
+}
+
+.recent-colors {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+.recent-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--muted);
+  flex-shrink: 0;
+}
+.recent-swatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+}
+.recent-swatches .swatch {
+  width: 18px;
+  height: 18px;
+}
+
+.pal-tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 6px;
+}
+.pal-tools button {
+  flex: 1 1 auto;
+  padding: 3px 6px;
+  font-size: 11px;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  background: var(--chrome);
+  color: var(--ink);
+  cursor: pointer;
+}
+.pal-tools button:hover {
+  background: var(--chrome-strong);
+}
+
 .tb-playtag select,
 .tb-blend select {
   max-width: 110px;
@@ -1172,22 +1572,7 @@
   min-height: 36px;
 }
 
-/* ---- Export / pivot props (Canvas panel) ---- */
-.export-props {
-  margin-top: 12px;
-  padding-top: 12px;
-  border-top: 1px solid var(--line);
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-.props-title {
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--dim);
-}
+/* ---- Export / pivot props (shared with the Export menu) ---- */
 .prop-row {
   display: flex;
   align-items: center;
