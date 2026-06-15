@@ -50,6 +50,7 @@ type Tool =
   | 'fill'
   | 'gradient'
   | 'shade'
+  | 'spray'
   | 'picker'
   | 'line'
   | 'rect'
@@ -282,6 +283,10 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
 
   @ViewChild('groupMenuEl')
   private groupMenuRef?: ElementRef<HTMLElement>;
+  @ViewChild('paletteMenuEl')
+  private paletteMenuRef?: ElementRef<HTMLElement>;
+  @ViewChild('paletteColorInput')
+  private paletteColorInputRef?: ElementRef<HTMLInputElement>;
   @ViewChild('dlgInput')
   private dlgInputRef?: ElementRef<HTMLInputElement>;
 
@@ -303,6 +308,10 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
   convertModalOpen = false;
   /** Right-click context menu for a layer row ({x,y} viewport coords + layer index). */
   layerMenu: { x: number; y: number; index: number } | null = null;
+  /** Right-click context menu for a palette swatch ({x,y} coords + palette index). */
+  paletteMenu: { x: number; y: number; index: number } | null = null;
+  /** Swatch index being edited via the native colour picker (survives menu close). */
+  private paletteEditIndex = -1;
   /** Custom prompt/confirm/alert dialog (replaces window.prompt/confirm/alert). */
   dialog: {
     type: 'prompt' | 'confirm' | 'alert';
@@ -366,7 +375,9 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
   }
 
   toggleFileMenu(): void {
-    this.fileMenuOpen = !this.fileMenuOpen;
+    const open = !this.fileMenuOpen;
+    this.closeTopMenus();
+    this.fileMenuOpen = open;
   }
 
   openConvertModal(): void {
@@ -415,6 +426,7 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
       fill: `${s}<path d="M6.5 3.5l9 9-6.5 6.5a2.5 2.5 0 0 1-3.5 0l-3-3a2.5 2.5 0 0 1 0-3.5z"/><path d="M9 6l8 8"/><path d="M20 14.5s1.5 2 1.5 3.2A1.7 1.7 0 0 1 18.5 18c0-1.2 1.5-3.5 1.5-3.5z"/></svg>`,
       gradient: `${s}<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 8h.01M11 8h.01M15 8h.01M7 12h.01M11 12h.01M9 16h.01"/></svg>`,
       shade: `${s}<circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 0 0 18z" fill="currentColor" stroke="none"/></svg>`,
+      spray: `${s}<path d="M9 8h6l1 12H8z"/><path d="M9 8V5h6v3"/><path d="M18 4h.01M20 6h.01M19 9h.01M21 11h.01M18 12h.01"/></svg>`,
       picker: `${s}<path d="M3 21l1-4 9.5-9.5 3 3L7 20z"/><path d="M14.5 4.5l2-2a2.1 2.1 0 0 1 3 3l-2 2"/></svg>`,
       line: `${s}<line x1="5" y1="19" x2="19" y2="5"/><circle cx="5" cy="19" r="1.4" fill="currentColor"/><circle cx="19" cy="5" r="1.4" fill="currentColor"/></svg>`,
       rect: `${s}<rect x="4" y="5" width="16" height="14" rx="1"/></svg>`,
@@ -438,6 +450,7 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
     { id: 'fill', label: 'Fill', key: 'B' },
     { id: 'gradient', label: 'Gradient', key: 'D' },
     { id: 'shade', label: 'Shade', key: 'A' },
+    { id: 'spray', label: 'Spray', key: 'K' },
     { id: 'picker', label: 'Pick', key: 'I' },
     { id: 'line', label: 'Line', key: 'L' },
     { id: 'rect', label: 'Rect', key: 'R' },
@@ -451,7 +464,7 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
 
   /** Tools grouped for the Tools panel (separators + labels). */
   readonly toolGroups: { label: string; ids: Tool[] }[] = [
-    { label: 'Draw', ids: ['pen', 'eraser', 'fill', 'gradient', 'shade', 'picker'] },
+    { label: 'Draw', ids: ['pen', 'eraser', 'fill', 'gradient', 'shade', 'spray', 'picker'] },
     { label: 'Shape', ids: ['line', 'rect', 'ellipse'] },
     { label: 'Select', ids: ['select', 'wand', 'lasso', 'move', 'transform'] },
   ];
@@ -633,6 +646,12 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
   /** Shading ink: ramp + direction (-1 darker / +1 lighter) for the stroke. */
   private shadeRamp: string[] = [];
   private shadeDir = -1;
+  /** Spray brush: the few palette shades around the primary, sampled at random. */
+  private sprayColors: string[] = [];
+  /** Spray density: fraction of cells in the brush radius painted per dab. */
+  sprayDensity = 0.2;
+  /** Spray clump size: value-noise cell size (bigger = larger, softer blobs). */
+  sprayScatter = 4;
   /** Custom brush stamp captured from a selection (pen stamps it). */
   customBrush: { w: number; h: number; pixels: Pixel[] } | null = null;
   /** Timelapse recording of the drawing process. */
@@ -1049,7 +1068,9 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
   }
 
   togglePanelsMenu(): void {
-    this.panelsMenuOpen = !this.panelsMenuOpen;
+    const open = !this.panelsMenuOpen;
+    this.closeTopMenus();
+    this.panelsMenuOpen = open;
   }
 
   // ---- floating window drag / resize (pointer based) ----------------------
@@ -1158,6 +1179,167 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
     this.workspaces.push(workspace);
     this.activeWorkspaceIndex = this.workspaces.length - 1;
     this.applyWorkspace(workspace);
+  }
+
+  /** Load a stylised conifer/bush tree on a grassy mound (from a reference). */
+  loadBushTreeExample(): void {
+    this.fileMenuOpen = false;
+    this.saveCurrentWorkspace();
+    const id = this.workspaceIdSeed;
+    this.workspaceIdSeed += 1;
+    const workspace = this.buildBushTree(id);
+    this.workspaces.push(workspace);
+    this.activeWorkspaceIndex = this.workspaces.length - 1;
+    this.applyWorkspace(workspace);
+  }
+
+  private buildBushTree(id: number): WorkspaceState {
+    const W = 32;
+    const H = 40;
+    const cx = 16;
+    const px = new Array<Pixel>(W * H).fill(null);
+    const inB = (x: number, y: number) => x >= 0 && y >= 0 && x < W && y < H;
+    const set = (x: number, y: number, c: string) => {
+      if (inB(x, y)) px[y * W + x] = c;
+    };
+    const get = (x: number, y: number) => (inB(x, y) ? px[y * W + x] : null);
+    const ellipse = (
+      ecx: number,
+      ecy: number,
+      rx: number,
+      ry: number,
+      c: string,
+      pred?: (x: number, y: number) => boolean,
+    ) => {
+      for (let y = Math.ceil(ecy - ry); y <= Math.floor(ecy + ry); y += 1) {
+        for (let x = Math.ceil(ecx - rx); x <= Math.floor(ecx + rx); x += 1) {
+          const dx = (x - ecx) / rx;
+          const dy = (y - ecy) / ry;
+          if (dx * dx + dy * dy <= 1 && (!pred || pred(x, y))) set(x, y, c);
+        }
+      }
+    };
+
+    const C = {
+      out: '#16331c', // dark outline
+      dk: '#2e6233', // shadow green
+      md: '#4f9a3f', // base green
+      lt: '#82c64f', // highlight
+      gout: '#1f4a22',
+      gdk: '#3f7a2e',
+      gmd: '#6fb83e',
+      glt: '#9bd45c',
+      tout: '#241712',
+      tdk: '#4a2e22',
+      tmd: '#6b4632',
+      tlt: '#8a5a40',
+    };
+
+    // Grassy mound at the base.
+    ellipse(cx, 34, 11, 5, C.gout);
+    ellipse(cx, 34, 10, 4, C.gdk);
+    ellipse(cx, 33, 9, 3.4, C.gmd);
+    ellipse(cx - 2, 32, 5, 2, C.glt);
+
+    // Teardrop crown: half-width per row (pointed top, round bottom).
+    const hw = [
+      1, 2, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 10, 11, 11, 11, 11,
+      10, 10, 9, 8, 6,
+    ];
+    const top = 4;
+    for (let i = 0; i < hw.length; i += 1) {
+      const y = top + i;
+      for (let x = cx - hw[i]; x <= cx + hw[i]; x += 1) set(x, y, C.md);
+    }
+    // Lower-right shading.
+    for (let i = 0; i < hw.length; i += 1) {
+      const y = top + i;
+      for (let x = cx - hw[i]; x <= cx + hw[i]; x += 1) {
+        if (get(x, y) === C.md && x - cx + (y - 14) > 7) set(x, y, C.dk);
+      }
+    }
+    // Soft highlight blobs (upper-left) + a few scattered leaves.
+    [
+      [12, 9, 2, 1],
+      [10, 13, 3, 2],
+      [13, 16, 2, 1],
+      [9, 19, 3, 2],
+      [14, 22, 3, 1],
+      [11, 25, 2, 1],
+      [19, 14, 2, 1],
+      [20, 20, 2, 1],
+    ].forEach(([bx, by, rx, ry]) => ellipse(bx, by, rx, ry, C.lt));
+    // Dark texture cuts.
+    [
+      [15, 12],
+      [17, 18],
+      [13, 21],
+      [18, 24],
+      [10, 16],
+    ].forEach(([bx, by]) => {
+      set(bx, by, C.dk);
+      set(bx + 1, by, C.dk);
+    });
+
+    // Crown outline: any green pixel touching empty/grass gets the dark border.
+    const greens = new Set([C.md, C.dk, C.lt]);
+    const snap = px.slice();
+    for (let y = 0; y < H; y += 1) {
+      for (let x = 0; x < W; x += 1) {
+        const c = snap[y * W + x];
+        if (!c || !greens.has(c)) continue;
+        for (const [nx, ny] of [
+          [x - 1, y],
+          [x + 1, y],
+          [x, y - 1],
+          [x, y + 1],
+        ]) {
+          const nc = inB(nx, ny) ? snap[ny * W + nx] : null;
+          if (!nc || (!greens.has(nc) && nc !== C.out)) set(nx, ny, C.out);
+        }
+      }
+    }
+
+    // Trunk hollow (knot) at the base, sitting on the mound.
+    ellipse(cx, 30, 5, 4, C.tout);
+    ellipse(cx, 30, 4, 3, C.tdk);
+    ellipse(cx, 31, 3, 2, C.tmd);
+    ellipse(cx - 1, 31, 1.6, 1, C.tlt);
+
+    const frame: Frame = {
+      name: 'Frame 1',
+      duration: 160,
+      visible: true,
+      layers: [
+        {
+          name: 'Tree',
+          visible: true,
+          locked: false,
+          opacity: 1,
+          blend: 'normal',
+          groupId: null,
+          pixels: px,
+        },
+      ],
+    };
+    return {
+      id,
+      name: 'Bush tree',
+      width: W,
+      height: H,
+      frames: [frame],
+      tags: [],
+      groups: [],
+      activeFrameIndex: 0,
+      activeLayerIndex: 0,
+      palette: [
+        C.out, C.dk, C.md, C.lt, C.gout, C.gdk, C.gmd, C.glt,
+        C.tout, C.tdk, C.tmd, C.tlt,
+      ],
+      primaryColor: C.md,
+      secondaryColor: C.out,
+      view: { ...this.defaultView(), zoom: 8, displayZoom: 6 },
+    };
   }
 
   private buildBlendTree(id: number): WorkspaceState {
@@ -2587,6 +2769,9 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
       this.shadeDir = event.button === 2 || event.altKey ? 1 : -1;
       this.shadeRamp = this.buildShadeRamp();
       this.shadeAt(point.x, point.y);
+    } else if (this.activeTool === 'spray') {
+      this.sprayColors = this.buildSprayColors();
+      this.sprayAt(point.x, point.y);
     } else if (this.activeTool === 'select') {
       this.selection = { x: point.x, y: point.y, w: 1, h: 1, pixels: [] };
     } else if (this.activeTool === 'move' && this.selection) {
@@ -2765,6 +2950,12 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
       );
       this.pointer.x = point.x;
       this.pointer.y = point.y;
+    } else if (this.activeTool === 'spray') {
+      this.drawLine(this.pointer.x, this.pointer.y, point.x, point.y, (x, y) =>
+        this.sprayAt(x, y),
+      );
+      this.pointer.x = point.x;
+      this.pointer.y = point.y;
     } else if (this.activeTool === 'gradient' && this.gradientBase) {
       this.previewPixels = [...this.gradientBase];
       this.applyGradient(
@@ -2884,6 +3075,36 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
     this.eachSelectionPixel(this.selection, (x, y) =>
       this.setPixel(this.activeLayer.pixels, x, y, null),
     );
+    this.render();
+  }
+
+  /** Lift the selected pixels onto a brand-new layer (copy, or cut from source). */
+  selectionToNewLayer(cut = false): void {
+    const sel = this.selection;
+    if (!sel || (cut && this.activeLayerLocked)) return;
+    // Grab the selected pixels from the active layer of the current frame.
+    const src = this.activeLayer.pixels;
+    const picked: { x: number; y: number; c: string }[] = [];
+    this.eachSelectionPixel(sel, (x, y) => {
+      const c = src[this.index(x, y)];
+      if (c) picked.push({ x, y, c });
+    });
+    if (!picked.length) return;
+    this.pushUndo();
+    if (cut) {
+      for (const p of picked) this.setPixel(this.activeLayer.pixels, p.x, p.y, null);
+    }
+    // Insert an aligned new layer above the active one across all frames.
+    const at = this.activeLayerIndex + 1;
+    const groupId = this.layerGroupId(this.activeLayerIndex);
+    const name = `Selection ${this.timelineLayerCount + 1}`;
+    for (const frame of this.frames) {
+      frame.layers.splice(at, 0, this.createLayer(name, groupId));
+    }
+    // Paint the lifted pixels onto the new layer of the current frame only.
+    const newLayer = this.frames[this.activeFrameIndex].layers[at];
+    for (const p of picked) this.setPixel(newLayer.pixels, p.x, p.y, p.c);
+    this.activeLayerIndex = at;
     this.render();
   }
 
@@ -3095,7 +3316,9 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
   // ===================== Export suite =====================
 
   toggleExportMenu(): void {
-    this.exportMenuOpen = !this.exportMenuOpen;
+    const open = !this.exportMenuOpen;
+    this.closeTopMenus();
+    this.exportMenuOpen = open;
   }
 
   /** Free users keep PNG @1x/@2x (watermarked); the rest is Pro. */
@@ -3103,7 +3326,7 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
     if (this.premium.isPro) return true;
     const go = await this.askConfirm({
       title: `${feature} is a Pro feature`,
-      message: 'Unlock Pro to use it. Enter a license key? (demo key: PIXELPRO)',
+      message: 'Unlock Pro to use it. Enter a license key?',
       okLabel: 'Enter key',
     });
     if (go) await this.promptActivatePro();
@@ -3113,7 +3336,7 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
   async promptActivatePro(): Promise<void> {
     const key = await this.askPrompt({
       title: 'Unlock Pro',
-      message: 'Enter your Pro license key (demo: PIXELPRO).',
+      message: 'Enter your Pro license key.',
       placeholder: 'License key',
       okLabel: 'Activate',
     });
@@ -3300,6 +3523,90 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
     );
   }
 
+  /** Background fill for video export (video has no transparency). */
+  videoBg = '#ffffff';
+
+  /**
+   * Export the animation as a video for social media (GIF is often rejected).
+   * Records a scaled offscreen canvas with MediaRecorder — MP4 (H.264) when the
+   * browser supports it, otherwise WebM. No dependencies.
+   */
+  async exportVideo(scale = 4): Promise<void> {
+    this.exportMenuOpen = false;
+    if (!this.isBrowser || typeof MediaRecorder === 'undefined') {
+      await this.showAlert({ title: 'Video', message: 'Trình duyệt không hỗ trợ ghi video.' });
+      return;
+    }
+    if (!(await this.requirePro('Video (MP4) export'))) return;
+    const indices = this.exportFrameIndices();
+    if (!indices.length) return;
+    const W = this.width * scale;
+    const H = this.height * scale;
+    const off = document.createElement('canvas');
+    off.width = W;
+    off.height = H;
+    const ctx = off.getContext('2d');
+    if (!ctx) return;
+    ctx.imageSmoothingEnabled = false;
+
+    const mp4 = 'video/mp4;codecs=avc1.42E01E';
+    const webm = 'video/webm;codecs=vp9';
+    const type = MediaRecorder.isTypeSupported(mp4)
+      ? mp4
+      : MediaRecorder.isTypeSupported(webm)
+        ? webm
+        : 'video/webm';
+    const ext = type.startsWith('video/mp4') ? 'mp4' : 'webm';
+
+    const durs = indices.map((fi) => Math.max(40, this.frames[fi]?.duration ?? 130));
+    const total = durs.reduce((a, b) => a + b, 0);
+    const drawAt = (elapsed: number) => {
+      let t = elapsed % total;
+      let fi = indices[0];
+      for (let k = 0; k < indices.length; k += 1) {
+        if (t < durs[k]) {
+          fi = indices[k];
+          break;
+        }
+        t -= durs[k];
+      }
+      ctx.fillStyle = this.videoBg;
+      ctx.fillRect(0, 0, W, H);
+      ctx.drawImage(this.renderFrameCanvas(fi, scale), 0, 0);
+    };
+
+    drawAt(0);
+    const stream = off.captureStream(60);
+    const chunks: BlobPart[] = [];
+    const rec = new MediaRecorder(stream, { mimeType: type, videoBitsPerSecond: 12_000_000 });
+    rec.ondataavailable = (e) => {
+      if (e.data.size) chunks.push(e.data);
+    };
+    const stopped = new Promise<void>((res) => {
+      rec.onstop = () => res();
+    });
+    rec.start();
+    // Loop a few times so very short animations aren't sub-second clips.
+    const loops = Math.max(1, Math.ceil(2000 / total));
+    const runMs = total * loops;
+    const start = performance.now();
+    await new Promise<void>((res) => {
+      const tick = () => {
+        const e = performance.now() - start;
+        drawAt(e);
+        if (e >= runMs) {
+          res();
+          return;
+        }
+        requestAnimationFrame(tick);
+      };
+      tick();
+    });
+    rec.stop();
+    await stopped;
+    this.downloadBlob(new Blob(chunks, { type }), `${this.exportBaseName()}.${ext}`);
+  }
+
   /**
    * Quantize a canvas region and write it as a GIF frame, mapping only truly
    * transparent pixels (alpha 0) to the transparent index — so opaque black
@@ -3438,7 +3745,11 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
     this.applyWorkspace(this.workspaces[0]);
   }
 
-  triggerProjectImport(): void {
+  /** 'replace' opens a project (wipes session); 'append' adds its workspaces as tabs. */
+  private projectImportMode: 'replace' | 'append' = 'replace';
+
+  triggerProjectImport(mode: 'replace' | 'append' = 'replace'): void {
+    this.projectImportMode = mode;
     this.projectInputRef.nativeElement.click();
   }
 
@@ -3450,10 +3761,33 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
     }
     try {
       const project = JSON.parse(await file.text()) as PixelArtProjectFile;
-      this.loadProject(project);
+      if (this.projectImportMode === 'append') this.appendProject(project);
+      else this.loadProject(project);
     } finally {
       input.value = '';
+      this.projectImportMode = 'replace';
     }
+  }
+
+  /** Add a project's workspaces as new tabs, keeping existing ones. */
+  private appendProject(project: PixelArtProjectFile): void {
+    if (
+      project.app !== 'Pixel Studio' ||
+      !Array.isArray(project.workspaces) ||
+      project.workspaces.length === 0
+    ) {
+      throw new Error('Unsupported Pixel Studio project file.');
+    }
+    this.saveCurrentWorkspace();
+    const startIndex = this.workspaces.length;
+    for (const ws of project.workspaces) {
+      const normalized = this.normalizeWorkspace(ws);
+      normalized.id = this.workspaceIdSeed;
+      this.workspaceIdSeed += 1;
+      this.workspaces.push(normalized);
+    }
+    this.activeWorkspaceIndex = startIndex;
+    this.applyWorkspace(this.activeWorkspace);
   }
 
   selectFrame(index: number): void {
@@ -4139,6 +4473,73 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
     this.layerMenu = null;
   }
 
+  // ---- Palette swatch right-click menu ----
+
+  onPaletteContextMenu(event: MouseEvent, index: number): void {
+    event.preventDefault();
+    this.paletteMenu = { x: event.clientX, y: event.clientY, index };
+    if (this.isBrowser) requestAnimationFrame(() => this.clampPaletteMenu());
+  }
+
+  private clampPaletteMenu(): void {
+    const el = this.paletteMenuRef?.nativeElement;
+    if (!this.paletteMenu || !el) return;
+    const pad = 8;
+    const maxX = window.innerWidth - el.offsetWidth - pad;
+    const maxY = window.innerHeight - el.offsetHeight - pad;
+    this.paletteMenu = {
+      ...this.paletteMenu,
+      x: Math.max(pad, Math.min(this.paletteMenu.x, maxX)),
+      y: Math.max(pad, Math.min(this.paletteMenu.y, maxY)),
+    };
+  }
+
+  closePaletteMenu(): void {
+    this.paletteMenu = null;
+  }
+
+  /** Use the menu's swatch as primary / secondary. */
+  paletteMenuSetColor(secondary: boolean): void {
+    if (!this.paletteMenu) return;
+    const color = this.palette[this.paletteMenu.index];
+    if (!color) return;
+    if (secondary) this.secondaryColor = color;
+    else this.primaryColor = color;
+    this.closePaletteMenu();
+  }
+
+  /** Open a native colour picker to replace the menu's swatch in place. */
+  editPaletteColor(): void {
+    const input = this.paletteColorInputRef?.nativeElement;
+    if (!this.paletteMenu || !input) return;
+    this.paletteEditIndex = this.paletteMenu.index; // survives the menu closing
+    input.value = this.normalizeRequiredColor(this.palette[this.paletteMenu.index], '#000000');
+    input.click();
+  }
+
+  /** Commit the native colour picker's value to the swatch being edited. */
+  onPaletteColorEdit(event: Event): void {
+    const index = this.paletteEditIndex;
+    if (index < 0 || index >= this.palette.length) return;
+    const value = (event.target as HTMLInputElement).value;
+    const old = this.palette[index];
+    this.palette = this.palette.map((c, i) => (i === index ? value : c));
+    // Keep primary/secondary pointing at the edited colour if they used it.
+    if (old && this.primaryColor.toLowerCase() === old.toLowerCase()) this.primaryColor = value;
+    if (old && this.secondaryColor.toLowerCase() === old.toLowerCase()) this.secondaryColor = value;
+    this.paletteEditIndex = -1;
+    this.closePaletteMenu();
+    this.render();
+  }
+
+  /** Remove the menu's swatch from the current palette. */
+  deletePaletteColor(): void {
+    if (!this.paletteMenu) return;
+    const index = this.paletteMenu.index;
+    this.palette = this.palette.filter((_, i) => i !== index);
+    this.closePaletteMenu();
+  }
+
   // ---- Custom dialog (prompt / confirm / alert) ----
 
   /** Text-input dialog. Resolves to the entered string, or null if cancelled. */
@@ -4234,11 +4635,26 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
     }
   }
 
-  @HostListener('document:click')
-  onDocumentClick(): void {
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event?: Event): void {
     if (this.layerMenu) this.layerMenu = null;
     if (this.tagMenu) this.tagMenu = null;
     if (this.groupMenu) this.groupMenu = null;
+    if (this.paletteMenu) this.paletteMenu = null;
+    // Close the topbar dropdowns when clicking anywhere outside a `.menu`.
+    const target = event?.target as HTMLElement | undefined;
+    if (target && !target.closest('.menu')) this.closeTopMenus();
+  }
+
+  closeTopMenus(): void {
+    this.fileMenuOpen = false;
+    this.exportMenuOpen = false;
+    this.panelsMenuOpen = false;
+  }
+
+  /** Close the dropdown after an action button is clicked (inputs keep it open). */
+  onMenuPick(event: Event): void {
+    if ((event.target as HTMLElement).closest('button')) this.closeTopMenus();
   }
 
   @HostListener('document:keydown.escape')
@@ -4656,6 +5072,22 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
         if (seen.size >= 64) break;
       }
     }
+    if (seen.size) this.palette = [...seen].slice(0, 64);
+  }
+
+  /** Build the palette from the colours inside the current selection only. */
+  extractPaletteFromSelection(): void {
+    const sel = this.selection;
+    if (!sel) return;
+    const seen = new Set<string>();
+    this.eachSelectionPixel(sel, (x, y) => {
+      const i = this.index(x, y);
+      for (const layer of this.activeFrame.layers) {
+        if (!layer.visible) continue;
+        const px = layer.pixels[i];
+        if (px) seen.add(px.toLowerCase());
+      }
+    });
     if (seen.size) this.palette = [...seen].slice(0, 64);
   }
 
@@ -5120,6 +5552,82 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
     }
   }
 
+  /** The few palette shades around the primary that a spray dab samples from.
+   *  Picked by colour distance (RGB) so spraying a grey stays grey — neighbours
+   *  share the primary's hue, not just its brightness. */
+  private buildSprayColors(): string[] {
+    const pal = this.dedupeColors([...this.palette]);
+    const primary = this.lockColor(this.primaryColor);
+    if (pal.length >= 3) {
+      const [pr, pg, pb] = this.hexToRgb(primary);
+      const near = pal
+        .map((c) => {
+          const [r, g, b] = this.hexToRgb(c);
+          return { c, d: (pr - r) ** 2 + (pg - g) ** 2 + (pb - b) ** 2 };
+        })
+        .sort((a, b) => a.d - b.d)
+        .slice(0, 5)
+        .map((e) => e.c);
+      if (near.length >= 3) return near;
+    }
+    // Palette too small → synthesise a 5-step brightness ramp from the primary.
+    const [r, g, b] = this.hexToRgb(primary);
+    return [1.28, 1.13, 1, 0.85, 0.7].map((f) =>
+      this.rgbToHex(
+        this.clamp(Math.round(r * f), 0, 255),
+        this.clamp(Math.round(g * f), 0, 255),
+        this.clamp(Math.round(b * f), 0, 255),
+      ),
+    );
+  }
+
+  /** Smooth value noise in [0,1] on a coarse grid — gives spray its coherent
+   *  clumps (and shade patches) instead of salt-and-pepper single pixels. */
+  private sprayNoise(x: number, y: number, seed: number): number {
+    const cell = Math.max(2, this.sprayScatter);
+    const gx = Math.floor(x / cell);
+    const gy = Math.floor(y / cell);
+    const fx = x / cell - gx;
+    const fy = y / cell - gy;
+    const h = (ix: number, iy: number) => {
+      const n = Math.sin(ix * 127.1 + iy * 311.7 + seed * 53.3) * 43758.5453;
+      return n - Math.floor(n);
+    };
+    const a = h(gx, gy);
+    const b = h(gx + 1, gy);
+    const c = h(gx, gy + 1);
+    const d = h(gx + 1, gy + 1);
+    const sx = fx * fx * (3 - 2 * fx); // smoothstep
+    const sy = fy * fy * (3 - 2 * fy);
+    return a + (b - a) * sx + (c - a) * sy + (a - b - c + d) * sx * sy;
+  }
+
+  /** Spray brush: scatter palette-neighbour shades within the radius, clumped by
+   *  value noise so it reads as soft mottled water / light / foam — not noise.
+   *  Soft edges + coherent shade patches; build up with repeated passes. */
+  private sprayAt(x: number, y: number): void {
+    if (!this.sprayColors.length) this.sprayColors = this.buildSprayColors();
+    const radius = Math.max(2, this.brushSize * 2);
+    const r2 = radius * radius;
+    const len = this.sprayColors.length;
+    for (let oy = -radius; oy <= radius; oy += 1) {
+      for (let ox = -radius; ox <= radius; ox += 1) {
+        const dist2 = ox * ox + oy * oy;
+        if (dist2 > r2) continue;
+        const px = x + ox;
+        const py = y + oy;
+        if (!this.isInSelection(px, py)) continue; // stay inside an active selection
+        const falloff = 1 - dist2 / r2; // airbrush-soft edge
+        const clump = this.sprayNoise(px, py, 11); // coherent blob shape
+        const prob = this.sprayDensity * falloff * (0.3 + clump * 1.1);
+        if (Math.random() >= prob) continue;
+        // shade from a 2nd noise field → neighbours share a shade (soft loang)
+        const idx = Math.min(len - 1, Math.floor(this.sprayNoise(px, py, 29) * len));
+        this.setMirroredPixel(this.activeLayer.pixels, px, py, this.sprayColors[idx]);
+      }
+    }
+  }
+
   setImportPreset(longSide: number): void {
     this.importLongSide = longSide;
   }
@@ -5165,6 +5673,9 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
       if (key === 'k') {
         event.preventDefault();
         this.toggleCommandPalette();
+      } else if (key === 'j') {
+        event.preventDefault();
+        this.selectionToNewLayer(event.shiftKey);
       } else if (key === 'z') {
         event.preventDefault();
         event.shiftKey ? this.redo() : this.undo();
@@ -7098,6 +7609,16 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
       : this.copyPixels(selection);
   }
 
+  /** True if (x,y) is inside the active selection (or always, when none). */
+  private isInSelection(x: number, y: number): boolean {
+    const s = this.selection;
+    if (!s) return true;
+    const rx = x - s.x;
+    const ry = y - s.y;
+    if (rx < 0 || ry < 0 || rx >= s.w || ry >= s.h) return false;
+    return !s.mask || !!s.mask[ry * s.w + rx];
+  }
+
   private eachSelectionPixel(
     selection: Selection,
     fn: (x: number, y: number) => void,
@@ -7622,6 +8143,10 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
       const ctx = c.getContext('2d');
       if (!ctx) return;
       ctx.imageSmoothingEnabled = false;
+      // Solid background so the clip isn't transparent — video editors (CapCut,
+      // etc.) ignore GIF alpha and would otherwise show it as black.
+      ctx.fillStyle = this.videoBg;
+      ctx.fillRect(0, 0, w, h);
       ctx.drawImage(src, 0, 0, src.width, src.height, 0, 0, w, h);
       this.stampWatermark(ctx, w, h);
       // Linger on the final frame so the result is readable in a loop.

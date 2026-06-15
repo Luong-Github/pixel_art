@@ -45,6 +45,7 @@ export class GuideComponent {
     { key: 'B', name: 'Fill', desc: 'Flood-fill a connected area.' },
     { key: 'D', name: 'Gradient', desc: 'Drag primary→secondary; linear/radial with Bayer dither.' },
     { key: 'A', name: 'Shade', desc: 'Drag to darken (Alt: lighten) along the palette ramp.' },
+    { key: 'K', name: 'Spray', desc: 'Scatter palette shades around the primary in soft clumps — fast mottled water, light & foam. Size = radius; Density & Scatter (clump size) in tool options; make a selection to confine it.' },
     { key: 'I', name: 'Picker', desc: 'Sample a color from the canvas.' },
     { key: 'L', name: 'Line', desc: 'Draw a straight line.' },
     { key: 'R', name: 'Rectangle', desc: 'Draw a rectangle outline.' },
@@ -58,7 +59,7 @@ export class GuideComponent {
 
   readonly shortcuts: Shortcut[] = [
     { keys: 'Ctrl + K', action: 'Command palette (search every action)' },
-    { keys: 'P E B D A I L R O S W Q M T', action: 'Pick a tool' },
+    { keys: 'P E B D A K I L R O S W Q M T', action: 'Pick a tool' },
     { keys: 'Shift / Alt + Wand·Lasso', action: 'Add to / subtract from selection' },
     { keys: 'T then drag handles', action: 'Transform: scale / rotate / move' },
     { keys: 'Enter / Esc', action: 'Commit / cancel a transform' },
@@ -66,6 +67,7 @@ export class GuideComponent {
     { keys: 'Ctrl + Z', action: 'Undo' },
     { keys: 'Ctrl + Y / Ctrl + Shift + Z', action: 'Redo' },
     { keys: 'Ctrl + C / X / V', action: 'Copy / cut / paste selection' },
+    { keys: 'Ctrl + J / Ctrl + Shift + J', action: 'Selection → new layer (copy / cut)' },
     { keys: 'Delete', action: 'Cut selection' },
     { keys: '← ↑ → ↓', action: 'Nudge selection / layer' },
     { keys: 'Enter', action: 'Play / pause animation' },

@@ -34,6 +34,18 @@
       <p class="opt-hint">Drag primary→secondary across the selection (or whole layer).</p>
     </div>
     <p class="opt-hint" *ngIf="activeTool === 'shade'">Shade: drag to darken · hold Alt to lighten (uses the palette ramp).</p>
+    <div class="tool-options" *ngIf="activeTool === 'spray'">
+      <span class="tool-group-label">Spray</span>
+      <label class="opt-row" title="How densely each dab scatters pixels">
+        <span>Density</span>
+        <input type="range" min="0.08" max="0.8" step="0.04" [(ngModel)]="sprayDensity" />
+      </label>
+      <label class="opt-row" title="Clump size — bigger = larger, softer blobs (less speckly)">
+        <span>Scatter</span>
+        <input type="range" min="2" max="10" step="1" [(ngModel)]="sprayScatter" />
+      </label>
+      <p class="opt-hint">Scatters palette shades around the primary in soft clumps (Size = radius). Make a <strong>selection</strong> to keep it inside. Great for water, light &amp; foam — pick the Water palette first.</p>
+    </div>
 
     <div class="tool-options">
       <span class="tool-group-label">Brush</span>
@@ -175,22 +187,24 @@
       <button type="button" title="Add primary→secondary gradient ramp" (click)="addGradientToPalette()">Gradient</button>
       <button type="button" title="Add harmony colours of the primary" (click)="addHarmonyToPalette()">Harmony</button>
       <button type="button" title="Build palette from the current sprite" (click)="extractPaletteFromSprite()">From sprite</button>
+      <button type="button" title="Build palette from the colours inside the selection" [disabled]="!hasSelection" (click)="extractPaletteFromSelection()">From sel</button>
       <button type="button" title="Recolor the whole sprite to the nearest palette colours" (click)="remapToPalette()">Recolor sprite</button>
     </div>
   </div>
 
   <div class="palette">
     <button
-      *ngFor="let color of palette"
+      *ngFor="let color of palette; let i = index"
       type="button"
       class="swatch"
       [style.background]="color"
       [class.selected]="color.toLowerCase() === primaryColor.toLowerCase()"
-      [title]="color"
+      [title]="color + ' — right-click to edit'"
       (click)="selectPrimary(color)"
-      (contextmenu)="setSecondaryFromPalette($event, color)">
+      (contextmenu)="onPaletteContextMenu($event, i)">
     </button>
   </div>
+  <input #paletteColorInput type="color" class="visually-hidden" (change)="onPaletteColorEdit($event)" />
 
   <div class="dither-controls">
     <span class="dither-label">Dither brush</span>
@@ -655,7 +669,7 @@
 
         <div class="menu file-menu">
           <button type="button" class="primary-action" (click)="toggleFileMenu()">File ▾</button>
-          <div class="menu-dropdown" *ngIf="fileMenuOpen">
+          <div class="menu-dropdown" *ngIf="fileMenuOpen" (click)="onMenuPick($event)">
             <span class="menu-label">Import</span>
             <button type="button" (click)="openConvertModal()">Import / convert image…</button>
             <button type="button" (click)="extractPaletteOnly(); fileMenuOpen = false">Extract palette</button>
@@ -664,6 +678,7 @@
             <button type="button" (click)="loadIdlePresetExample(); fileMenuOpen = false">Idle example</button>
             <button type="button" (click)="loadTreeExample(); fileMenuOpen = false">Tree example</button>
             <button type="button" (click)="loadBlendTreeExample()">Blend tree (Multiply/Screen/Add)</button>
+            <button type="button" (click)="loadBushTreeExample()">Bush tree</button>
             <span class="menu-label">Timelapse</span>
             <button type="button" [class.danger-action]="recording" (click)="toggleRecording()">
               {{ recording ? '■ Stop recording (' + timelapseFrames.length + ')' : '⏺ Record timelapse' }}
@@ -679,7 +694,7 @@
 
         <div class="menu export-menu">
           <button type="button" (click)="toggleExportMenu()">Export ▾</button>
-          <div class="menu-dropdown" *ngIf="exportMenuOpen">
+          <div class="menu-dropdown" *ngIf="exportMenuOpen" (click)="onMenuPick($event)">
             <div class="export-settings" (click)="$event.stopPropagation()">
               <label class="prop-row">
                 <span>Sheet columns</span>
@@ -700,19 +715,26 @@
             <button type="button" class="pro" (click)="exportPngScale(4)">PNG · 4x <em>✦</em></button>
             <button type="button" class="pro" (click)="exportPngScale(8)">PNG · 8x <em>✦</em></button>
             <span class="menu-label">Animation</span>
-            <button type="button" class="pro" (click)="exportGif(1)">Animated GIF <em>✦</em></button>
+            <button type="button" class="pro" (click)="exportGif(1)">Animated GIF · 1x <em>✦</em></button>
             <button type="button" class="pro" (click)="exportGif(2)">Animated GIF · 2x <em>✦</em></button>
+            <button type="button" class="pro" (click)="exportGif(4)">Animated GIF · 4x <em>✦</em></button>
+            <button type="button" class="pro" (click)="exportGif(8)">Animated GIF · 8x <em>✦</em></button>
+            <span class="menu-label">Video (social media)</span>
+            <button type="button" class="pro" (click)="exportVideo(4)">MP4 / WebM · 4x <em>✦</em></button>
+            <button type="button" class="pro" (click)="exportVideo(8)">MP4 / WebM · 8x <em>✦</em></button>
+            <label class="export-bg" (click)="$event.stopPropagation()">Video background <input type="color" [(ngModel)]="videoBg" /></label>
             <button type="button" class="pro" (click)="exportSpriteSheet('grid', 1)">Sprite sheet · grid + JSON <em>✦</em></button>
             <button type="button" class="pro" (click)="exportSpriteSheet('row', 1)">Sprite sheet · row + JSON <em>✦</em></button>
             <span class="menu-label">Project</span>
             <button type="button" (click)="exportProject(); exportMenuOpen = false">Export Project (.json)</button>
-            <button type="button" (click)="triggerProjectImport(); exportMenuOpen = false">Import Project</button>
+            <button type="button" (click)="triggerProjectImport('append'); exportMenuOpen = false">Import as tab(s) (keep current)</button>
+            <button type="button" (click)="triggerProjectImport('replace'); exportMenuOpen = false">Open Project (replace all)</button>
           </div>
         </div>
 
         <div class="menu view-menu">
           <button type="button" (click)="togglePanelsMenu()">View ▾</button>
-          <div class="menu-dropdown" *ngIf="panelsMenuOpen">
+          <div class="menu-dropdown" *ngIf="panelsMenuOpen" (click)="onMenuPick($event)">
             <span class="menu-label">Panels</span>
             <label *ngFor="let id of panelIds" class="check">
               <input type="checkbox" [checked]="!dock.isHidden(id)" (change)="dock.toggleHidden(id)" />
@@ -757,6 +779,10 @@
           <button type="button" class="icon-btn" title="Copy (Ctrl+C)" [disabled]="!hasSelection" [innerHTML]="uiIcons.copy" (click)="copySelection()"></button>
           <button type="button" class="icon-btn" title="Cut (Ctrl+X)" [disabled]="!hasSelection" [innerHTML]="uiIcons.cut" (click)="cutSelection()"></button>
           <button type="button" class="icon-btn" title="Paste (Ctrl+V)" [innerHTML]="uiIcons.paste" (click)="pasteSelection()"></button>
+        </span>
+        <span class="sel-group">
+          <button type="button" class="sel-btn" title="Copy selection to a new layer (Ctrl+J)" [disabled]="!hasSelection" (click)="selectionToNewLayer(false)">⧉ Layer</button>
+          <button type="button" class="sel-btn" title="Cut selection to a new layer (Ctrl+Shift+J)" [disabled]="!hasSelection" (click)="selectionToNewLayer(true)">✂ Layer</button>
         </span>
         <span class="sel-hint">{{ hasSelection ? selectionLabel : 'No selection — acts on whole layer' }}</span>
       </div>
@@ -1089,6 +1115,26 @@
   </label>
   <span class="menu-sep"></span>
   <button type="button" class="danger-action" (click)="ungroup(groupMenu.id)">Ungroup</button>
+</div>
+
+<!-- ============================================================
+     Palette swatch right-click context menu
+     ============================================================ -->
+<div
+  #paletteMenuEl
+  class="context-menu menu-dropdown"
+  *ngIf="paletteMenu"
+  [style.left.px]="paletteMenu.x"
+  [style.top.px]="paletteMenu.y">
+  <span class="menu-label">
+    <span class="menu-swatch" [style.background]="palette[paletteMenu.index]"></span>
+    {{ palette[paletteMenu.index] }}
+  </span>
+  <button type="button" (click)="paletteMenuSetColor(false)">Set as primary</button>
+  <button type="button" (click)="paletteMenuSetColor(true)">Set as secondary</button>
+  <span class="menu-sep"></span>
+  <button type="button" (click)="editPaletteColor()">Edit colour…</button>
+  <button type="button" class="danger-action" (click)="deletePaletteColor()">Remove from palette</button>
 </div>
 
 <!-- ============================================================

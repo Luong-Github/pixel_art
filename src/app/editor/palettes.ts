@@ -66,6 +66,50 @@ export const BUILTIN_PALETTES: NamedPalette[] = [
       '#e8b796', '#c28569',
     ],
   },
+
+  // ---- Purpose palettes: each spans deep shadow → bright highlight for strong
+  // contrast, with hue-shifted ramps (cooler/darker shadows, warmer/lighter tips).
+  {
+    id: 'water',
+    name: 'Water',
+    // Deep blue → cyan → foam, plus a teal accent for reflective glints.
+    colors: [
+      '#06182e', '#0d2b50', '#164a78', '#216f9e', '#2f93c4', '#54b3e0',
+      '#86d2f1', '#bfecff', '#eafaff', '#ffffff', '#1f9e8d', '#0a3f3a',
+    ],
+  },
+  {
+    id: 'glass',
+    name: 'Glass (paint at low opacity)',
+    // Built for see-through: paint on a layer (or brush) with reduced opacity so
+    // the background reads through. Pale blue tints + bright edge highlights, a
+    // thin dark rim, and stained-glass tints (green/violet). Order: highlight first.
+    colors: [
+      '#ffffff', '#eaf7ff', '#c7e8fb', '#9bd3f0', '#6fb9e2', '#3f93c4',
+      '#bdeed6', '#7fdcc0', '#d9c2f0', '#f6c9e0', '#243447', '#0e1a28',
+    ],
+  },
+  {
+    id: 'tech',
+    name: 'Tech / Devices',
+    // Cool brushed-steel grays (near-black → white) + emissive LED/warning accents.
+    colors: [
+      '#0c0f14', '#171d26', '#27303b', '#3b4654', '#52606f', '#717f8e',
+      '#9aa7b4', '#c6d0d9', '#eef3f7', '#ffffff', '#00e5d0', '#36d399',
+      '#ff5d5d', '#ffd23f',
+    ],
+  },
+  {
+    id: 'nature',
+    name: 'Nature',
+    // Foliage greens (blue-green shade → yellow-green tip), bark/earth browns,
+    // and sky/water + flower accents for focal pops.
+    colors: [
+      '#16240f', '#26401a', '#3a6326', '#4f7d2a', '#6f9a32', '#8cae3e',
+      '#b5d35a', '#e6e6a3', '#2c1a10', '#4a2f1c', '#6e4a2c', '#9a6f3f',
+      '#c39a5e', '#7fb4d8', '#3f7fbf', '#e36a8a',
+    ],
+  },
 ];
 
 export const PALETTE_STORAGE_KEY = 'pixelart.palettes.v1';

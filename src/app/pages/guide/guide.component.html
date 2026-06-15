@@ -95,10 +95,11 @@
         <h2 class="h-lg">Color &amp; palette</h2>
         <ul class="bullets">
           <li><strong>HSV picker</strong> — drag the saturation/value square and the hue slider, or type a <strong>HEX</strong> / <strong>R G B</strong> value, to set the primary color.</li>
-          <li><strong>Primary / Secondary</strong> colors — left-click a swatch sets primary, right-click sets secondary. Swap them with <kbd>X</kbd>. <strong>Recent</strong> colors appear above the palette.</li>
-          <li><strong>Palette tools</strong> — Sort by hue / brightness, add a primary→secondary <strong>Gradient</strong> ramp, generate <strong>Harmony</strong> colours from the primary, or build the palette <strong>From sprite</strong> (its used colours).</li>
+          <li><strong>Primary / Secondary</strong> colors — left-click a swatch sets primary; <strong>right-click</strong> opens a menu to set it as primary/secondary, <strong>edit the colour</strong> (native picker, replaces it in place) or <strong>remove it</strong> from the palette. Swap primary/secondary with <kbd>X</kbd>. <strong>Recent</strong> colors appear above the palette.</li>
+          <li><strong>Palette tools</strong> — Sort by hue / brightness, add a primary→secondary <strong>Gradient</strong> ramp, generate <strong>Harmony</strong> colours from the primary, build the palette <strong>From sprite</strong> (its used colours) or <strong>From sel</strong> (only the colours inside the current selection — handy for grabbing one object's palette).</li>
           <li><strong>Pick from screen</strong> — the eyedropper buttons sample any on-screen color.</li>
           <li><strong>Built-in palettes</strong> — load PICO-8, Game Boy, NES, DawnBringer 16, ENDESGA 32 or the <strong>Shadow Ramp</strong> (a light→dark shading ramp) from the dropdown.</li>
+          <li><strong>Purpose palettes</strong> — ready-made ramps for common subjects, each spanning deep shadow → bright highlight for strong contrast: <strong>Water</strong> (deep blue → cyan → foam), <strong>Tech / Devices</strong> (brushed-steel greys + LED accents), <strong>Nature</strong> (foliage greens + bark + sky/flower pops), and <strong>Glass</strong> — paint it on a layer (or brush) at <strong>reduced opacity</strong> so the background shows through for a see-through effect.</li>
           <li><strong>Save</strong> your current palette (kept in the browser) and reload it later.</li>
           <li><strong>Palette lock</strong> — when on (🔒), every stroke snaps to the nearest palette color so you never stray off-palette.</li>
         </ul>
@@ -109,6 +110,7 @@
         <p>Layers live in the <strong>Timeline</strong>’s left column (one row per layer).</p>
         <ul class="bullets">
           <li><strong>Add / Duplicate / Delete</strong> layers from the timeline toolbar.</li>
+          <li><strong>Selection → new layer</strong> — with a selection active, use <strong>⧉ Layer</strong> / <strong>✂ Layer</strong> on the selection bar (or <kbd>Ctrl</kbd>+<kbd>J</kbd> to copy, <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>J</kbd> to cut) to lift the selected pixels onto a fresh layer above.</li>
           <li><strong>Reorder</strong> by dragging the ⠿ handle, or with the ▲ / ▼ buttons.</li>
           <li><strong>Visibility</strong> (◉/○) and <strong>lock</strong> (🔒) per layer — a locked layer can’t be drawn on or edited.</li>
           <li><strong>Rename</strong> inline, and set the active layer’s <strong>opacity</strong> with the slider.</li>
@@ -169,7 +171,8 @@
         <p>From <strong>Export ▾</strong>:</p>
         <ul class="bullets">
           <li><strong>PNG</strong> at 1× / 2× (free) or 4× / 8× (Pro), with transparency preserved.</li>
-          <li><strong>Animated GIF</strong> (Pro) of the visible frames, using each frame’s duration.</li>
+          <li><strong>Animated GIF</strong> (Pro) at 1× / 2× / 4× / 8× of the visible frames, using each frame’s duration (transparency preserved).</li>
+          <li><strong>Video for social media</strong> (Pro) — <strong>MP4</strong> (or WebM where MP4 isn’t supported) at 4× / 8×, since many platforms reject GIF. Video has no transparency, so pick a <strong>Video background</strong> colour first.</li>
           <li><strong>Sprite sheet</strong> (Pro) — grid or single row — plus an engine-ready <strong>JSON atlas</strong> (frame size, count, durations, columns, pivot and <strong>animation tags</strong>).</li>
           <li><strong>Pivot / anchor</strong> — set Center / Feet / Top-left in the Canvas panel; it’s written into the sprite-sheet JSON.</li>
         </ul>
@@ -180,8 +183,10 @@
         <h2 class="h-lg">Projects</h2>
         <p>
           Use <strong>Export Project</strong> to save a <code>.pixelart.json</code> file containing all
-          workspaces, frames, layers, palette and settings — then <strong>Import Project</strong> to
-          continue later. Everything stays local to your machine.
+          workspaces, frames, layers, palette and settings. Bring one back with either
+          <strong>Import as tab(s)</strong> — adds its workspaces as new tabs, keeping your current
+          ones — or <strong>Open Project (replace all)</strong> to load it as a fresh session.
+          Everything stays local to your machine.
         </p>
       </section>
 
