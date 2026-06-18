@@ -639,6 +639,8 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
   referenceOpacity = 0.5;
   referenceVisible = true;
   referenceAbove = false;
+  /** True when the reference is pixel-native (e.g. a .json export) — drawn crisp, no smoothing. */
+  referencePixelExact = false;
   /** Gradient tool options. */
   gradientShape: 'linear' | 'radial' = 'linear';
   gradientDither = true;
@@ -3954,6 +3956,26 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
     this.render();
   }
 
+  /** Add a new ungrouped layer just above the given group, keeping the group's run intact. */
+  addLayerAboveGroup(groupId: number): void {
+    this.pushUndo();
+    const name = `Layer ${this.timelineLayerCount + 1}`;
+    // Insert before the group's first member so the new layer stays outside the group.
+    let at = this.timelineLayerCount;
+    for (let i = 0; i < this.timelineLayerCount; i += 1) {
+      if (this.layerGroupId(i) === groupId) {
+        at = i;
+        break;
+      }
+    }
+    for (const frame of this.frames) {
+      frame.layers.splice(at, 0, this.createLayer(name, null));
+    }
+    this.activeLayerIndex = at;
+    this.groupMenu = null;
+    this.render();
+  }
+
   moveLayerToGroup(layerIndex: number, groupId: number | null): void {
     this.pushUndo();
     this.setLayerGroupAcross(layerIndex, groupId);
@@ -6551,7 +6573,7 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
     if (!img) return;
     this.ctx.save();
     this.ctx.globalAlpha = this.referenceOpacity;
-    this.ctx.imageSmoothingEnabled = true;
+    this.ctx.imageSmoothingEnabled = !this.referencePixelExact;
     this.ctx.drawImage(img, 0, 0, this.canvasWidth, this.canvasHeight);
     this.ctx.restore();
   }
@@ -6559,19 +6581,77 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
   loadReference(event: Event): void {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0];
+    input.value = '';
     if (!file) return;
+    // A Pixel Studio export (.pixelart.json) is flattened into a reference image.
+    if (/\.json$/i.test(file.name) || file.type === 'application/json') {
+      void this.loadReferenceFromJson(file);
+      return;
+    }
     const img = new Image();
     img.onload = () => {
-      this.referenceImage = img;
-      this.referenceVisible = true;
-      this.render();
+      this.setReferenceImage(img, false);
     };
     img.src = URL.createObjectURL(file);
-    input.value = '';
+  }
+
+  /** Parse a Pixel Studio export and use its first frame as a flattened reference. */
+  private async loadReferenceFromJson(file: File): Promise<void> {
+    let project: PixelArtProjectFile;
+    try {
+      project = JSON.parse(await file.text()) as PixelArtProjectFile;
+    } catch {
+      return;
+    }
+    const ws = project?.workspaces?.[0];
+    const frame = ws?.frames?.[0];
+    if (!ws || !frame) return;
+    const dataUrl = this.flattenFrameToDataUrl(ws, frame);
+    if (!dataUrl) return;
+    const img = new Image();
+    img.onload = () => {
+      this.setReferenceImage(img, true);
+    };
+    img.src = dataUrl;
+  }
+
+  private setReferenceImage(img: HTMLImageElement, pixelExact: boolean): void {
+    this.referenceImage = img;
+    this.referencePixelExact = pixelExact;
+    this.referenceVisible = true;
+    this.render();
+  }
+
+  /** Composite a frame's visible layers (skipping hidden groups) into a 1:1 PNG data URL. */
+  private flattenFrameToDataUrl(ws: WorkspaceState, frame: Frame): string | null {
+    const w = ws.width;
+    const h = ws.height;
+    if (!w || !h) return null;
+    const canvas = document.createElement('canvas');
+    canvas.width = w;
+    canvas.height = h;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return null;
+    const hiddenGroups = new Set(
+      (ws.groups ?? []).filter((g) => g.visible === false).map((g) => g.id),
+    );
+    for (const layer of frame.layers) {
+      if (layer.visible === false) continue;
+      if (layer.groupId != null && hiddenGroups.has(layer.groupId)) continue;
+      const pixels = layer.pixels ?? [];
+      for (let i = 0; i < pixels.length; i += 1) {
+        const color = pixels[i];
+        if (!color) continue;
+        ctx.fillStyle = color;
+        ctx.fillRect(i % w, Math.floor(i / w), 1, 1);
+      }
+    }
+    return canvas.toDataURL('image/png');
   }
 
   clearReference(): void {
     this.referenceImage = null;
+    this.referencePixelExact = false;
     this.render();
   }
 
@@ -8128,7 +8208,66 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
       });
       return;
     }
-    const first = this.timelapseFrames[0];
+    this.encodeTimelapseGif(this.timelapseFrames);
+  }
+
+  /**
+   * Reconstruct a timelapse GIF from the in-memory undo history when recording
+   * was never turned on. Best-effort: limited to the snapshots still in the
+   * undo stack (this session only — lost on reload).
+   */
+  async exportTimelapseFromHistory(): Promise<void> {
+    this.fileMenuOpen = false;
+    // Oldest → newest: each undo snapshot is the state before an edit, plus the live state.
+    const snapshots = [...this.undoStack, this.serialize()];
+    if (snapshots.length < 2) {
+      await this.showAlert({
+        title: 'Timelapse',
+        message:
+          'Chưa đủ lịch sử vẽ trong phiên này để dựng GIF. Lịch sử undo chỉ tồn tại khi tab editor còn mở và bạn chưa tải lại trang.',
+      });
+      return;
+    }
+    const frames = this.renderSnapshotFrames(snapshots);
+    if (frames.length < 2) return;
+    this.encodeTimelapseGif(frames);
+  }
+
+  /** Render each serialized snapshot's active frame to a 1× canvas, restoring live state after. */
+  private renderSnapshotFrames(snapshots: string[]): HTMLCanvasElement[] {
+    const savedFrames = this.frames;
+    const savedWidth = this.width;
+    const savedHeight = this.height;
+    const savedGroups = this.groups;
+    const savedPreview = this.previewPixels;
+    this.previewPixels = null;
+    const out: HTMLCanvasElement[] = [];
+    try {
+      for (const snap of snapshots) {
+        const state = JSON.parse(snap);
+        this.width = state.width;
+        this.height = state.height;
+        this.frames = state.frames;
+        this.groups = state.groups ?? [];
+        const fi = Math.min(
+          state.activeFrameIndex ?? 0,
+          state.frames.length - 1,
+        );
+        out.push(this.renderFrameCanvas(fi, 1));
+      }
+    } finally {
+      this.frames = savedFrames;
+      this.width = savedWidth;
+      this.height = savedHeight;
+      this.groups = savedGroups;
+      this.previewPixels = savedPreview;
+    }
+    return out;
+  }
+
+  /** Encode a sequence of frame canvases into a watermarked, video-friendly GIF. */
+  private encodeTimelapseGif(sources: HTMLCanvasElement[]): void {
+    const first = sources[0];
     const scale = Math.max(
       1,
       Math.floor(384 / Math.max(first.width, first.height)),
@@ -8136,7 +8275,7 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
     const w = first.width * scale;
     const h = first.height * scale;
     const gif = GIFEncoder();
-    this.timelapseFrames.forEach((src, i) => {
+    sources.forEach((src, i) => {
       const c = document.createElement('canvas');
       c.width = w;
       c.height = h;
@@ -8150,7 +8289,7 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
       ctx.drawImage(src, 0, 0, src.width, src.height, 0, 0, w, h);
       this.stampWatermark(ctx, w, h);
       // Linger on the final frame so the result is readable in a loop.
-      const last = i === this.timelapseFrames.length - 1;
+      const last = i === sources.length - 1;
       this.writeGifFrame(gif, ctx, w, h, last ? 1200 : 90);
     });
     gif.finish();

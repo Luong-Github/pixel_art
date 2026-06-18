@@ -328,7 +328,7 @@
   <div class="ref-controls">
     <span class="tool-group-label">Reference</span>
     <div class="btn-row" *ngIf="!referenceImage">
-      <button type="button" (click)="refInput.click()">Load image…</button>
+      <button type="button" (click)="refInput.click()" title="Load an image or a Pixel Studio .json export">Load image / JSON…</button>
     </div>
     <ng-container *ngIf="referenceImage">
       <div class="check-row">
@@ -344,7 +344,7 @@
         <button type="button" class="danger-action" (click)="clearReference()">Remove</button>
       </div>
     </ng-container>
-    <input #refInput hidden type="file" accept="image/*" (change)="loadReference($event)" />
+    <input #refInput hidden type="file" accept="image/*,.json,application/json" (change)="loadReference($event)" />
   </div>
 </ng-template>
 
@@ -684,6 +684,7 @@
               {{ recording ? '■ Stop recording (' + timelapseFrames.length + ')' : '⏺ Record timelapse' }}
             </button>
             <button type="button" [disabled]="timelapseFrames.length < 2" (click)="exportTimelapse()">Export timelapse (GIF)</button>
+            <button type="button" title="Dựng GIF từ lịch sử undo của phiên hiện tại (khi chưa bật record)" (click)="exportTimelapseFromHistory()">Export GIF từ undo history</button>
             <span class="menu-label">Edit</span>
             <button type="button" (click)="openAdjust(); fileMenuOpen = false">Adjust colours (HSB)…</button>
             <button type="button" (click)="outlineLayer(); fileMenuOpen = false">Outline layer (secondary)</button>
@@ -1107,6 +1108,8 @@
     {{ getGroup(groupMenu.id)!.locked ? 'Unlock group' : 'Lock group' }}
   </button>
   <button type="button" (click)="cycleGroupColor(groupMenu.id); $event.stopPropagation()">Change color</button>
+  <span class="menu-sep"></span>
+  <button type="button" (click)="addLayerAboveGroup(groupMenu.id)">＋ Add layer above group</button>
   <label class="menu-range" (click)="$event.stopPropagation()">
     <span>Opacity</span>
     <input type="range" min="0" max="1" step="0.05"
