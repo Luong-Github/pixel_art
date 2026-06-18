@@ -4,6 +4,7 @@ export type PanelId =
   | 'color'
   | 'display'
   | 'canvas'
+  | 'generate'
   | 'timeline'
   | 'tilemap';
 
@@ -12,6 +13,7 @@ export const PANEL_IDS: PanelId[] = [
   'color',
   'display',
   'canvas',
+  'generate',
   'timeline',
   'tilemap',
 ];
@@ -49,6 +51,7 @@ export const PANEL_TITLES: Record<PanelId, string> = {
   color: 'Color & Palette',
   display: 'Preview',
   canvas: 'Canvas',
+  generate: 'Generate',
   timeline: 'Timeline',
   tilemap: 'Tilemap',
 };
@@ -57,7 +60,7 @@ export function defaultDockState(): DockState {
   return {
     zones: {
       left: ['tools', 'color'],
-      right: ['display', 'canvas'],
+      right: ['display', 'canvas', 'generate'],
       bottom: ['timeline'],
     },
     floating: [],

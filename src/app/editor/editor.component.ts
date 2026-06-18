@@ -656,6 +656,18 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
   sprayScatter = 4;
   /** Custom brush stamp captured from a selection (pen stamps it). */
   customBrush: { w: number; h: number; pixels: Pixel[] } | null = null;
+  /** Procedural fill generator (Pixel Composer-style): writes patterns into the active layer. */
+  genType: 'noise' | 'gradient' | 'checker' | 'bricks' | 'stipple' = 'noise';
+  /** Feature / cell size in pixels (checker, bricks, noise lattice). */
+  genScale = 4;
+  /** Coverage / threshold 0–1 (noise, gradient, stipple). */
+  genDensity = 0.5;
+  genSeed = 1;
+  /** Use the secondary colour as the second tone; off = leave it transparent. */
+  genTwoColor = false;
+  genGradientDir: 'h' | 'v' | 'd' = 'v';
+  /** Clear the cells before generating; off = overlay on top of existing pixels. */
+  genReplace = true;
   /** Timelapse recording of the drawing process. */
   recording = false;
   timelapseFrames: HTMLCanvasElement[] = [];
@@ -1155,10 +1167,25 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
     this.saveCurrentWorkspace();
     const id = this.workspaceIdSeed;
     this.workspaceIdSeed += 1;
-    const workspace = this.createBlankWorkspace(`Workspace ${id}`, id);
+    const workspace = this.createBlankWorkspace(
+      `Workspace ${this.nextWorkspaceNumber()}`,
+      id,
+    );
     this.workspaces.push(workspace);
     this.activeWorkspaceIndex = this.workspaces.length - 1;
     this.applyWorkspace(workspace);
+  }
+
+  /** Smallest positive integer N with no existing "Workspace N" tab — reuses gaps after a close. */
+  private nextWorkspaceNumber(): number {
+    const used = new Set<number>();
+    for (const ws of this.workspaces) {
+      const m = /^Workspace (\d+)$/.exec(ws.name);
+      if (m) used.add(Number(m[1]));
+    }
+    let n = 1;
+    while (used.has(n)) n += 1;
+    return n;
   }
 
   duplicateWorkspace(): void {
@@ -2669,6 +2696,188 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
     this.activeLayer.pixels.fill(null);
     this.selection = null;
     this.render();
+  }
+
+  // ===================== Procedural fill generator =====================
+
+  randomizeGenSeed(): void {
+    this.genSeed = Math.floor(Math.random() * 100000);
+  }
+
+  /** Generate the selected pattern into the active layer (selection-aware, undoable). */
+  applyGenerator(): void {
+    if (this.activeLayerLocked) return;
+    this.pushUndo();
+    const px = this.activeLayer.pixels;
+    if (this.genReplace) {
+      for (let y = 0; y < this.height; y += 1) {
+        for (let x = 0; x < this.width; x += 1) {
+          if (this.inActiveSelection(x, y)) px[this.index(x, y)] = null;
+        }
+      }
+    }
+    const primary = this.lockColor(this.primaryColor);
+    const second: Pixel = this.genTwoColor
+      ? this.lockColor(this.secondaryColor)
+      : null;
+    const rng = this.makeRng(this.genSeed);
+    const scale = Math.max(1, Math.round(this.genScale));
+    const density = this.clamp(this.genDensity, 0, 1);
+    switch (this.genType) {
+      case 'noise':
+        this.genNoise(px, primary, second, scale, density, rng);
+        break;
+      case 'gradient':
+        this.genGradient(px, primary, second, density);
+        break;
+      case 'checker':
+        this.genChecker(px, primary, second, scale);
+        break;
+      case 'bricks':
+        this.genBricks(px, primary, second, scale);
+        break;
+      case 'stipple':
+        this.genStipple(px, primary, second, density, rng);
+        break;
+    }
+    this.refreshActiveFrameThumbnail();
+    this.render();
+  }
+
+  private putGen(px: Pixel[], x: number, y: number, color: Pixel): void {
+    // A null tone means "leave it" — keeps the layer transparent there.
+    if (color === null) return;
+    if (!this.inActiveSelection(x, y)) return;
+    px[this.index(x, y)] = color;
+  }
+
+  /** Smooth value noise thresholded into primary/second tones. */
+  private genNoise(
+    px: Pixel[],
+    primary: Pixel,
+    second: Pixel,
+    scale: number,
+    density: number,
+    rng: () => number,
+  ): void {
+    const gw = Math.ceil(this.width / scale) + 2;
+    const gh = Math.ceil(this.height / scale) + 2;
+    const lattice = new Array<number>(gw * gh);
+    for (let i = 0; i < lattice.length; i += 1) lattice[i] = rng();
+    const smooth = (t: number) => t * t * (3 - 2 * t);
+    for (let y = 0; y < this.height; y += 1) {
+      for (let x = 0; x < this.width; x += 1) {
+        const gx = x / scale;
+        const gy = y / scale;
+        const x0 = Math.floor(gx);
+        const y0 = Math.floor(gy);
+        const fx = smooth(gx - x0);
+        const fy = smooth(gy - y0);
+        const v00 = lattice[y0 * gw + x0];
+        const v10 = lattice[y0 * gw + x0 + 1];
+        const v01 = lattice[(y0 + 1) * gw + x0];
+        const v11 = lattice[(y0 + 1) * gw + x0 + 1];
+        const top = v00 + (v10 - v00) * fx;
+        const bot = v01 + (v11 - v01) * fx;
+        const v = top + (bot - top) * fy;
+        this.putGen(px, x, y, v >= 1 - density ? primary : second);
+      }
+    }
+  }
+
+  /** Ordered (Bayer) dithered gradient along the chosen axis. */
+  private genGradient(
+    px: Pixel[],
+    primary: Pixel,
+    second: Pixel,
+    density: number,
+  ): void {
+    const bayer = EditorComponent.BAYER4;
+    for (let y = 0; y < this.height; y += 1) {
+      for (let x = 0; x < this.width; x += 1) {
+        let t: number;
+        if (this.genGradientDir === 'h') {
+          t = x / Math.max(1, this.width - 1);
+        } else if (this.genGradientDir === 'v') {
+          t = y / Math.max(1, this.height - 1);
+        } else {
+          t = (x + y) / Math.max(1, this.width + this.height - 2);
+        }
+        const level = this.clamp(t + (density - 0.5), 0, 1);
+        const threshold = (bayer[y & 3][x & 3] + 0.5) / 16;
+        this.putGen(px, x, y, level > threshold ? primary : second);
+      }
+    }
+  }
+
+  private genChecker(
+    px: Pixel[],
+    primary: Pixel,
+    second: Pixel,
+    scale: number,
+  ): void {
+    for (let y = 0; y < this.height; y += 1) {
+      for (let x = 0; x < this.width; x += 1) {
+        const cell = (Math.floor(x / scale) + Math.floor(y / scale)) & 1;
+        this.putGen(px, x, y, cell ? second : primary);
+      }
+    }
+  }
+
+  private genBricks(
+    px: Pixel[],
+    primary: Pixel,
+    second: Pixel,
+    scale: number,
+  ): void {
+    const bh = Math.max(2, scale);
+    const bw = Math.max(2, scale * 2);
+    for (let y = 0; y < this.height; y += 1) {
+      const row = Math.floor(y / bh);
+      const offset = row & 1 ? Math.floor(bw / 2) : 0;
+      const mortarRow = y % bh === 0;
+      for (let x = 0; x < this.width; x += 1) {
+        const mortarCol = (x + offset) % bw === 0;
+        this.putGen(px, x, y, mortarRow || mortarCol ? second : primary);
+      }
+    }
+  }
+
+  private genStipple(
+    px: Pixel[],
+    primary: Pixel,
+    second: Pixel,
+    density: number,
+    rng: () => number,
+  ): void {
+    for (let y = 0; y < this.height; y += 1) {
+      for (let x = 0; x < this.width; x += 1) {
+        this.putGen(px, x, y, rng() < density ? primary : second);
+      }
+    }
+  }
+
+  /** True when (x,y) is inside the active selection (or there's no selection). */
+  private inActiveSelection(x: number, y: number): boolean {
+    const sel = this.selection;
+    if (!sel) return true;
+    if (x < sel.x || y < sel.y || x >= sel.x + sel.w || y >= sel.y + sel.h) {
+      return false;
+    }
+    if (sel.mask) return sel.mask[(y - sel.y) * sel.w + (x - sel.x)] !== false;
+    return true;
+  }
+
+  /** Deterministic PRNG (mulberry32) so a given seed always reproduces a pattern. */
+  private makeRng(seed: number): () => number {
+    let a = seed >>> 0;
+    return () => {
+      a |= 0;
+      a = (a + 0x6d2b79f5) | 0;
+      let t = Math.imul(a ^ (a >>> 15), 1 | a);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
   }
 
   togglePlayback(): void {

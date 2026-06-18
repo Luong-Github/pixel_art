@@ -348,6 +348,64 @@
   </div>
 </ng-template>
 
+<ng-template dockPanelDef="generate">
+  <div class="gen-controls">
+    <label class="span-2">
+      <span>Pattern</span>
+      <select [(ngModel)]="genType">
+        <option value="noise">Noise</option>
+        <option value="gradient">Gradient (dither)</option>
+        <option value="checker">Checker</option>
+        <option value="bricks">Bricks</option>
+        <option value="stipple">Stipple</option>
+      </select>
+    </label>
+
+    <label *ngIf="genType !== 'gradient' && genType !== 'stipple'">
+      <span>Scale · {{ genScale }}px</span>
+      <input type="range" min="1" max="16" step="1" [(ngModel)]="genScale" />
+    </label>
+
+    <label *ngIf="genType !== 'checker' && genType !== 'bricks'">
+      <span>Density · {{ (genDensity * 100).toFixed(0) }}%</span>
+      <input type="range" min="0" max="1" step="0.01" [(ngModel)]="genDensity" />
+    </label>
+
+    <label *ngIf="genType === 'gradient'">
+      <span>Direction</span>
+      <select [(ngModel)]="genGradientDir">
+        <option value="v">Vertical</option>
+        <option value="h">Horizontal</option>
+        <option value="d">Diagonal</option>
+      </select>
+    </label>
+
+    <ng-container *ngIf="genType === 'noise' || genType === 'stipple'">
+      <label class="gen-seed">
+        <span>Seed</span>
+        <input type="number" [(ngModel)]="genSeed" />
+      </label>
+      <button type="button" (click)="randomizeGenSeed()">🎲 Random seed</button>
+    </ng-container>
+
+    <div class="check-row">
+      <label class="check" title="Dùng màu secondary làm tông thứ hai (tắt = để trong suốt)">
+        <input type="checkbox" [(ngModel)]="genTwoColor" /> Two colours
+      </label>
+      <label class="check" title="Xoá vùng trước khi sinh (tắt = vẽ chồng lên)">
+        <input type="checkbox" [(ngModel)]="genReplace" /> Replace
+      </label>
+    </div>
+
+    <button type="button" class="gen-apply" [disabled]="activeLayerLocked" (click)="applyGenerator()">
+      Generate into layer
+    </button>
+    <p class="gen-hint">
+      Dùng màu primary{{ genTwoColor ? ' + secondary' : '' }}. Có vùng chọn thì chỉ sinh trong vùng đó.
+    </p>
+  </div>
+</ng-template>
+
 <ng-template dockPanelDef="timeline">
   <div class="timeline-toolbar playback-bar">
     <button type="button" class="tb-icon" title="Previous frame ( , )" (click)="stepFrame(-1)">⏮</button>
