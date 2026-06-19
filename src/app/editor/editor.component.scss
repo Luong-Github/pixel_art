@@ -775,6 +775,14 @@
   font-size: 11px;
   line-height: 1.4;
 }
+.gen-vfx {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
 
 /* Minimap navigator */
 .workspace {

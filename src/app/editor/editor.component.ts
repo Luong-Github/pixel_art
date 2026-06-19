@@ -668,6 +668,10 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
   genGradientDir: 'h' | 'v' | 'd' = 'v';
   /** Clear the cells before generating; off = overlay on top of existing pixels. */
   genReplace = true;
+  /** Animated VFX generator — builds a multi-frame effect in a new workspace tab. */
+  vfxPreset: 'fire' | 'smoke' | 'sparkle' | 'explosion' | 'rain' = 'fire';
+  vfxFrames = 8;
+  vfxSeed = 1;
   /** Timelapse recording of the drawing process. */
   recording = false;
   timelapseFrames: HTMLCanvasElement[] = [];
@@ -2878,6 +2882,278 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
       t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
       return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
     };
+  }
+
+  // ===================== Animated VFX generator =====================
+
+  randomizeVfxSeed(): void {
+    this.vfxSeed = Math.floor(Math.random() * 100000);
+  }
+
+  private static readonly VFX_LABELS: Record<string, string> = {
+    fire: 'Fire',
+    smoke: 'Smoke',
+    sparkle: 'Sparkle',
+    explosion: 'Explosion',
+    rain: 'Rain',
+  };
+
+  /** Build the chosen looping effect as a fresh workspace tab (non-destructive). */
+  generateVfx(): void {
+    this.saveCurrentWorkspace();
+    const id = this.workspaceIdSeed;
+    this.workspaceIdSeed += 1;
+    const workspace = this.buildVfxWorkspace(
+      id,
+      this.vfxPreset,
+      this.clamp(Math.round(this.vfxFrames), 2, 24),
+      this.vfxSeed,
+    );
+    this.workspaces.push(workspace);
+    this.activeWorkspaceIndex = this.workspaces.length - 1;
+    this.applyWorkspace(workspace);
+  }
+
+  private buildVfxWorkspace(
+    id: number,
+    preset: EditorComponent['vfxPreset'],
+    frameCount: number,
+    seed: number,
+  ): WorkspaceState {
+    const W = this.width;
+    const H = this.height;
+    const rng = this.makeRng(seed);
+    const scale = Math.max(2, Math.round(Math.min(W, H) / 10));
+    const periodCells = 8;
+    const noise =
+      preset === 'fire' || preset === 'smoke'
+        ? this.makeTileNoiseY(W, scale, periodCells, rng)
+        : null;
+    // Per-preset particle state, fixed for the whole loop so it animates coherently.
+    const sparkles: { x: number; y: number; birth: number; life: number }[] = [];
+    if (preset === 'sparkle') {
+      const n = Math.max(6, Math.floor((W * H) / 90));
+      for (let i = 0; i < n; i += 1) {
+        sparkles.push({
+          x: Math.floor(rng() * W),
+          y: Math.floor(rng() * H),
+          birth: rng(),
+          life: 0.2 + rng() * 0.4,
+        });
+      }
+    }
+    const drops: { x: number; speed: number; phase: number; len: number }[] = [];
+    if (preset === 'rain') {
+      const n = Math.max(8, Math.floor(W / 2));
+      for (let i = 0; i < n; i += 1) {
+        drops.push({
+          x: Math.floor(rng() * W),
+          speed: 0.7 + rng() * 0.9,
+          phase: rng(),
+          len: 2 + Math.floor(rng() * 3),
+        });
+      }
+    }
+    const frames: Frame[] = [];
+    for (let f = 0; f < frameCount; f += 1) {
+      const t = f / frameCount; // 0..1 loop phase
+      const px = new Array<Pixel>(W * H).fill(null);
+      switch (preset) {
+        case 'fire':
+          this.vfxFire(px, W, H, t, scale, periodCells, noise!);
+          break;
+        case 'smoke':
+          this.vfxSmoke(px, W, H, t, scale, periodCells, noise!);
+          break;
+        case 'sparkle':
+          this.vfxSparkle(px, W, H, t, sparkles);
+          break;
+        case 'explosion':
+          this.vfxExplosion(px, W, H, t);
+          break;
+        case 'rain':
+          this.vfxRain(px, W, H, t, drops);
+          break;
+      }
+      frames.push({
+        name: `Frame ${f + 1}`,
+        duration: 80,
+        visible: true,
+        layers: [
+          {
+            name: EditorComponent.VFX_LABELS[preset],
+            visible: true,
+            locked: false,
+            opacity: 1,
+            blend: 'normal',
+            groupId: null,
+            pixels: px,
+          },
+        ],
+      });
+    }
+    return {
+      id,
+      name: `VFX ${EditorComponent.VFX_LABELS[preset]}`,
+      width: W,
+      height: H,
+      frames,
+      tags: [],
+      groups: [],
+      activeFrameIndex: 0,
+      activeLayerIndex: 0,
+      palette: [...this.palette],
+      primaryColor: this.primaryColor,
+      secondaryColor: this.secondaryColor,
+      view: this.defaultView(),
+    };
+  }
+
+  /** Value noise that tiles vertically (period = periodCells·scale px) for seamless loops. */
+  private makeTileNoiseY(
+    width: number,
+    scale: number,
+    periodCells: number,
+    rng: () => number,
+  ): (x: number, y: number) => number {
+    const gw = Math.ceil(width / scale) + 2;
+    const gh = periodCells;
+    const lattice = new Array<number>(gw * gh);
+    for (let i = 0; i < lattice.length; i += 1) lattice[i] = rng();
+    const smooth = (v: number) => v * v * (3 - 2 * v);
+    return (x: number, y: number) => {
+      const gx = x / scale;
+      const gy = y / scale;
+      const x0 = Math.min(gw - 2, Math.floor(gx));
+      const y0 = Math.floor(gy);
+      const fx = smooth(gx - x0);
+      const fy = smooth(gy - y0);
+      const ya = ((y0 % gh) + gh) % gh;
+      const yb = (ya + 1) % gh;
+      const v00 = lattice[ya * gw + x0];
+      const v10 = lattice[ya * gw + x0 + 1];
+      const v01 = lattice[yb * gw + x0];
+      const v11 = lattice[yb * gw + x0 + 1];
+      const top = v00 + (v10 - v00) * fx;
+      const bot = v01 + (v11 - v01) * fx;
+      return top + (bot - top) * fy;
+    };
+  }
+
+  private rampColor(ramp: string[], v: number): Pixel {
+    if (v <= 0) return null;
+    const i = Math.min(ramp.length - 1, Math.floor(v * ramp.length));
+    return ramp[i];
+  }
+
+  private vfxFire(
+    px: Pixel[],
+    W: number,
+    H: number,
+    t: number,
+    scale: number,
+    periodCells: number,
+    noise: (x: number, y: number) => number,
+  ): void {
+    const ramp = ['#5a1606', '#9e2b0e', '#d6481a', '#f47b1f', '#ffb43a', '#ffe57a', '#fff4c2'];
+    const dy = t * periodCells * scale; // full period over the loop → seamless
+    for (let y = 0; y < H; y += 1) {
+      const base = H > 1 ? y / (H - 1) : 1; // 0 top → 1 bottom (hot)
+      for (let x = 0; x < W; x += 1) {
+        const n = noise(x, y + dy);
+        const v = this.clamp(n * 1.5 - (1 - base) * 1.05, 0, 1);
+        const c = this.rampColor(ramp, v <= 0.08 ? 0 : v);
+        if (c) px[y * W + x] = c;
+      }
+    }
+  }
+
+  private vfxSmoke(
+    px: Pixel[],
+    W: number,
+    H: number,
+    t: number,
+    scale: number,
+    periodCells: number,
+    noise: (x: number, y: number) => number,
+  ): void {
+    const ramp = ['#3a3a40', '#55555e', '#74747f', '#9596a1', '#b9bac4'];
+    const dy = t * periodCells * scale;
+    for (let y = 0; y < H; y += 1) {
+      const top = H > 1 ? 1 - y / (H - 1) : 0; // 1 at top (thinning)
+      for (let x = 0; x < W; x += 1) {
+        const n = noise(x, y + dy);
+        const v = this.clamp(n * 1.25 - top * 0.7, 0, 1);
+        const c = this.rampColor(ramp, v <= 0.12 ? 0 : v);
+        if (c) px[y * W + x] = c;
+      }
+    }
+  }
+
+  private vfxSparkle(
+    px: Pixel[],
+    W: number,
+    H: number,
+    t: number,
+    sparkles: { x: number; y: number; birth: number; life: number }[],
+  ): void {
+    const ramp = ['#fff7c2', '#ffffff'];
+    const put = (x: number, y: number, c: Pixel) => {
+      if (x >= 0 && y >= 0 && x < W && y < H && c) px[y * W + x] = c;
+    };
+    for (const s of sparkles) {
+      const phase = ((t - s.birth + 1) % 1) / s.life;
+      if (phase < 0 || phase > 1) continue;
+      const grow = Math.sin(phase * Math.PI); // 0 → 1 → 0
+      if (grow <= 0.05) continue;
+      const arm = Math.round(grow * 2.2);
+      const c = grow > 0.6 ? ramp[1] : ramp[0];
+      put(s.x, s.y, ramp[1]);
+      for (let r = 1; r <= arm; r += 1) {
+        put(s.x + r, s.y, c);
+        put(s.x - r, s.y, c);
+        put(s.x, s.y + r, c);
+        put(s.x, s.y - r, c);
+      }
+    }
+  }
+
+  private vfxExplosion(px: Pixel[], W: number, H: number, t: number): void {
+    const ramp = ['#5a1606', '#9e2b0e', '#d6481a', '#f47b1f', '#ffb43a', '#ffe57a', '#fff4c2'];
+    const cx = (W - 1) / 2;
+    const cy = (H - 1) / 2;
+    const maxR = Math.min(W, H) / 2 - 1;
+    const radius = t * maxR * 1.15;
+    const thickness = 1.5 + (1 - t) * 3;
+    const fade = 1 - t * 0.65;
+    for (let y = 0; y < H; y += 1) {
+      for (let x = 0; x < W; x += 1) {
+        const d = Math.hypot(x - cx, y - cy);
+        const shell = Math.abs(d - radius);
+        if (shell > thickness) continue;
+        const v = this.clamp((1 - shell / thickness) * fade, 0, 1);
+        const c = this.rampColor(ramp, v <= 0.1 ? 0 : v);
+        if (c) px[y * W + x] = c;
+      }
+    }
+  }
+
+  private vfxRain(
+    px: Pixel[],
+    W: number,
+    H: number,
+    t: number,
+    drops: { x: number; speed: number; phase: number; len: number }[],
+  ): void {
+    const ramp = ['#9fc7ff', '#d6ecff'];
+    for (const drop of drops) {
+      const head = Math.floor((((drop.phase + t * drop.speed) % 1) + 1) % 1 * H);
+      for (let i = 0; i < drop.len; i += 1) {
+        const y = head - i;
+        if (y < 0 || y >= H || drop.x < 0 || drop.x >= W) continue;
+        px[y * W + drop.x] = i === 0 ? ramp[1] : ramp[0];
+      }
+    }
   }
 
   togglePlayback(): void {
@@ -6682,12 +6958,24 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
   }
 
   private applyPickedColor(color: string, useSecondary: boolean): void {
+    const picked = this.normalizeHex(color);
+    // If the colour already lives in the palette, select that swatch in place
+    // (no duplicate, no reorder) so it highlights; otherwise add it.
+    const existing = this.palette.find((c) => this.normalizeHex(c) === picked);
+    const value = existing ?? picked;
     if (useSecondary) {
-      this.secondaryColor = color;
+      this.secondaryColor = value;
     } else {
-      this.primaryColor = color;
+      this.primaryColor = value;
     }
-    this.addPaletteColor(color);
+    if (!existing) this.addPaletteColor(value);
+  }
+
+  /** Canonical lowercase 6-digit hex (expands #abc → #aabbcc) for reliable matching. */
+  private normalizeHex(color: string): string {
+    let h = color.trim().toLowerCase().replace('#', '');
+    if (h.length === 3) h = h.split('').map((c) => c + c).join('');
+    return `#${h}`;
   }
 
   private shouldPanCanvas(event: PointerEvent): boolean {

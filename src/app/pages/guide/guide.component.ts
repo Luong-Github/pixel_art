@@ -29,6 +29,7 @@ export class GuideComponent {
     { id: 'interface', label: 'Interface & panels' },
     { id: 'tools', label: 'Tools' },
     { id: 'drawing', label: 'Drawing & dithering' },
+    { id: 'generate', label: 'Generate (procedural)' },
     { id: 'color', label: 'Color & palette' },
     { id: 'layers', label: 'Layers' },
     { id: 'animation', label: 'Animation & timeline' },

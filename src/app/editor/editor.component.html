@@ -403,6 +403,35 @@
     <p class="gen-hint">
       Dùng màu primary{{ genTwoColor ? ' + secondary' : '' }}. Có vùng chọn thì chỉ sinh trong vùng đó.
     </p>
+
+    <div class="gen-vfx">
+      <span class="tool-group-label">Animated VFX → tab mới</span>
+      <label class="span-2">
+        <span>Effect</span>
+        <select [(ngModel)]="vfxPreset">
+          <option value="fire">Fire 🔥</option>
+          <option value="smoke">Smoke 💨</option>
+          <option value="sparkle">Sparkle ✨</option>
+          <option value="explosion">Explosion 💥</option>
+          <option value="rain">Rain 🌧</option>
+        </select>
+      </label>
+      <label>
+        <span>Frames · {{ vfxFrames }}</span>
+        <input type="range" min="2" max="24" step="1" [(ngModel)]="vfxFrames" />
+      </label>
+      <label class="gen-seed">
+        <span>Seed</span>
+        <input type="number" [(ngModel)]="vfxSeed" />
+      </label>
+      <button type="button" (click)="randomizeVfxSeed()">🎲 Random seed</button>
+      <button type="button" class="gen-apply" (click)="generateVfx()">
+        Generate VFX → tab mới
+      </button>
+      <p class="gen-hint">
+        Tạo một workspace mới {{ width }}×{{ height }} với {{ vfxFrames }} frame lặp. Nhấn ▶ để xem, rồi Export GIF.
+      </p>
+    </div>
   </div>
 </ng-template>
 

@@ -82,13 +82,36 @@
           <li><strong>Shading ink</strong> (<kbd>A</kbd>) — drag over pixels to step them one shade <strong>darker</strong> (hold <kbd>Alt</kbd> to lighten) along the palette ramp — pair it with the <strong>Shadow Ramp</strong> palette.</li>
           <li><strong>Custom brush</strong> — select a region, then <em>Brush from selection</em> (Tools panel) to stamp it with the Pen.</li>
           <li><strong>Outline / Replace color</strong> — from <strong>File ▾ → Edit</strong>: outline the layer in the secondary colour, or replace every secondary-coloured pixel with the primary.</li>
-          <li><strong>Reference image</strong> — load a photo overlay (Canvas panel) at adjustable opacity, above or below the art, to trace from. <strong>Tiled preview</strong> (Preview panel) repeats the sprite 3×3 to check seamless tiling.</li>
-          <li><strong>Timelapse</strong> — <strong>File ▾ → Timelapse → Record</strong>, draw, then <strong>Export timelapse (GIF)</strong> to share your process.</li>
+          <li><strong>Reference image</strong> — load a photo overlay (Canvas panel) at adjustable opacity, above or below the art, to trace from. You can also load a <strong>Pixel Studio <code>.json</code> export</strong> — it's flattened into a crisp, pixel-exact reference (no smoothing). <strong>Tiled preview</strong> (Preview panel) repeats the sprite 3×3 to check seamless tiling.</li>
+          <li><strong>Timelapse</strong> — <strong>File ▾ → Timelapse → Record</strong>, draw, then <strong>Export timelapse (GIF)</strong> to share your process. Forgot to record? <strong>Export GIF from undo history</strong> rebuilds an approximate timelapse from this session's undo steps — but only while the editor tab is still open (it's lost on reload).</li>
           <li><strong>Grid</strong> — toggle the pixel grid with <kbd>G</kbd> (auto-hidden when zoomed far out).</li>
           <li><strong>Dither brush</strong> — in Color &amp; Palette, choose 25% / 50% / 75%. The pen then alternates primary &amp; secondary in a pixel-perfect pattern.</li>
           <li><strong>Selection</strong> — mark a region with <strong>Select</strong> (rectangle), <strong>Magic wand</strong> (contiguous same-color area) or <strong>Lasso</strong> (freehand shape), then Move, Copy / Cut / Paste, Rotate, Flip and Nudge it. Hold <kbd>Shift</kbd> to add to, or <kbd>Alt</kbd> to subtract from, the current selection (wand &amp; lasso).</li>
           <li><strong>Free transform</strong> — with a selection, press <kbd>T</kbd>: drag the box <strong>handles</strong> to scale, the top <strong>knob</strong> to rotate freely, or inside the box to move. <kbd>Enter</kbd> commits, <kbd>Esc</kbd> cancels (clicking outside also commits).</li>
         </ul>
+      </section>
+
+      <section id="generate" class="doc-section">
+        <h2 class="h-lg">Generate (procedural)</h2>
+        <p>
+          The <strong>Generate</strong> panel fills the <strong>active layer</strong> with a procedural
+          pattern (Pixel&nbsp;Composer-style) using your <strong>primary</strong> (and optionally
+          <strong>secondary</strong>) colour. Every result is <strong>undoable</strong>, and if a region is
+          selected it's confined to that selection.
+        </p>
+        <ul class="bullets">
+          <li><strong>Noise</strong> — smooth value noise; tune <em>Scale</em> (blob size), <em>Density</em> (coverage) and <em>Seed</em>.</li>
+          <li><strong>Gradient (dither)</strong> — a Bayer-dithered ramp along <em>Vertical / Horizontal / Diagonal</em>; <em>Density</em> shifts the midpoint.</li>
+          <li><strong>Checker</strong> — chequerboard with cell size set by <em>Scale</em>.</li>
+          <li><strong>Bricks</strong> — staggered brick wall; mortar lines use the second tone.</li>
+          <li><strong>Stipple</strong> — random dots at the chosen <em>Density</em>.</li>
+        </ul>
+        <p class="note">
+          <strong>Two colours</strong> uses the secondary as the second tone (off = transparent).
+          <strong>Replace</strong> clears the area first (off = overlay on top). A <strong>Seed</strong> +
+          <strong>🎲 Random</strong> make noise/stipple reproducible. Open the panel from <strong>View ▾</strong>
+          if it's hidden.
+        </p>
       </section>
 
       <section id="color" class="doc-section">
@@ -115,7 +138,7 @@
           <li><strong>Visibility</strong> (◉/○) and <strong>lock</strong> (🔒) per layer — a locked layer can’t be drawn on or edited.</li>
           <li><strong>Rename</strong> inline, and set the active layer’s <strong>opacity</strong> with the slider.</li>
           <li><strong>Blend mode</strong> — pick how the active layer mixes with the layers below from the <strong>Blend</strong> dropdown in the timeline toolbar: Normal, Multiply, Screen, Overlay, Darken, Lighten, Add or Difference. Try <strong>File ▾ → Examples → Blend tree</strong> for a worked example (Multiply shadow + Screen highlight + Add glow, grouped).</li>
-          <li><strong>Groups (folders)</strong> — press <strong>📁</strong> in the Layer toolbar (or right-click → <em>New group</em>) to wrap the active layer in a folder. A group header row appears with a <strong>caret</strong> to collapse/expand, plus group <strong>visibility</strong>, <strong>lock</strong> and (right-click) <strong>opacity</strong>, <strong>color</strong> and <strong>rename / ungroup</strong>. Hiding, locking or fading a group affects all its layers. Move layers in or out via the layer’s right-click menu.</li>
+          <li><strong>Groups (folders)</strong> — press <strong>📁</strong> in the Layer toolbar (or right-click → <em>New group</em>) to wrap the active layer in a folder. A group header row appears with a <strong>caret</strong> to collapse/expand, plus group <strong>visibility</strong>, <strong>lock</strong> and (right-click) <strong>opacity</strong>, <strong>color</strong> and <strong>rename / ungroup</strong>. Hiding, locking or fading a group affects all its layers. Move layers in or out via the layer’s right-click menu. While the active layer is inside a group, the <strong>＋ Add</strong> button adds the new layer <em>into</em> that group — to add one outside, right-click the group header and choose <strong>＋ Add layer above group</strong>.</li>
           <li><strong>Right-click a layer</strong> for a context menu — rename, duplicate, new, show/hide, lock/unlock, move up/down, group/ungroup or delete.</li>
         </ul>
       </section>
