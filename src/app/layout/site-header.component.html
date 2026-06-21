@@ -24,6 +24,23 @@
         (click)="close()"
         >{{ item.label }}</a
       >
+      <div class="lang-menu" [class.open]="langOpen">
+        <button type="button" class="lang-trigger" (click)="toggleLang($event)"
+          aria-haspopup="listbox" [attr.aria-expanded]="langOpen" title="Language / Ngôn ngữ">
+          <span class="globe" aria-hidden="true">🌐</span>
+          <span class="cur">{{ currentLangLabel }}</span>
+          <span class="caret" aria-hidden="true">▾</span>
+        </button>
+        <ul class="lang-pop" *ngIf="langOpen" role="listbox">
+          <li *ngFor="let l of locale.langs">
+            <button type="button" role="option" [class.active]="l.code === locale.lang()"
+              [attr.aria-selected]="l.code === locale.lang()" (click)="setLang(l.code)">
+              <span>{{ l.label }}</span>
+              <span class="tick" *ngIf="l.code === locale.lang()" aria-hidden="true">✓</span>
+            </button>
+          </li>
+        </ul>
+      </div>
       <a routerLink="/editor" class="cta" (click)="close()">Launch App</a>
     </nav>
   </div>

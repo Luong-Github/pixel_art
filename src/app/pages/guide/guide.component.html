@@ -52,7 +52,7 @@
           <li><strong>Command palette</strong> — press <kbd>Ctrl</kbd>+<kbd>K</kbd> to search and run any tool or action.</li>
           <li><strong>Autosave</strong> — your whole project is saved to the browser and restored on reload; <strong>File ▾ → Start fresh</strong> clears it.</li>
           <li><strong>Minimap</strong> — appears bottom-right when zoomed in; click/drag it to pan. <strong>Brush stabilizer</strong> (Tools panel) smooths jittery freehand strokes.</li>
-          <li><strong>Colour</strong> — <strong>File ▾ → Edit → Adjust colours</strong> (hue/saturation/brightness), and <strong>Recolor sprite</strong> (Palette tab) snaps the whole sprite to the current palette.</li>
+          <li><strong>Colour</strong> — <strong>Edit ▾ → Adjust colours</strong> (hue/saturation/brightness), and <strong>Recolor sprite</strong> (Palette tab) snaps the whole sprite to the current palette.</li>
         </ul>
         <p class="note">The top bar keeps only undo/redo and the File, Export and View menus. A <strong>selection bar</strong> under it holds rotate / flip / copy / cut / paste (they act on the selection, or the whole layer when nothing is selected). The <strong>Tools</strong> panel is grouped into Draw, Shape and Select, with brush size, pixel-perfect and symmetry options below it.</p>
       </section>
@@ -81,9 +81,9 @@
           <li><strong>Gradient tool</strong> (<kbd>D</kbd>) — drag from the primary to the secondary colour to fill the selection (or whole layer). Choose <strong>Linear/Radial</strong> and toggle <strong>Bayer dither</strong> (pixel-art) vs smooth RGB.</li>
           <li><strong>Shading ink</strong> (<kbd>A</kbd>) — drag over pixels to step them one shade <strong>darker</strong> (hold <kbd>Alt</kbd> to lighten) along the palette ramp — pair it with the <strong>Shadow Ramp</strong> palette.</li>
           <li><strong>Custom brush</strong> — select a region, then <em>Brush from selection</em> (Tools panel) to stamp it with the Pen.</li>
-          <li><strong>Outline / Replace color</strong> — from <strong>File ▾ → Edit</strong>: outline the layer in the secondary colour, or replace every secondary-coloured pixel with the primary.</li>
+          <li><strong>Outline / Replace color</strong> — from <strong>Edit ▾</strong>: outline the layer in the secondary colour, or replace every secondary-coloured pixel with the primary.</li>
           <li><strong>Reference image</strong> — load a photo overlay (Canvas panel) at adjustable opacity, above or below the art, to trace from. You can also load a <strong>Pixel Studio <code>.json</code> export</strong> — it's flattened into a crisp, pixel-exact reference (no smoothing). <strong>Tiled preview</strong> (Preview panel) repeats the sprite 3×3 to check seamless tiling.</li>
-          <li><strong>Timelapse</strong> — <strong>File ▾ → Timelapse → Record</strong>, draw, then <strong>Export timelapse (GIF)</strong> to share your process. Forgot to record? <strong>Export GIF from undo history</strong> rebuilds an approximate timelapse from this session's undo steps — but only while the editor tab is still open (it's lost on reload).</li>
+          <li><strong>Timelapse</strong> — <strong>Export ▾ → Timelapse → Record</strong>, draw, then <strong>Export timelapse (GIF)</strong> to share your process. Forgot to record? <strong>From undo history</strong> rebuilds an approximate timelapse from this session's undo steps — but only while the editor tab is still open (it's lost on reload).</li>
           <li><strong>Grid</strong> — toggle the pixel grid with <kbd>G</kbd> (auto-hidden when zoomed far out).</li>
           <li><strong>Dither brush</strong> — in Color &amp; Palette, choose 25% / 50% / 75%. The pen then alternates primary &amp; secondary in a pixel-perfect pattern.</li>
           <li><strong>Selection</strong> — mark a region with <strong>Select</strong> (rectangle), <strong>Magic wand</strong> (contiguous same-color area) or <strong>Lasso</strong> (freehand shape), then Move, Copy / Cut / Paste, Rotate, Flip and Nudge it. Hold <kbd>Shift</kbd> to add to, or <kbd>Alt</kbd> to subtract from, the current selection (wand &amp; lasso).</li>
@@ -205,11 +205,17 @@
       <section id="projects" class="doc-section">
         <h2 class="h-lg">Projects</h2>
         <p>
-          Use <strong>Export Project</strong> to save a <code>.pixelart.json</code> file containing all
-          workspaces, frames, layers, palette and settings. Bring one back with either
-          <strong>Import as tab(s)</strong> — adds its workspaces as new tabs, keeping your current
-          ones — or <strong>Open Project (replace all)</strong> to load it as a fresh session.
-          Everything stays local to your machine.
+          Everything in <strong>File ▾ → Project</strong>. <strong>💾 Save project</strong> stores the whole
+          project (all workspaces, frames, layers, palette, settings) into a local library in your browser
+          (IndexedDB); a modal shows the save progress. Reopen any of them from <strong>🕘 Recent projects</strong>
+          — a grid of thumbnails you can open or delete. Saving again overwrites the open project, or use
+          <strong>Save as new</strong> to branch a copy.
+        </p>
+        <p>
+          To move work between machines, use <strong>Export project (.json)</strong> for a portable
+          <code>.pixelart.json</code> file, and bring it back with <strong>Import as tab(s)</strong> (adds its
+          workspaces as new tabs) or <strong>Open project (.json)</strong> (loads it as a fresh session).
+          The local library is per-browser, so export a <code>.json</code> now and then as a backup.
         </p>
       </section>
 

@@ -20,66 +20,66 @@
       </div>
     </div>
     <div class="tool-options" *ngIf="activeTool === 'gradient'">
-      <span class="tool-group-label">Gradient</span>
+      <span class="tool-group-label">{{ 'tools.gradient' | t }}</span>
       <label class="opt-row">
-        <span>Shape</span>
+        <span>{{ 'tools.shape' | t }}</span>
         <select [(ngModel)]="gradientShape">
-          <option value="linear">Linear</option>
-          <option value="radial">Radial</option>
+          <option value="linear">{{ 'tools.linear' | t }}</option>
+          <option value="radial">{{ 'tools.radial' | t }}</option>
         </select>
       </label>
-      <label class="opt-check" title="Dither between primary &amp; secondary (pixel-art) vs smooth RGB">
-        <input type="checkbox" [(ngModel)]="gradientDither" /> Dither (Bayer)
+      <label class="opt-check" [title]="'tools.gradientDitherTitle' | t">
+        <input type="checkbox" [(ngModel)]="gradientDither" /> {{ 'tools.ditherBayer' | t }}
       </label>
-      <p class="opt-hint">Drag primary→secondary across the selection (or whole layer).</p>
+      <p class="opt-hint">{{ 'tools.gradientHint' | t }}</p>
     </div>
-    <p class="opt-hint" *ngIf="activeTool === 'shade'">Shade: drag to darken · hold Alt to lighten (uses the palette ramp).</p>
+    <p class="opt-hint" *ngIf="activeTool === 'shade'">{{ 'tools.shadeHint' | t }}</p>
     <div class="tool-options" *ngIf="activeTool === 'spray'">
-      <span class="tool-group-label">Spray</span>
-      <label class="opt-row" title="How densely each dab scatters pixels">
-        <span>Density</span>
+      <span class="tool-group-label">{{ 'tools.spray' | t }}</span>
+      <label class="opt-row" [title]="'tools.densityTitle' | t">
+        <span>{{ 'tools.density' | t }}</span>
         <input type="range" min="0.08" max="0.8" step="0.04" [(ngModel)]="sprayDensity" />
       </label>
-      <label class="opt-row" title="Clump size — bigger = larger, softer blobs (less speckly)">
-        <span>Scatter</span>
+      <label class="opt-row" [title]="'tools.scatterTitle' | t">
+        <span>{{ 'tools.scatter' | t }}</span>
         <input type="range" min="2" max="10" step="1" [(ngModel)]="sprayScatter" />
       </label>
-      <p class="opt-hint">Scatters palette shades around the primary in soft clumps (Size = radius). Make a <strong>selection</strong> to keep it inside. Great for water, light &amp; foam — pick the Water palette first.</p>
+      <p class="opt-hint">{{ 'tools.sprayHint' | t }}</p>
     </div>
 
     <div class="tool-options">
-      <span class="tool-group-label">Brush</span>
-      <label class="opt-row" title="Brush size ( [ / ] )">
-        <span>Size</span>
+      <span class="tool-group-label">{{ 'tools.brush' | t }}</span>
+      <label class="opt-row" [title]="'tools.brushSizeTitle' | t">
+        <span>{{ 'tools.size' | t }}</span>
         <input type="number" min="1" max="8" [(ngModel)]="brushSize" />
       </label>
-      <label class="opt-check" title="Pixel-perfect freehand (brush size 1)">
-        <input type="checkbox" [(ngModel)]="pixelPerfect" /> Pixel-perfect
+      <label class="opt-check" [title]="'tools.pixelPerfectTitle' | t">
+        <input type="checkbox" [(ngModel)]="pixelPerfect" /> {{ 'tools.pixelPerfect' | t }}
       </label>
-      <label class="opt-check" title="Lazy mouse: smooth jittery strokes">
-        <input type="checkbox" [(ngModel)]="stabilizer" /> Stabilizer
+      <label class="opt-check" [title]="'tools.stabilizerTitle' | t">
+        <input type="checkbox" [(ngModel)]="stabilizer" /> {{ 'tools.stabilizer' | t }}
       </label>
-      <label class="opt-row" *ngIf="stabilizer" title="Higher = smoother but laggier line">
-        <span>Strength</span>
+      <label class="opt-row" *ngIf="stabilizer" [title]="'tools.strengthTitle' | t">
+        <span>{{ 'tools.strength' | t }}</span>
         <input type="range" min="0" max="0.92" step="0.04" [(ngModel)]="stabAmount" />
       </label>
-      <label class="opt-row" title="Drawing symmetry (Shift+M toggles X)">
-        <span>Symmetry</span>
+      <label class="opt-row" [title]="'tools.symmetryTitle' | t">
+        <span>{{ 'tools.symmetry' | t }}</span>
         <select [ngModel]="symmetry" (ngModelChange)="setSymmetry($event)">
-          <option value="off">Off</option>
-          <option value="x">Mirror X</option>
-          <option value="y">Mirror Y</option>
-          <option value="both">Both (4-way)</option>
-          <option value="mandala">Mandala (8-way)</option>
+          <option value="off">{{ 'tools.symmetryOff' | t }}</option>
+          <option value="x">{{ 'tools.mirrorX' | t }}</option>
+          <option value="y">{{ 'tools.mirrorY' | t }}</option>
+          <option value="both">{{ 'tools.symmetryBoth' | t }}</option>
+          <option value="mandala">{{ 'tools.symmetryMandala' | t }}</option>
         </select>
       </label>
       <button
         type="button"
         class="opt-btn"
         [disabled]="!customBrush && !hasSelection"
-        title="Capture the selection as a stamp brush for the Pen"
+        [title]="'tools.brushFromSelectionTitle' | t"
         (click)="customBrush ? clearBrush() : setBrushFromSelection()">
-        {{ customBrush ? 'Clear custom brush (' + customBrush.w + '×' + customBrush.h + ')' : 'Brush from selection' }}
+        {{ customBrush ? (('tools.clearCustomBrush' | t) + ' (' + customBrush.w + '×' + customBrush.h + ')') : ('tools.brushFromSelection' | t) }}
       </button>
     </div>
   </div>
@@ -87,28 +87,28 @@
 
 <ng-template dockPanelDef="color">
   <div class="panel-tabs">
-    <button type="button" [class.on]="colorTab === 'color'" (click)="colorTab = 'color'">Color</button>
-    <button type="button" [class.on]="colorTab === 'palette'" (click)="colorTab = 'palette'">Palette</button>
+    <button type="button" [class.on]="colorTab === 'color'" (click)="colorTab = 'color'">{{ 'color.tabColor' | t }}</button>
+    <button type="button" [class.on]="colorTab === 'palette'" (click)="colorTab = 'palette'">{{ 'color.tabPalette' | t }}</button>
   </div>
 
   <ng-container *ngIf="colorTab === 'color'">
   <div class="swatches-large">
     <label>
-      <span>Primary</span>
+      <span>{{ 'color.primary' | t }}</span>
       <input type="color" [(ngModel)]="primaryColor" (change)="addPaletteColor()" />
     </label>
     <label>
-      <span>Secondary</span>
+      <span>{{ 'color.secondary' | t }}</span>
       <input type="color" [(ngModel)]="secondaryColor" />
     </label>
-    <button type="button" class="icon-action labeled" title="Swap primary / secondary (X)" (click)="swapColors()">
-      <span [innerHTML]="uiIcons.swap"></span> Swap
+    <button type="button" class="icon-action labeled" [title]="'color.swapTitle' | t" (click)="swapColors()">
+      <span [innerHTML]="uiIcons.swap"></span> {{ 'color.swap' | t }}
     </button>
     <div class="pick-row">
-      <button type="button" class="action-btn labeled" title="Pick primary color from screen" (click)="pickFromScreen(false)">
+      <button type="button" class="action-btn labeled" [title]="'color.pickPrimary' | t" (click)="pickFromScreen(false)">
         <span [innerHTML]="uiIcons.pick"></span> P
       </button>
-      <button type="button" class="action-btn labeled" title="Pick secondary color from screen" (click)="pickFromScreen(true)">
+      <button type="button" class="action-btn labeled" [title]="'color.pickSecondary' | t" (click)="pickFromScreen(true)">
         <span [innerHTML]="uiIcons.pick"></span> S
       </button>
     </div>
@@ -141,7 +141,7 @@
   </div>
 
   <div class="recent-colors" *ngIf="recentColors.length">
-    <span class="recent-label">Recent</span>
+    <span class="recent-label">{{ 'color.recent' | t }}</span>
     <div class="recent-swatches">
       <button
         *ngFor="let color of recentColors"
@@ -159,36 +159,36 @@
   <ng-container *ngIf="colorTab === 'palette'">
   <div class="palette-controls">
     <label class="pal-select">
-      <span>Palette</span>
+      <span>{{ 'common.palette' | t }}</span>
       <select (change)="onPaletteSelect($event)">
-        <option value="">— load a palette —</option>
-        <optgroup label="Built-in">
+        <option value="">{{ 'color.loadPalette' | t }}</option>
+        <optgroup [label]="'color.builtin' | t">
           <option *ngFor="let p of builtinPalettes" [value]="'b:' + p.id">{{ p.name }} · {{ p.colors.length }}</option>
         </optgroup>
-        <optgroup label="Saved" *ngIf="savedPalettes.length">
+        <optgroup [label]="'color.saved' | t" *ngIf="savedPalettes.length">
           <option *ngFor="let p of savedPalettes" [value]="'s:' + p.id">{{ p.name }} · {{ p.colors.length }}</option>
         </optgroup>
       </select>
     </label>
     <div class="pal-actions">
-      <button type="button" (click)="saveCurrentPalette()">Save</button>
+      <button type="button" (click)="saveCurrentPalette()">{{ 'color.save' | t }}</button>
       <button
         type="button"
         class="pal-lock"
         [class.on]="paletteLock"
-        title="Restrict drawing to palette colours"
+        [title]="'color.lockTitle' | t"
         (click)="togglePaletteLock()">
-        {{ paletteLock ? '🔒 Locked' : '🔓 Lock' }}
+        {{ paletteLock ? ('color.locked' | t) : ('color.lock' | t) }}
       </button>
     </div>
     <div class="pal-tools">
-      <button type="button" title="Sort by hue" (click)="sortPalette('hue')">Sort H</button>
-      <button type="button" title="Sort by brightness" (click)="sortPalette('lum')">Sort L</button>
-      <button type="button" title="Add primary→secondary gradient ramp" (click)="addGradientToPalette()">Gradient</button>
-      <button type="button" title="Add harmony colours of the primary" (click)="addHarmonyToPalette()">Harmony</button>
-      <button type="button" title="Build palette from the current sprite" (click)="extractPaletteFromSprite()">From sprite</button>
-      <button type="button" title="Build palette from the colours inside the selection" [disabled]="!hasSelection" (click)="extractPaletteFromSelection()">From sel</button>
-      <button type="button" title="Recolor the whole sprite to the nearest palette colours" (click)="remapToPalette()">Recolor sprite</button>
+      <button type="button" [title]="'color.sortHueTitle' | t" (click)="sortPalette('hue')">{{ 'color.sortH' | t }}</button>
+      <button type="button" [title]="'color.sortLumTitle' | t" (click)="sortPalette('lum')">{{ 'color.sortL' | t }}</button>
+      <button type="button" [title]="'color.gradientTitle' | t" (click)="addGradientToPalette()">{{ 'color.gradient' | t }}</button>
+      <button type="button" [title]="'color.harmonyTitle' | t" (click)="addHarmonyToPalette()">{{ 'color.harmony' | t }}</button>
+      <button type="button" [title]="'color.fromSpriteTitle' | t" (click)="extractPaletteFromSprite()">{{ 'color.fromSprite' | t }}</button>
+      <button type="button" [title]="'color.fromSelTitle' | t" [disabled]="!hasSelection" (click)="extractPaletteFromSelection()">{{ 'color.fromSel' | t }}</button>
+      <button type="button" [title]="'color.recolorTitle' | t" (click)="remapToPalette()">{{ 'color.recolor' | t }}</button>
     </div>
   </div>
 
@@ -207,14 +207,14 @@
   <input #paletteColorInput type="color" class="visually-hidden" (change)="onPaletteColorEdit($event)" />
 
   <div class="dither-controls">
-    <span class="dither-label">Dither brush</span>
+    <span class="dither-label">{{ 'color.ditherBrush' | t }}</span>
     <div class="seg">
-      <button type="button" [class.on]="ditherMode === 'off'" (click)="setDither('off')">Off</button>
+      <button type="button" [class.on]="ditherMode === 'off'" (click)="setDither('off')">{{ 'color.ditherOff' | t }}</button>
       <button type="button" [class.on]="ditherMode === '25'" (click)="setDither('25')">25%</button>
       <button type="button" [class.on]="ditherMode === '50'" (click)="setDither('50')">50%</button>
       <button type="button" [class.on]="ditherMode === '75'" (click)="setDither('75')">75%</button>
     </div>
-    <p class="dither-hint">Uses primary + secondary colours.</p>
+    <p class="dither-hint">{{ 'color.ditherHint' | t }}</p>
   </div>
   </ng-container>
 </ng-template>
@@ -222,7 +222,7 @@
 <ng-template dockPanelDef="tilemap">
   <div class="tilemap-panel">
     <div class="tilemap-config">
-      <label><span>Tile</span>
+      <label><span>{{ 'tilemap.tile' | t }}</span>
         <select [(ngModel)]="tileSize" (ngModelChange)="onTilemapConfigChange()">
           <option [ngValue]="8">8</option>
           <option [ngValue]="16">16</option>
@@ -230,22 +230,22 @@
           <option [ngValue]="32">32</option>
         </select>
       </label>
-      <label><span>Cols</span><input type="number" min="1" max="128" [(ngModel)]="tileMapCols" (change)="onTilemapConfigChange()" /></label>
-      <label><span>Rows</span><input type="number" min="1" max="128" [(ngModel)]="tileMapRows" (change)="onTilemapConfigChange()" /></label>
-      <label><span>Zoom</span><input type="number" min="4" max="48" [(ngModel)]="tilemapScale" (change)="onTilemapConfigChange()" /></label>
+      <label><span>{{ 'tilemap.cols' | t }}</span><input type="number" min="1" max="128" [(ngModel)]="tileMapCols" (change)="onTilemapConfigChange()" /></label>
+      <label><span>{{ 'tilemap.rows' | t }}</span><input type="number" min="1" max="128" [(ngModel)]="tileMapRows" (change)="onTilemapConfigChange()" /></label>
+      <label><span>{{ 'tilemap.zoom' | t }}</span><input type="number" min="4" max="48" [(ngModel)]="tilemapScale" (change)="onTilemapConfigChange()" /></label>
     </div>
     <div class="tilemap-toolbar">
-      <button type="button" (click)="refreshTiles(); renderTilemap()" title="Re-slice tiles from the current sprite">↻ Tiles</button>
-      <button type="button" [class.on]="tileMapAuto" (click)="tileMapAuto = !tileMapAuto" title="Auto-tiling: picks the tile variant from neighbours (uses 16 tiles from the selected one)">⊞ Auto</button>
-      <button type="button" [class.on]="selectedTile === -1" (click)="selectTile(-1)" title="Eraser (or right-click on the map)">⌫ Erase</button>
-      <button type="button" (click)="clearTilemap()" title="Clear the whole map">Clear</button>
-      <button type="button" class="tilemap-export" (click)="exportTilemap()" title="Export map PNG + tileset PNG + JSON">Export ⤓</button>
+      <button type="button" (click)="refreshTiles(); renderTilemap()" [title]="'tilemap.reslice' | t">{{ 'tilemap.tilesBtn' | t }}</button>
+      <button type="button" [class.on]="tileMapAuto" (click)="tileMapAuto = !tileMapAuto" [title]="'tilemap.autoTitle' | t">{{ 'tilemap.autoBtn' | t }}</button>
+      <button type="button" [class.on]="selectedTile === -1" (click)="selectTile(-1)" [title]="'tilemap.eraserTitle' | t">{{ 'tilemap.eraseBtn' | t }}</button>
+      <button type="button" (click)="clearTilemap()" [title]="'tilemap.clearTitle' | t">{{ 'tilemap.clear' | t }}</button>
+      <button type="button" class="tilemap-export" (click)="exportTilemap()" [title]="'tilemap.exportTitle' | t">{{ 'tilemap.export' | t }}</button>
     </div>
     <p *ngIf="tileMapAuto && !autoTileReady" class="tilemap-hint warn">
-      Auto needs 16 tiles starting at the selected one — pick an earlier tile or add more.
+      {{ 'tilemap.autoNeedTiles' | t }}
     </p>
     <p *ngIf="tileMapAuto && autoTileReady" class="tilemap-hint">
-      Auto-tile base = tile {{ selectedTile }} (+15). Paint to connect; right-click erases.
+      {{ 'tilemap.autoBaseHint' | t }}
     </p>
     <div class="tilemap-tiles">
       <button
@@ -256,7 +256,7 @@
         [style.background-image]="'url(' + thumb + ')'"
         [title]="'Tile ' + i"
         (click)="selectTile(i)"></button>
-      <p *ngIf="!tileThumbs.length" class="tilemap-hint">Draw on the canvas, then ↻ Tiles to slice it.</p>
+      <p *ngIf="!tileThumbs.length" class="tilemap-hint">{{ 'tilemap.drawHint' | t }}</p>
     </div>
     <div class="tilemap-stage">
       <canvas
@@ -284,64 +284,64 @@
     </canvas>
   </div>
   <label class="duration">
-    <span>Preview zoom</span>
+    <span>{{ 'preview.previewZoom' | t }}</span>
     <input type="range" min="2" max="12" [(ngModel)]="displayZoom" (input)="render()" />
   </label>
-  <label class="check" title="Repeat 3×3 to check seamless tiling"><input type="checkbox" [(ngModel)]="tiledPreview" (change)="render()" /> Tiled (seamless) preview</label>
+  <label class="check" [title]="'preview.repeatTilingCheck' | t"><input type="checkbox" [(ngModel)]="tiledPreview" (change)="render()" /> {{ 'preview.tiledPreview' | t }}</label>
 </ng-template>
 
 <ng-template dockPanelDef="canvas">
   <div class="field-grid">
     <label>
-      <span>Width</span>
+      <span>{{ 'canvas.width' | t }}</span>
       <input type="number" min="8" max="128" [(ngModel)]="width" />
     </label>
     <label>
-      <span>Height</span>
+      <span>{{ 'canvas.height' | t }}</span>
       <input type="number" min="8" max="128" [(ngModel)]="height" />
     </label>
-    <label class="span-2" title="Zoom (+ / −)">
-      <span>Zoom · {{ zoom }}x</span>
+    <label class="span-2" [title]="'canvas.zoomHint' | t">
+      <span>{{ 'canvas.zoom' | t }} · {{ zoom }}x</span>
       <input type="range" [min]="minZoom" [max]="maxZoom" [(ngModel)]="zoom" (input)="render()" />
     </label>
   </div>
   <div class="btn-row">
-    <button type="button" (click)="fitToScreen()">Fit</button>
-    <button type="button" (click)="newSprite()">New</button>
+    <button type="button" (click)="fitToScreen()">{{ 'canvas.fit' | t }}</button>
+    <button type="button" (click)="newSprite()">{{ 'canvas.new' | t }}</button>
   </div>
   <div class="check-row">
-    <label class="check" title="Toggle grid (G)"><input type="checkbox" [(ngModel)]="showGrid" (change)="render()" /> Grid</label>
-    <label class="check"><input type="checkbox" [(ngModel)]="onionSkin" (change)="render()" /> Onion skin</label>
+    <label class="check" [title]="'canvas.toggleGrid' | t"><input type="checkbox" [(ngModel)]="showGrid" (change)="render()" /> {{ 'canvas.grid' | t }}</label>
+    <label class="check"><input type="checkbox" [(ngModel)]="onionSkin" (change)="render()" /> {{ 'canvas.onionSkin' | t }}</label>
   </div>
   <div class="onion-controls" *ngIf="onionSkin">
-    <label class="check"><input type="checkbox" [(ngModel)]="onionTint" (change)="render()" /> Tint prev/next</label>
+    <label class="check"><input type="checkbox" [(ngModel)]="onionTint" (change)="render()" /> {{ 'canvas.tintPrevNext' | t }}</label>
     <label>
-      <span>Prev opacity</span>
+      <span>{{ 'canvas.prevOpacity' | t }}</span>
       <input type="range" min="0" max="1" step="0.05" [(ngModel)]="onionPrevOpacity" (input)="render()" />
     </label>
     <label>
-      <span>Next opacity</span>
+      <span>{{ 'canvas.nextOpacity' | t }}</span>
       <input type="range" min="0" max="1" step="0.05" [(ngModel)]="onionNextOpacity" (input)="render()" />
     </label>
   </div>
 
   <div class="ref-controls">
-    <span class="tool-group-label">Reference</span>
+    <span class="tool-group-label">{{ 'canvas.reference' | t }}</span>
     <div class="btn-row" *ngIf="!referenceImage">
-      <button type="button" (click)="refInput.click()" title="Load an image or a Pixel Studio .json export">Load image / JSON…</button>
+      <button type="button" (click)="refInput.click()" [title]="'canvas.loadImageJson' | t">{{ 'canvas.loadImageJsonBtn' | t }}</button>
     </div>
     <ng-container *ngIf="referenceImage">
       <div class="check-row">
-        <label class="check"><input type="checkbox" [(ngModel)]="referenceVisible" (change)="render()" /> Show</label>
-        <label class="check" title="Draw above the artwork"><input type="checkbox" [(ngModel)]="referenceAbove" (change)="render()" /> On top</label>
+        <label class="check"><input type="checkbox" [(ngModel)]="referenceVisible" (change)="render()" /> {{ 'canvas.show' | t }}</label>
+        <label class="check" [title]="'canvas.drawAboveArtwork' | t"><input type="checkbox" [(ngModel)]="referenceAbove" (change)="render()" /> {{ 'canvas.onTop' | t }}</label>
       </div>
       <label>
-        <span>Opacity</span>
+        <span>{{ 'common.opacity' | t }}</span>
         <input type="range" min="0.05" max="1" step="0.05" [(ngModel)]="referenceOpacity" (input)="render()" />
       </label>
       <div class="btn-row">
-        <button type="button" (click)="refInput.click()">Replace…</button>
-        <button type="button" class="danger-action" (click)="clearReference()">Remove</button>
+        <button type="button" (click)="refInput.click()">{{ 'canvas.replace' | t }}</button>
+        <button type="button" class="danger-action" (click)="clearReference()">{{ 'canvas.remove' | t }}</button>
       </div>
     </ng-container>
     <input #refInput hidden type="file" accept="image/*,.json,application/json" (change)="loadReference($event)" />
@@ -351,54 +351,54 @@
 <ng-template dockPanelDef="generate">
   <div class="gen-controls">
     <label class="span-2">
-      <span>Pattern</span>
+      <span>{{ 'gen.pattern' | t }}</span>
       <select [(ngModel)]="genType">
-        <option value="noise">Noise</option>
-        <option value="gradient">Gradient (dither)</option>
-        <option value="checker">Checker</option>
-        <option value="bricks">Bricks</option>
-        <option value="stipple">Stipple</option>
+        <option value="noise">{{ 'gen.noise' | t }}</option>
+        <option value="gradient">{{ 'gen.gradientDither' | t }}</option>
+        <option value="checker">{{ 'gen.checker' | t }}</option>
+        <option value="bricks">{{ 'gen.bricks' | t }}</option>
+        <option value="stipple">{{ 'gen.stipple' | t }}</option>
       </select>
     </label>
 
     <label *ngIf="genType !== 'gradient' && genType !== 'stipple'">
-      <span>Scale · {{ genScale }}px</span>
+      <span>{{ 'gen.scale' | t }} · {{ genScale }}px</span>
       <input type="range" min="1" max="16" step="1" [(ngModel)]="genScale" />
     </label>
 
     <label *ngIf="genType !== 'checker' && genType !== 'bricks'">
-      <span>Density · {{ (genDensity * 100).toFixed(0) }}%</span>
+      <span>{{ 'gen.density' | t }} · {{ (genDensity * 100).toFixed(0) }}%</span>
       <input type="range" min="0" max="1" step="0.01" [(ngModel)]="genDensity" />
     </label>
 
     <label *ngIf="genType === 'gradient'">
-      <span>Direction</span>
+      <span>{{ 'gen.direction' | t }}</span>
       <select [(ngModel)]="genGradientDir">
-        <option value="v">Vertical</option>
-        <option value="h">Horizontal</option>
-        <option value="d">Diagonal</option>
+        <option value="v">{{ 'gen.vertical' | t }}</option>
+        <option value="h">{{ 'gen.horizontal' | t }}</option>
+        <option value="d">{{ 'gen.diagonal' | t }}</option>
       </select>
     </label>
 
     <ng-container *ngIf="genType === 'noise' || genType === 'stipple'">
       <label class="gen-seed">
-        <span>Seed</span>
+        <span>{{ 'gen.seed' | t }}</span>
         <input type="number" [(ngModel)]="genSeed" />
       </label>
-      <button type="button" (click)="randomizeGenSeed()">🎲 Random seed</button>
+      <button type="button" (click)="randomizeGenSeed()">{{ 'gen.randomSeed' | t }}</button>
     </ng-container>
 
     <div class="check-row">
       <label class="check" title="Dùng màu secondary làm tông thứ hai (tắt = để trong suốt)">
-        <input type="checkbox" [(ngModel)]="genTwoColor" /> Two colours
+        <input type="checkbox" [(ngModel)]="genTwoColor" /> {{ 'gen.twoColours' | t }}
       </label>
       <label class="check" title="Xoá vùng trước khi sinh (tắt = vẽ chồng lên)">
-        <input type="checkbox" [(ngModel)]="genReplace" /> Replace
+        <input type="checkbox" [(ngModel)]="genReplace" /> {{ 'gen.replace' | t }}
       </label>
     </div>
 
     <button type="button" class="gen-apply" [disabled]="activeLayerLocked" (click)="applyGenerator()">
-      Generate into layer
+      {{ 'gen.generateIntoLayer' | t }}
     </button>
     <p class="gen-hint">
       Dùng màu primary{{ genTwoColor ? ' + secondary' : '' }}. Có vùng chọn thì chỉ sinh trong vùng đó.
@@ -407,24 +407,24 @@
     <div class="gen-vfx">
       <span class="tool-group-label">Animated VFX → tab mới</span>
       <label class="span-2">
-        <span>Effect</span>
+        <span>{{ 'gen.effect' | t }}</span>
         <select [(ngModel)]="vfxPreset">
-          <option value="fire">Fire 🔥</option>
-          <option value="smoke">Smoke 💨</option>
-          <option value="sparkle">Sparkle ✨</option>
-          <option value="explosion">Explosion 💥</option>
-          <option value="rain">Rain 🌧</option>
+          <option value="fire">{{ 'gen.fire' | t }}</option>
+          <option value="smoke">{{ 'gen.smoke' | t }}</option>
+          <option value="sparkle">{{ 'gen.sparkle' | t }}</option>
+          <option value="explosion">{{ 'gen.explosion' | t }}</option>
+          <option value="rain">{{ 'gen.rain' | t }}</option>
         </select>
       </label>
       <label>
-        <span>Frames · {{ vfxFrames }}</span>
+        <span>{{ 'gen.frames' | t }} · {{ vfxFrames }}</span>
         <input type="range" min="2" max="24" step="1" [(ngModel)]="vfxFrames" />
       </label>
       <label class="gen-seed">
-        <span>Seed</span>
+        <span>{{ 'gen.seed' | t }}</span>
         <input type="number" [(ngModel)]="vfxSeed" />
       </label>
-      <button type="button" (click)="randomizeVfxSeed()">🎲 Random seed</button>
+      <button type="button" (click)="randomizeVfxSeed()">{{ 'gen.randomSeed' | t }}</button>
       <button type="button" class="gen-apply" (click)="generateVfx()">
         Generate VFX → tab mới
       </button>
@@ -437,54 +437,54 @@
 
 <ng-template dockPanelDef="timeline">
   <div class="timeline-toolbar playback-bar">
-    <button type="button" class="tb-icon" title="Previous frame ( , )" (click)="stepFrame(-1)">⏮</button>
-    <button type="button" class="tb-icon play" [title]="isPlaying ? 'Pause (Enter)' : 'Play (Enter)'" (click)="togglePlayback()">{{ isPlaying ? '⏸' : '▶' }}</button>
-    <button type="button" class="tb-icon" title="Next frame ( . )" (click)="stepFrame(1)">⏭</button>
-    <button type="button" class="tb-toggle" [class.on]="loop" title="Loop playback" (click)="toggleLoop()">⟳ Loop</button>
+    <button type="button" class="tb-icon" [title]="'timeline.previousFrame' | t" (click)="stepFrame(-1)">⏮</button>
+    <button type="button" class="tb-icon play" [title]="isPlaying ? ('timeline.pause' | t) : ('timeline.play' | t)" (click)="togglePlayback()">{{ isPlaying ? '⏸' : '▶' }}</button>
+    <button type="button" class="tb-icon" [title]="'timeline.nextFrame' | t" (click)="stepFrame(1)">⏭</button>
+    <button type="button" class="tb-toggle" [class.on]="loop" [title]="'timeline.loopPlayback' | t" (click)="toggleLoop()">⟳ {{ 'timeline.loop' | t }}</button>
     <label class="tb-num"><span>FPS</span><input type="number" min="1" max="60" [(ngModel)]="fps" (change)="applyFps()" /></label>
     <label class="tb-num"><span>ms</span><input type="number" min="20" step="10" [(ngModel)]="activeFrame.duration" (change)="render()" /></label>
-    <label class="tb-num tb-playtag" title="Limit playback to a tag's frames">
-      <span>Play</span>
+    <label class="tb-num tb-playtag" [title]="'timeline.limitToTag' | t">
+      <span>{{ 'timeline.play2' | t }}</span>
       <select [ngModel]="activeTagId" (ngModelChange)="setPlayTag($event)">
-        <option [ngValue]="null">All frames</option>
+        <option [ngValue]="null">{{ 'timeline.allFrames' | t }}</option>
         <option *ngFor="let t of tags" [ngValue]="t.id">{{ t.name }}</option>
       </select>
     </label>
-    <span class="tb-frameinfo">Frame {{ activeFrameIndex + 1 }} / {{ frames.length }}</span>
+    <span class="tb-frameinfo">{{ 'timeline.frame' | t }} {{ activeFrameIndex + 1 }} / {{ frames.length }}</span>
   </div>
   <div class="timeline-toolbar ops-bar">
     <span class="tb-group">
-      <span class="tb-group-label">Frame</span>
-      <button type="button" class="tb-add" (click)="addFrame()">＋ Add</button>
-      <button type="button" class="tb-icon" title="Duplicate frame" (click)="duplicateFrame()">⧉</button>
-      <button type="button" class="tb-icon" title="Copy selected frame(s)" [innerHTML]="uiIcons.copy" (click)="copySelectedFrames()"></button>
-      <button type="button" class="tb-icon" title="Paste frame(s) after current" [disabled]="!hasFrameClipboard" [innerHTML]="uiIcons.paste" (click)="pasteFrames()"></button>
-      <button type="button" class="tb-icon" title="Insert blank before" (click)="insertFrame(false)">⇤</button>
-      <button type="button" class="tb-icon" title="Insert blank after" (click)="insertFrame(true)">⇥</button>
-      <button type="button" class="tb-icon" title="Reverse frame order" (click)="reverseFrames()">⇄</button>
-      <button type="button" class="tb-icon" title="Tag selected frame(s)" (click)="addTagFromSelection()">🏷</button>
-      <button type="button" class="tb-icon danger-action" title="Delete frame" (click)="deleteFrame()">
+      <span class="tb-group-label">{{ 'timeline.frame' | t }}</span>
+      <button type="button" class="tb-add" (click)="addFrame()">＋ {{ 'timeline.add' | t }}</button>
+      <button type="button" class="tb-icon" [title]="'timeline.duplicateFrame' | t" (click)="duplicateFrame()">⧉</button>
+      <button type="button" class="tb-icon" [title]="'timeline.copyFrames' | t" [innerHTML]="uiIcons.copy" (click)="copySelectedFrames()"></button>
+      <button type="button" class="tb-icon" [title]="'timeline.pasteFrames' | t" [disabled]="!hasFrameClipboard" [innerHTML]="uiIcons.paste" (click)="pasteFrames()"></button>
+      <button type="button" class="tb-icon" [title]="'timeline.insertBefore' | t" (click)="insertFrame(false)">⇤</button>
+      <button type="button" class="tb-icon" [title]="'timeline.insertAfter' | t" (click)="insertFrame(true)">⇥</button>
+      <button type="button" class="tb-icon" [title]="'timeline.reverseFrames' | t" (click)="reverseFrames()">⇄</button>
+      <button type="button" class="tb-icon" [title]="'timeline.tagFrames' | t" (click)="addTagFromSelection()">🏷</button>
+      <button type="button" class="tb-icon danger-action" [title]="'timeline.deleteFrame' | t" (click)="deleteFrame()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/><path d="M6 7l1 13a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-13"/></svg>
       </button>
     </span>
     <span class="tb-group">
-      <span class="tb-group-label">Layer</span>
-      <button type="button" class="tb-add" (click)="addLayer()">＋ Add</button>
-      <button type="button" class="tb-icon" title="Duplicate layer" (click)="duplicateLayer()">⧉</button>
-      <button type="button" class="tb-icon" title="Move layer up" (click)="moveLayer(-1)">▲</button>
-      <button type="button" class="tb-icon" title="Move layer down" (click)="moveLayer(1)">▼</button>
-      <button type="button" class="tb-icon" title="Group active layer" (click)="createGroupFromActive()">📁</button>
-      <label class="tb-num tb-blend" title="Active layer blend mode">
-        <span>Blend</span>
+      <span class="tb-group-label">{{ 'timeline.layer' | t }}</span>
+      <button type="button" class="tb-add" (click)="addLayer()">＋ {{ 'timeline.add' | t }}</button>
+      <button type="button" class="tb-icon" [title]="'timeline.duplicateLayer' | t" (click)="duplicateLayer()">⧉</button>
+      <button type="button" class="tb-icon" [title]="'timeline.moveLayerUp' | t" (click)="moveLayer(-1)">▲</button>
+      <button type="button" class="tb-icon" [title]="'timeline.moveLayerDown' | t" (click)="moveLayer(1)">▼</button>
+      <button type="button" class="tb-icon" [title]="'timeline.groupLayer' | t" (click)="createGroupFromActive()">📁</button>
+      <label class="tb-num tb-blend" [title]="'timeline.layerBlendMode' | t">
+        <span>{{ 'timeline.blend' | t }}</span>
         <select [ngModel]="activeLayerBlend" (ngModelChange)="setActiveLayerBlend($event)">
           <option *ngFor="let b of blendModes" [ngValue]="b.value">{{ b.label }}</option>
         </select>
       </label>
-      <button type="button" class="tb-icon danger-action" title="Delete layer" (click)="deleteLayer()">
+      <button type="button" class="tb-icon danger-action" [title]="'timeline.deleteLayer' | t" (click)="deleteLayer()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/><path d="M6 7l1 13a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-13"/></svg>
       </button>
-      <label class="tb-num" title="Active layer opacity">
-        <span>Opacity</span>
+      <label class="tb-num" [title]="'timeline.layerOpacity' | t">
+        <span>{{ 'common.opacity' | t }}</span>
         <input
           type="range"
           min="0"
@@ -495,15 +495,15 @@
       </label>
     </span>
     <span class="tb-group">
-      <span class="tb-group-label">View</span>
-      <button type="button" class="tb-toggle" [class.on]="!layersMinimized" (click)="toggleLayersMinimized()">Layers</button>
-      <button type="button" class="tb-toggle" [class.on]="!framesMinimized" (click)="toggleFramesMinimized()">Frames</button>
+      <span class="tb-group-label">{{ 'timeline.view' | t }}</span>
+      <button type="button" class="tb-toggle" [class.on]="!layersMinimized" (click)="toggleLayersMinimized()">{{ 'timeline.layers' | t }}</button>
+      <button type="button" class="tb-toggle" [class.on]="!framesMinimized" (click)="toggleFramesMinimized()">{{ 'timeline.frames' | t }}</button>
     </span>
   </div>
   <div class="timeline-combined-body" (pointerdown)="onTimelineBackgroundDown($event)">
     <section *ngIf="!framesMinimized" class="timeline-grid" (pointerdown)="onTimelineBackgroundDown($event)">
       <div class="timeline-tagrow" *ngIf="tags.length">
-        <div class="timeline-corner tag-corner" *ngIf="!layersMinimized">Tags</div>
+        <div class="timeline-corner tag-corner" *ngIf="!layersMinimized">{{ 'timeline.tags' | t }}</div>
         <div class="timeline-tag-track" [style.width.px]="tagTrackWidth">
           <button
             *ngFor="let tag of tags"
@@ -513,7 +513,7 @@
             [style.left.px]="tagLeft(tag)"
             [style.width.px]="tagWidth(tag)"
             [style.background]="tag.color"
-            [title]="tag.name + ' · ' + tagDirectionLabel(tag.direction) + ' — click to select, right-click for options'"
+            [title]="tag.name + ' · ' + tagDirectionLabel(tag.direction) + ' — ' + ('timeline.tagBarHint' | t)"
             (pointerdown)="$event.stopPropagation()"
             (click)="selectTag(tag)"
             (contextmenu)="onTagContextMenu($event, tag.id)">
@@ -523,7 +523,7 @@
         </div>
       </div>
       <div class="timeline-headrow">
-        <div class="timeline-corner" *ngIf="!layersMinimized">Layers / Frames</div>
+        <div class="timeline-corner" *ngIf="!layersMinimized">{{ 'timeline.layersFrames' | t }}</div>
         <div class="timeline-frame-header-row">
           <div
             *ngFor="let frame of frames; let i = index"
@@ -535,7 +535,7 @@
             [class.drag-over-after]="isMovingFrames && frameDragOver === i && frameDropAfter"
             [class.playhead]="isPlaying && activePreviewFrameIndex === i"
             [class.off]="!isFrameVisible(i)"
-            [title]="'Frame ' + (i + 1) + ' · ' + frameDurationLabel(i) + ' — drag to move, Shift-drag to select'"
+            [title]="('timeline.frame' | t) + ' ' + (i + 1) + ' · ' + frameDurationLabel(i) + ' — ' + ('timeline.frameTileHint' | t)"
             (pointerdown)="onFrameDown(i, $event)"
             (pointerenter)="onFrameEnter(i)"
             (pointermove)="onFrameMove(i, $event)">
@@ -545,7 +545,7 @@
               type="button"
               class="frame-visibility"
               [class.off]="!isFrameVisible(i)"
-              [title]="isFrameVisible(i) ? 'Hide frame' : 'Show frame'"
+              [title]="isFrameVisible(i) ? ('timeline.hideFrame' | t) : ('timeline.showFrame' | t)"
               (pointerdown)="$event.stopPropagation()"
               (click)="toggleFrameVisibility(i, $event)">
               <span aria-hidden="true">{{ isFrameVisible(i) ? '◉' : '○' }}</span>
@@ -564,23 +564,23 @@
             class="timeline-group-label"
             [style.--group-color]="groupOf(layerIndex)!.color"
             (contextmenu)="onGroupContextMenu($event, groupOf(layerIndex)!.id)">
-            <button type="button" class="group-caret" title="Collapse / expand group"
+            <button type="button" class="group-caret" [title]="'timeline.collapseGroup' | t"
               (click)="toggleGroupCollapsed(groupOf(layerIndex)!.id, $event)">
               <span aria-hidden="true">{{ groupOf(layerIndex)!.collapsed ? '▸' : '▾' }}</span>
             </button>
             <button type="button" class="timeline-layer-visibility"
               [class.off]="!groupOf(layerIndex)!.visible"
-              [title]="groupOf(layerIndex)!.visible ? 'Hide group' : 'Show group'"
+              [title]="groupOf(layerIndex)!.visible ? ('timeline.hideGroup' | t) : ('timeline.showGroup' | t)"
               (click)="toggleGroupVisibility(groupOf(layerIndex)!.id, $event)">
               <span aria-hidden="true">{{ groupOf(layerIndex)!.visible ? '◉' : '○' }}</span>
             </button>
             <button type="button" class="timeline-layer-lock"
               [class.on]="groupOf(layerIndex)!.locked"
-              [title]="groupOf(layerIndex)!.locked ? 'Unlock group' : 'Lock group'"
+              [title]="groupOf(layerIndex)!.locked ? ('timeline.unlockGroup' | t) : ('timeline.lockGroup' | t)"
               (click)="toggleGroupLock(groupOf(layerIndex)!.id, $event)">
               <span aria-hidden="true">{{ groupOf(layerIndex)!.locked ? '🔒' : '🔓' }}</span>
             </button>
-            <span class="timeline-group-name" title="Double-click to rename"
+            <span class="timeline-group-name" [title]="'timeline.dblClickRename' | t"
               (dblclick)="renameGroup(groupOf(layerIndex)!.id)">📁 {{ groupOf(layerIndex)!.name }}</span>
           </div>
           <div class="timeline-cel-row timeline-group-band" [style.width.px]="tagTrackWidth">
@@ -601,12 +601,12 @@
             [style.--group-color]="groupOf(layerIndex)?.color || 'transparent'"
             (click)="selectLayer(layerIndex)"
             (contextmenu)="onLayerContextMenu($event, layerIndex)">
-            <span class="layer-drag-handle" cdkDragHandle title="Drag to reorder layer" aria-hidden="true">⠿</span>
+            <span class="layer-drag-handle" cdkDragHandle [title]="'timeline.dragReorderLayer' | t" aria-hidden="true">⠿</span>
             <button
               type="button"
               class="timeline-layer-visibility"
               [class.off]="!isLayerVisible(layerIndex)"
-              [title]="isLayerVisible(layerIndex) ? 'Hide layer' : 'Show layer'"
+              [title]="isLayerVisible(layerIndex) ? ('timeline.hideLayer' | t) : ('timeline.showLayer' | t)"
               (click)="toggleLayerVisibility(layerIndex, $event)">
               <span aria-hidden="true">{{ isLayerVisible(layerIndex) ? '◉' : '○' }}</span>
             </button>
@@ -614,7 +614,7 @@
               type="button"
               class="timeline-layer-lock"
               [class.on]="isLayerLocked(layerIndex)"
-              [title]="isLayerLocked(layerIndex) ? 'Unlock layer' : 'Lock layer'"
+              [title]="isLayerLocked(layerIndex) ? ('timeline.unlockLayer' | t) : ('timeline.lockLayer' | t)"
               (click)="toggleLayerLock(layerIndex, $event)">
               <span aria-hidden="true">{{ isLayerLocked(layerIndex) ? '🔒' : '🔓' }}</span>
             </button>
@@ -642,7 +642,7 @@
                 type="button"
                 class="timeline-cel-visibility"
                 [class.off]="!isCellVisible(frameIndex, layerIndex)"
-                [title]="isCellVisible(frameIndex, layerIndex) ? 'Hide layer in this frame' : 'Show layer in this frame'"
+                [title]="isCellVisible(frameIndex, layerIndex) ? ('timeline.hideCell' | t) : ('timeline.showCell' | t)"
                 (click)="toggleCellVisibility(frameIndex, layerIndex, $event)">
                 <span aria-hidden="true">{{ isCellVisible(frameIndex, layerIndex) ? '◉' : '○' }}</span>
               </button>
@@ -654,8 +654,8 @@
       </div>
     </section>
     <div *ngIf="layersMinimized || framesMinimized" class="timeline-hidden-notice">
-      <span *ngIf="layersMinimized">Layers hidden</span>
-      <span *ngIf="framesMinimized">Frames hidden</span>
+      <span *ngIf="layersMinimized">{{ 'timeline.layersHidden' | t }}</span>
+      <span *ngIf="framesMinimized">{{ 'timeline.framesHidden' | t }}</span>
     </div>
   </div>
 </ng-template>
@@ -685,24 +685,24 @@
         (cdkDragStarted)="onDragStarted()"
         (cdkDragEnded)="onDragEnded(); onDockedDragEnded(id, $event)">
         <header class="dock-head" cdkDragHandle>
-          <span class="dock-title">{{ panelTitles[id] }}</span>
+          <span class="dock-title">{{ panelTitle(id) }}</span>
           <span class="dock-tools">
-            <button type="button" class="dock-btn" [title]="dock.isCollapsed(id) ? 'Expand' : 'Collapse'" (click)="dock.toggleCollapse(id)">{{ dock.isCollapsed(id) ? '▢' : '▬' }}</button>
-            <button type="button" class="dock-btn" title="Float panel" (click)="floatPanel(id)">⧉</button>
-            <button type="button" class="dock-btn" title="Close panel" (click)="dock.hide(id)">✕</button>
+            <button type="button" class="dock-btn" [title]="(dock.isCollapsed(id) ? 'panel.expand' : 'panel.collapse') | t" (click)="dock.toggleCollapse(id)">{{ dock.isCollapsed(id) ? '▢' : '▬' }}</button>
+            <button type="button" class="dock-btn" [title]="'panel.float' | t" (click)="floatPanel(id)">⧉</button>
+            <button type="button" class="dock-btn" [title]="'panel.close' | t" (click)="dock.hide(id)">✕</button>
           </span>
         </header>
         <div class="dock-body" *ngIf="!dock.isCollapsed(id)">
           <ng-container *ngTemplateOutlet="templateFor(id)"></ng-container>
         </div>
-        <div class="dock-drag-preview" *cdkDragPreview>{{ panelTitles[id] }}</div>
+        <div class="dock-drag-preview" *cdkDragPreview>{{ panelTitle(id) }}</div>
       </article>
     </section>
 
     <div
       class="pane-resizer pane-resizer-left"
       *ngIf="!dock.zoneEmpty('left')"
-      title="Resize left dock"
+      [title]="'panel.resizeLeft' | t"
       (pointerdown)="beginPaneResize($event, 'left')"
       (pointermove)="resizePane($event)"
       (pointerup)="endPaneResize($event)"
@@ -711,7 +711,7 @@
 
     <!-- CENTER document area (fixed) -->
     <section class="workspace" [style.grid-template-rows]="workspaceGridRows">
-      <nav class="workspace-tabs" aria-label="Workspaces">
+      <nav class="workspace-tabs" [attr.aria-label]="'workspace.tabsLabel' | t">
         <div
           *ngFor="let workspace of workspaces; let i = index"
           role="button"
@@ -722,13 +722,13 @@
           (keydown.enter)="selectWorkspace(i)">
           <span>{{ workspace.name }}</span>
           <small>{{ workspace.width }}x{{ workspace.height }}</small>
-          <button type="button" title="Close workspace" (click)="closeWorkspace(i, $event)">x</button>
+          <button type="button" [title]="'workspace.close' | t" (click)="closeWorkspace(i, $event)">x</button>
         </div>
-        <button type="button" class="workspace-add" title="New workspace" (click)="addWorkspace()">New</button>
+        <button type="button" class="workspace-add" [title]="'workspace.new' | t" (click)="addWorkspace()">{{ 'workspace.newShort' | t }}</button>
       </nav>
 
       <header class="topbar">
-        <a routerLink="/" class="editor-brand" title="Back to home">
+        <a routerLink="/" class="editor-brand" [title]="'topbar.backHome' | t">
           <span class="brand-mark" aria-hidden="true"></span>
           <span class="brand-name">Pixel<strong>Studio</strong></span>
         </a>
@@ -738,16 +738,16 @@
           type="text"
           [ngModel]="activeWorkspace.name"
           (ngModelChange)="renameActiveWorkspace($event)"
-          aria-label="Workspace name" />
+          [attr.aria-label]="'workspace.name' | t" />
 
         <div class="edit-group">
-          <button type="button" class="icon-btn" title="Undo (Ctrl+Z)" (click)="undo()">
+          <button type="button" class="icon-btn" [title]="'topbar.undo' | t" (click)="undo()">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14L4 9l5-5"/><path d="M4 9h11a5 5 0 0 1 0 10h-4"/></svg>
           </button>
-          <button type="button" class="icon-btn" title="Redo (Ctrl+Y)" (click)="redo()">
+          <button type="button" class="icon-btn" [title]="'topbar.redo' | t" (click)="redo()">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 14l5-5-5-5"/><path d="M20 9H9a5 5 0 0 0 0 10h4"/></svg>
           </button>
-          <button type="button" class="icon-btn" title="Duplicate workspace" (click)="duplicateWorkspace()">
+          <button type="button" class="icon-btn" [title]="'workspace.duplicate' | t" (click)="duplicateWorkspace()">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
           </button>
         </div>
@@ -755,81 +755,103 @@
         <span class="topbar-spacer"></span>
 
         <div class="menu file-menu">
-          <button type="button" class="primary-action" (click)="toggleFileMenu()">File ▾</button>
+          <button type="button" class="primary-action" (click)="toggleFileMenu()">{{ 'menu.file' | t }} ▾</button>
           <div class="menu-dropdown" *ngIf="fileMenuOpen" (click)="onMenuPick($event)">
-            <span class="menu-label">Import</span>
-            <button type="button" (click)="openConvertModal()">Import / convert image…</button>
-            <button type="button" (click)="extractPaletteOnly(); fileMenuOpen = false">Extract palette</button>
-            <button type="button" class="danger-action" (click)="resetEditor()">Start fresh (clear autosave)</button>
-            <span class="menu-label">Examples</span>
-            <button type="button" (click)="loadIdlePresetExample(); fileMenuOpen = false">Idle example</button>
-            <button type="button" (click)="loadTreeExample(); fileMenuOpen = false">Tree example</button>
-            <button type="button" (click)="loadBlendTreeExample()">Blend tree (Multiply/Screen/Add)</button>
-            <button type="button" (click)="loadBushTreeExample()">Bush tree</button>
-            <span class="menu-label">Timelapse</span>
-            <button type="button" [class.danger-action]="recording" (click)="toggleRecording()">
-              {{ recording ? '■ Stop recording (' + timelapseFrames.length + ')' : '⏺ Record timelapse' }}
-            </button>
-            <button type="button" [disabled]="timelapseFrames.length < 2" (click)="exportTimelapse()">Export timelapse (GIF)</button>
-            <button type="button" title="Dựng GIF từ lịch sử undo của phiên hiện tại (khi chưa bật record)" (click)="exportTimelapseFromHistory()">Export GIF từ undo history</button>
-            <span class="menu-label">Edit</span>
-            <button type="button" (click)="openAdjust(); fileMenuOpen = false">Adjust colours (HSB)…</button>
-            <button type="button" (click)="outlineLayer(); fileMenuOpen = false">Outline layer (secondary)</button>
-            <button type="button" (click)="replaceColor(); fileMenuOpen = false">Replace secondary → primary</button>
-            <button type="button" class="danger-action" (click)="clearLayer(); fileMenuOpen = false">Clear active layer</button>
+            <span class="menu-label">{{ 'file.project' | t }}</span>
+            <button type="button" (click)="openProjectsModal('save')">{{ 'file.save' | t }}</button>
+            <button type="button" (click)="openProjectsModal('recent')">{{ 'file.recent' | t }}</button>
+            <button type="button" (click)="triggerProjectImport('replace')">{{ 'file.open' | t }}</button>
+            <button type="button" (click)="triggerProjectImport('append')">{{ 'file.importTabs' | t }}</button>
+            <button type="button" (click)="exportProject()">{{ 'file.exportJson' | t }}</button>
+            <span class="menu-sep"></span>
+            <span class="menu-label">{{ 'file.image' | t }}</span>
+            <button type="button" (click)="openConvertModal()">{{ 'file.convert' | t }}</button>
+            <button type="button" (click)="extractPaletteOnly()">{{ 'file.extractPalette' | t }}</button>
+            <span class="menu-sep"></span>
+            <span class="menu-label">{{ 'file.examples' | t }}</span>
+            <button type="button" (click)="loadIdlePresetExample()">{{ 'example.idle' | t }}</button>
+            <button type="button" (click)="loadTreeExample()">{{ 'example.tree' | t }}</button>
+            <button type="button" (click)="loadBlendTreeExample()">{{ 'example.blendTree' | t }}</button>
+            <button type="button" (click)="loadBushTreeExample()">{{ 'example.bush' | t }}</button>
+            <span class="menu-sep"></span>
+            <button type="button" class="danger-action" (click)="resetEditor()">{{ 'file.startFresh' | t }}</button>
+          </div>
+        </div>
+
+        <div class="menu edit-menu">
+          <button type="button" (click)="toggleEditMenu()">{{ 'menu.edit' | t }} ▾</button>
+          <div class="menu-dropdown" *ngIf="editMenuOpen" (click)="onMenuPick($event)">
+            <span class="menu-label">{{ 'edit.colour' | t }}</span>
+            <button type="button" (click)="openAdjust()">{{ 'edit.adjust' | t }}</button>
+            <button type="button" (click)="replaceColor()">{{ 'edit.replace' | t }}</button>
+            <button type="button" (click)="outlineLayer()">{{ 'edit.outline' | t }}</button>
+            <span class="menu-sep"></span>
+            <button type="button" class="danger-action" (click)="clearLayer()">{{ 'edit.clear' | t }}</button>
           </div>
         </div>
 
         <div class="menu export-menu">
-          <button type="button" (click)="toggleExportMenu()">Export ▾</button>
+          <button type="button" (click)="toggleExportMenu()">{{ 'menu.export' | t }} ▾</button>
           <div class="menu-dropdown" *ngIf="exportMenuOpen" (click)="onMenuPick($event)">
             <div class="export-settings" (click)="$event.stopPropagation()">
               <label class="prop-row">
-                <span>Sheet columns</span>
-                <input type="number" min="0" max="32" [(ngModel)]="sheetColumns" title="0 = auto (square grid)" />
+                <span>{{ 'export.sheetColumns' | t }}</span>
+                <input type="number" min="0" max="32" [(ngModel)]="sheetColumns" [title]="'export.sheetColumnsHint' | t" />
               </label>
               <div class="prop-row">
-                <span>Pivot</span>
+                <span>{{ 'export.pivot' | t }}</span>
                 <div class="seg">
-                  <button type="button" [class.on]="pivotPreset === 'center'" (click)="setPivot('center')">Center</button>
-                  <button type="button" [class.on]="pivotPreset === 'feet'" (click)="setPivot('feet')">Feet</button>
-                  <button type="button" [class.on]="pivotPreset === 'topleft'" (click)="setPivot('topleft')">Top-L</button>
+                  <button type="button" [class.on]="pivotPreset === 'center'" (click)="setPivot('center')">{{ 'pivot.center' | t }}</button>
+                  <button type="button" [class.on]="pivotPreset === 'feet'" (click)="setPivot('feet')">{{ 'pivot.feet' | t }}</button>
+                  <button type="button" [class.on]="pivotPreset === 'topleft'" (click)="setPivot('topleft')">{{ 'pivot.topleft' | t }}</button>
                 </div>
               </div>
             </div>
-            <span class="menu-label">Image</span>
-            <button type="button" (click)="exportPngScale(1)">PNG · 1x</button>
-            <button type="button" (click)="exportPngScale(2)">PNG · 2x</button>
-            <button type="button" class="pro" (click)="exportPngScale(4)">PNG · 4x <em>✦</em></button>
-            <button type="button" class="pro" (click)="exportPngScale(8)">PNG · 8x <em>✦</em></button>
-            <span class="menu-label">Animation</span>
-            <button type="button" class="pro" (click)="exportGif(1)">Animated GIF · 1x <em>✦</em></button>
-            <button type="button" class="pro" (click)="exportGif(2)">Animated GIF · 2x <em>✦</em></button>
-            <button type="button" class="pro" (click)="exportGif(4)">Animated GIF · 4x <em>✦</em></button>
-            <button type="button" class="pro" (click)="exportGif(8)">Animated GIF · 8x <em>✦</em></button>
-            <span class="menu-label">Video (social media)</span>
-            <button type="button" class="pro" (click)="exportVideo(4)">MP4 / WebM · 4x <em>✦</em></button>
-            <button type="button" class="pro" (click)="exportVideo(8)">MP4 / WebM · 8x <em>✦</em></button>
-            <label class="export-bg" (click)="$event.stopPropagation()">Video background <input type="color" [(ngModel)]="videoBg" /></label>
-            <button type="button" class="pro" (click)="exportSpriteSheet('grid', 1)">Sprite sheet · grid + JSON <em>✦</em></button>
-            <button type="button" class="pro" (click)="exportSpriteSheet('row', 1)">Sprite sheet · row + JSON <em>✦</em></button>
-            <span class="menu-label">Project</span>
-            <button type="button" (click)="exportProject(); exportMenuOpen = false">Export Project (.json)</button>
-            <button type="button" (click)="triggerProjectImport('append'); exportMenuOpen = false">Import as tab(s) (keep current)</button>
-            <button type="button" (click)="triggerProjectImport('replace'); exportMenuOpen = false">Open Project (replace all)</button>
+            <span class="menu-label">{{ 'export.image' | t }}</span>
+            <div class="menu-row">
+              <button type="button" (click)="exportPngScale(1)">1x</button>
+              <button type="button" (click)="exportPngScale(2)">2x</button>
+              <button type="button" class="pro" (click)="exportPngScale(4)">4x ✦</button>
+              <button type="button" class="pro" (click)="exportPngScale(8)">8x ✦</button>
+            </div>
+            <span class="menu-label">{{ 'export.animation' | t }}</span>
+            <div class="menu-row">
+              <button type="button" class="pro" (click)="exportGif(1)">1x ✦</button>
+              <button type="button" class="pro" (click)="exportGif(2)">2x ✦</button>
+              <button type="button" class="pro" (click)="exportGif(4)">4x ✦</button>
+              <button type="button" class="pro" (click)="exportGif(8)">8x ✦</button>
+            </div>
+            <span class="menu-label">{{ 'export.video' | t }}</span>
+            <div class="menu-row">
+              <button type="button" class="pro" (click)="exportVideo(4)">MP4/WebM 4x ✦</button>
+              <button type="button" class="pro" (click)="exportVideo(8)">8x ✦</button>
+            </div>
+            <label class="export-bg" (click)="$event.stopPropagation()">{{ 'export.videoBg' | t }} <input type="color" [(ngModel)]="videoBg" /></label>
+            <span class="menu-label">{{ 'export.spriteSheet' | t }}</span>
+            <div class="menu-row">
+              <button type="button" class="pro" (click)="exportSpriteSheet('grid', 1)">{{ 'export.spriteGrid' | t }} ✦</button>
+              <button type="button" class="pro" (click)="exportSpriteSheet('row', 1)">{{ 'export.spriteRow' | t }} ✦</button>
+            </div>
+            <span class="menu-sep"></span>
+            <span class="menu-label">{{ 'export.timelapse' | t }}</span>
+            <button type="button" [class.danger-action]="recording" (click)="toggleRecording()">
+              {{ recording ? ('export.stopRecording' | t) + ' (' + timelapseFrames.length + ')' : ('export.record' | t) }}
+            </button>
+            <button type="button" [disabled]="timelapseFrames.length < 2" (click)="exportTimelapse()">{{ 'export.exportTimelapse' | t }}</button>
+            <button type="button" (click)="exportTimelapseFromHistory()">{{ 'export.fromUndo' | t }}</button>
           </div>
         </div>
 
         <div class="menu view-menu">
-          <button type="button" (click)="togglePanelsMenu()">View ▾</button>
+          <button type="button" (click)="togglePanelsMenu()">{{ 'menu.view' | t }} ▾</button>
           <div class="menu-dropdown" *ngIf="panelsMenuOpen" (click)="onMenuPick($event)">
-            <span class="menu-label">Panels</span>
+            <span class="menu-label">{{ 'view.panels' | t }}</span>
             <label *ngFor="let id of panelIds" class="check">
               <input type="checkbox" [checked]="!dock.isHidden(id)" (change)="dock.toggleHidden(id)" />
-              {{ panelTitles[id] }}
+              {{ panelTitle(id) }}
             </label>
-            <span class="menu-label">Layout</span>
-            <button type="button" (click)="resetLayout(); panelsMenuOpen = false">Reset layout</button>
+            <span class="menu-sep"></span>
+            <button type="button" (click)="resetLayout()">{{ 'view.resetLayout' | t }}</button>
           </div>
         </div>
 
@@ -838,16 +860,16 @@
           href="/guide"
           target="_blank"
           rel="noopener"
-          title="Help &amp; guide (opens in new tab)"
-          aria-label="Help and guide">?</a>
+          [title]="'topbar.helpGuide' | t"
+          [attr.aria-label]="'topbar.helpGuideAria' | t">?</a>
 
         <button
           type="button"
           class="pro-badge"
           [class.is-pro]="premium.isPro"
           (click)="promptActivatePro()"
-          [title]="premium.isPro ? 'Pro unlocked' : 'Unlock Pro features'">
-          ✦ {{ premium.isPro ? 'Pro' : 'Go Pro' }}
+          [title]="(premium.isPro ? 'pro.unlocked' : 'pro.unlock') | t">
+          ✦ {{ premium.isPro ? 'Pro' : ('pro.goPro' | t) }}
         </button>
 
         <input #importInput hidden type="file" accept="image/*" (change)="importImage($event)" />
@@ -858,21 +880,21 @@
            or the whole layer when nothing is selected). -->
       <div class="selection-bar">
         <span class="sel-group">
-          <button type="button" class="icon-btn" title="Rotate left" [innerHTML]="uiIcons.rotateL" (click)="rotateSelection(false)"></button>
-          <button type="button" class="icon-btn" title="Rotate right" [innerHTML]="uiIcons.rotateR" (click)="rotateSelection(true)"></button>
-          <button type="button" class="icon-btn" title="Flip horizontal (Shift+H)" [innerHTML]="uiIcons.flipH" (click)="flipSelection(true)"></button>
-          <button type="button" class="icon-btn" title="Flip vertical (Shift+V)" [innerHTML]="uiIcons.flipV" (click)="flipSelection(false)"></button>
+          <button type="button" class="icon-btn" [title]="'sel.rotateLeft' | t" [innerHTML]="uiIcons.rotateL" (click)="rotateSelection(false)"></button>
+          <button type="button" class="icon-btn" [title]="'sel.rotateRight' | t" [innerHTML]="uiIcons.rotateR" (click)="rotateSelection(true)"></button>
+          <button type="button" class="icon-btn" [title]="'sel.flipH' | t" [innerHTML]="uiIcons.flipH" (click)="flipSelection(true)"></button>
+          <button type="button" class="icon-btn" [title]="'sel.flipV' | t" [innerHTML]="uiIcons.flipV" (click)="flipSelection(false)"></button>
         </span>
         <span class="sel-group">
-          <button type="button" class="icon-btn" title="Copy (Ctrl+C)" [disabled]="!hasSelection" [innerHTML]="uiIcons.copy" (click)="copySelection()"></button>
-          <button type="button" class="icon-btn" title="Cut (Ctrl+X)" [disabled]="!hasSelection" [innerHTML]="uiIcons.cut" (click)="cutSelection()"></button>
-          <button type="button" class="icon-btn" title="Paste (Ctrl+V)" [innerHTML]="uiIcons.paste" (click)="pasteSelection()"></button>
+          <button type="button" class="icon-btn" [title]="'sel.copy' | t" [disabled]="!hasSelection" [innerHTML]="uiIcons.copy" (click)="copySelection()"></button>
+          <button type="button" class="icon-btn" [title]="'sel.cut' | t" [disabled]="!hasSelection" [innerHTML]="uiIcons.cut" (click)="cutSelection()"></button>
+          <button type="button" class="icon-btn" [title]="'sel.paste' | t" [innerHTML]="uiIcons.paste" (click)="pasteSelection()"></button>
         </span>
         <span class="sel-group">
-          <button type="button" class="sel-btn" title="Copy selection to a new layer (Ctrl+J)" [disabled]="!hasSelection" (click)="selectionToNewLayer(false)">⧉ Layer</button>
-          <button type="button" class="sel-btn" title="Cut selection to a new layer (Ctrl+Shift+J)" [disabled]="!hasSelection" (click)="selectionToNewLayer(true)">✂ Layer</button>
+          <button type="button" class="sel-btn" [title]="'sel.copyToLayer' | t" [disabled]="!hasSelection" (click)="selectionToNewLayer(false)">⧉ {{ 'sel.layer' | t }}</button>
+          <button type="button" class="sel-btn" [title]="'sel.cutToLayer' | t" [disabled]="!hasSelection" (click)="selectionToNewLayer(true)">✂ {{ 'sel.layer' | t }}</button>
         </span>
-        <span class="sel-hint">{{ hasSelection ? selectionLabel : 'No selection — acts on whole layer' }}</span>
+        <span class="sel-hint">{{ hasSelection ? selectionLabel : ('sel.noSelection' | t) }}</span>
       </div>
 
       <div
@@ -908,24 +930,26 @@
           (pointerup)="onMinimapUp($event)"
           (pointercancel)="onMinimapUp($event)"
           (lostpointercapture)="onMinimapUp($event)"></canvas>
-        <button type="button" class="minimap-close" title="Hide minimap" (click)="minimapOn = false">✕</button>
+        <button type="button" class="minimap-close" [title]="'minimap.hide' | t" (click)="minimapOn = false">✕</button>
       </div>
 
       <footer class="statusbar">
-        <span><strong>Tool</strong>{{ activeTool }}</span>
-        <span><strong>Selection</strong>{{ selectionLabel }}</span>
-        <span><strong>Layer</strong>{{ activeLayer.name }}</span>
-        <span><strong>Frame</strong>{{ activeFrameIndex + 1 }} / {{ frames.length }}</span>
-        <span *ngIf="symmetry !== 'off'" class="status-accent"><strong>Sym</strong>{{ symmetry }}</span>
-        <span *ngIf="pixelPerfect" class="status-accent"><strong>PP</strong>on</span>
-        <span *ngIf="recording" class="status-rec"><strong>● REC</strong>{{ timelapseFrames.length }}</span>
+        <span><strong>{{ 'status.tool' | t }}</strong>{{ activeTool }}</span>
+        <span><strong>{{ 'status.selection' | t }}</strong>{{ selectionLabel }}</span>
+        <span><strong>{{ 'status.layer' | t }}</strong>{{ activeLayer.name }}</span>
+        <span><strong>{{ 'status.frame' | t }}</strong>{{ activeFrameIndex + 1 }} / {{ frames.length }}</span>
+        <span *ngIf="symmetry !== 'off'" class="status-accent"><strong>{{ 'status.sym' | t }}</strong>{{ symmetry }}</span>
+        <span *ngIf="pixelPerfect" class="status-accent"><strong>{{ 'status.pp' | t }}</strong>{{ 'status.on' | t }}</span>
+        <span *ngIf="recording" class="status-rec" [class.at-limit]="timelapseLimitHit">
+          <strong>● REC</strong>{{ timelapseFrames.length }} / {{ maxTimelapseFrames }}{{ timelapseLimitHit ? ' · MAX' : '' }}
+        </span>
       </footer>
     </section>
 
     <div
       class="pane-resizer pane-resizer-right"
       *ngIf="!dock.zoneEmpty('right')"
-      title="Resize right dock"
+      [title]="'panel.resizeRight' | t"
       (pointerdown)="beginPaneResize($event, 'right')"
       (pointermove)="resizePane($event)"
       (pointerup)="endPaneResize($event)"
@@ -953,17 +977,17 @@
         (cdkDragStarted)="onDragStarted()"
         (cdkDragEnded)="onDragEnded(); onDockedDragEnded(id, $event)">
         <header class="dock-head" cdkDragHandle>
-          <span class="dock-title">{{ panelTitles[id] }}</span>
+          <span class="dock-title">{{ panelTitle(id) }}</span>
           <span class="dock-tools">
             <button type="button" class="dock-btn" [title]="dock.isCollapsed(id) ? 'Expand' : 'Collapse'" (click)="dock.toggleCollapse(id)">{{ dock.isCollapsed(id) ? '▢' : '▬' }}</button>
             <button type="button" class="dock-btn" title="Float panel" (click)="floatPanel(id)">⧉</button>
-            <button type="button" class="dock-btn" title="Close panel" (click)="dock.hide(id)">✕</button>
+            <button type="button" class="dock-btn" [title]="'common.closePanel' | t" (click)="dock.hide(id)">✕</button>
           </span>
         </header>
         <div class="dock-body" *ngIf="!dock.isCollapsed(id)">
           <ng-container *ngTemplateOutlet="templateFor(id)"></ng-container>
         </div>
-        <div class="dock-drag-preview" *cdkDragPreview>{{ panelTitles[id] }}</div>
+        <div class="dock-drag-preview" *cdkDragPreview>{{ panelTitle(id) }}</div>
       </article>
     </section>
   </div>
@@ -971,7 +995,7 @@
   <div
     class="pane-resizer pane-resizer-bottom"
     *ngIf="showBottomResizer"
-    title="Resize bottom dock"
+    [title]="'panel.resizeBottom' | t"
     (pointerdown)="beginPaneResize($event, 'bottom')"
     (pointermove)="resizePane($event)"
     (pointerup)="endPaneResize($event)"
@@ -1000,17 +1024,17 @@
       (cdkDragStarted)="onDragStarted()"
       (cdkDragEnded)="onDragEnded(); onDockedDragEnded(id, $event)">
       <header class="dock-head" cdkDragHandle>
-        <span class="dock-title">{{ panelTitles[id] }}</span>
+        <span class="dock-title">{{ panelTitle(id) }}</span>
         <span class="dock-tools">
           <button type="button" class="dock-btn" [title]="dock.isCollapsed(id) ? 'Expand' : 'Collapse'" (click)="dock.toggleCollapse(id)">{{ dock.isCollapsed(id) ? '▢' : '▬' }}</button>
           <button type="button" class="dock-btn" title="Float panel" (click)="floatPanel(id)">⧉</button>
-          <button type="button" class="dock-btn" title="Close panel" (click)="dock.hide(id)">✕</button>
+          <button type="button" class="dock-btn" [title]="'common.closePanel' | t" (click)="dock.hide(id)">✕</button>
         </span>
       </header>
       <div class="dock-body" *ngIf="!dock.isCollapsed(id)">
         <ng-container *ngTemplateOutlet="templateFor(id)"></ng-container>
       </div>
-      <div class="dock-drag-preview" *cdkDragPreview>{{ panelTitles[id] }}</div>
+      <div class="dock-drag-preview" *cdkDragPreview>{{ panelTitle(id) }}</div>
     </article>
   </section>
 </main>
@@ -1036,11 +1060,11 @@
       (pointerup)="onFloatEnd($event)"
       (pointercancel)="onFloatEnd($event)"
       (lostpointercapture)="onFloatEnd($event)">
-      <span class="dock-title">{{ panelTitles[f.id] }}</span>
+      <span class="dock-title">{{ panelTitle(f.id) }}</span>
       <span class="dock-tools">
-        <button type="button" class="dock-btn" [title]="dock.isCollapsed(f.id) ? 'Expand' : 'Collapse'" (pointerdown)="$event.stopPropagation()" (click)="dock.toggleCollapse(f.id)">{{ dock.isCollapsed(f.id) ? '▢' : '▬' }}</button>
-        <button type="button" class="dock-btn" title="Dock panel" (pointerdown)="$event.stopPropagation()" (click)="redock(f.id)">⤓</button>
-        <button type="button" class="dock-btn" title="Close panel" (pointerdown)="$event.stopPropagation()" (click)="dock.hide(f.id)">✕</button>
+        <button type="button" class="dock-btn" [title]="dock.isCollapsed(f.id) ? ('modal.expand' | t) : ('modal.collapse' | t)" (pointerdown)="$event.stopPropagation()" (click)="dock.toggleCollapse(f.id)">{{ dock.isCollapsed(f.id) ? '▢' : '▬' }}</button>
+        <button type="button" class="dock-btn" [title]="'modal.dockPanel' | t" (pointerdown)="$event.stopPropagation()" (click)="redock(f.id)">⤓</button>
+        <button type="button" class="dock-btn" [title]="'common.closePanel' | t" (pointerdown)="$event.stopPropagation()" (click)="dock.hide(f.id)">✕</button>
       </span>
     </header>
     <div class="dock-body float-body" *ngIf="!dock.isCollapsed(f.id)">
@@ -1061,24 +1085,24 @@
      Image → Pixel Art conversion modal
      ============================================================ -->
 <div class="modal-overlay" *ngIf="convertModalOpen" (click)="closeConvertModal()">
-  <div class="modal" (click)="$event.stopPropagation()" role="dialog" aria-label="Image to pixel art">
+  <div class="modal" (click)="$event.stopPropagation()" role="dialog" [attr.aria-label]="'modal.imageToPixelAria' | t">
     <header class="modal-head">
-      <h2>Image → Pixel Art</h2>
-      <button type="button" class="dock-btn" title="Close" (click)="closeConvertModal()">✕</button>
+      <h2>{{ 'modal.imageToPixelTitle' | t }}</h2>
+      <button type="button" class="dock-btn" [title]="'modal.close' | t" (click)="closeConvertModal()">✕</button>
     </header>
     <div class="modal-body">
       <div class="modal-row">
-        <span class="modal-label">Import into</span>
+        <span class="modal-label">{{ 'modal.importInto' | t }}</span>
         <div class="seg">
-          <button type="button" [class.on]="importTarget === 'current'" (click)="importTarget = 'current'">Current tab</button>
-          <button type="button" [class.on]="importTarget === 'new'" (click)="importTarget = 'new'">New tab</button>
+          <button type="button" [class.on]="importTarget === 'current'" (click)="importTarget = 'current'">{{ 'modal.currentTab' | t }}</button>
+          <button type="button" [class.on]="importTarget === 'new'" (click)="importTarget = 'new'">{{ 'modal.newTab' | t }}</button>
         </div>
       </div>
       <p class="modal-warn" *ngIf="importTarget === 'current' && workspaceInProgress">
-        ⚠ This tab has artwork — importing here will overwrite it.
+        {{ 'modal.importOverwriteWarn' | t }}
       </p>
       <div class="modal-row">
-        <span class="modal-label">Target size</span>
+        <span class="modal-label">{{ 'modal.targetSize' | t }}</span>
         <div class="seg">
           <button type="button" [class.on]="importLongSide === 64" (click)="setImportPreset(64)">64</button>
           <button type="button" [class.on]="importLongSide === 96" (click)="setImportPreset(96)">96</button>
@@ -1087,36 +1111,36 @@
       </div>
       <div class="field-grid">
         <label>
-          <span>Long side</span>
+          <span>{{ 'modal.longSide' | t }}</span>
           <input type="number" min="16" max="128" [(ngModel)]="importLongSide" />
         </label>
         <label>
-          <span>Palette</span>
+          <span>{{ 'common.palette' | t }}</span>
           <input type="number" min="4" max="64" [(ngModel)]="importPaletteSize" />
         </label>
         <label>
-          <span>Fit</span>
+          <span>{{ 'modal.fit' | t }}</span>
           <select [(ngModel)]="importFit">
-            <option value="contain">Contain</option>
-            <option value="cover">Cover</option>
-            <option value="stretch">Stretch</option>
+            <option value="contain">{{ 'modal.fitContain' | t }}</option>
+            <option value="cover">{{ 'modal.fitCover' | t }}</option>
+            <option value="stretch">{{ 'modal.fitStretch' | t }}</option>
           </select>
         </label>
         <label>
-          <span>Contrast</span>
+          <span>{{ 'modal.contrast' | t }}</span>
           <input type="range" min="0.8" max="1.4" step="0.02" [(ngModel)]="importContrast" />
         </label>
         <label>
-          <span>Sharpen</span>
+          <span>{{ 'modal.sharpen' | t }}</span>
           <input type="range" min="0" max="1" step="0.05" [(ngModel)]="importSharpen" />
         </label>
-        <label class="check"><input type="checkbox" [(ngModel)]="importResizeCanvas" /> Resize canvas</label>
-        <label class="check"><input type="checkbox" [(ngModel)]="importDither" /> Dither</label>
+        <label class="check"><input type="checkbox" [(ngModel)]="importResizeCanvas" /> {{ 'modal.resizeCanvas' | t }}</label>
+        <label class="check"><input type="checkbox" [(ngModel)]="importDither" /> {{ 'modal.dither' | t }}</label>
       </div>
     </div>
     <footer class="modal-foot">
-      <button type="button" class="quiet-action" (click)="closeConvertModal()">Cancel</button>
-      <button type="button" class="primary-action" (click)="startImageImport()">Choose image &amp; convert</button>
+      <button type="button" class="quiet-action" (click)="closeConvertModal()">{{ 'common.cancel' | t }}</button>
+      <button type="button" class="primary-action" (click)="startImageImport()">{{ 'modal.chooseImageConvert' | t }}</button>
     </footer>
   </div>
 </div>
@@ -1131,30 +1155,30 @@
   [style.left.px]="layerMenu.x"
   [style.top.px]="layerMenu.y">
   <span class="menu-label">{{ layerNameAt(layerMenu.index) }}</span>
-  <button type="button" (click)="renameLayerPrompt(layerMenu.index)">Rename…</button>
-  <button type="button" (click)="duplicateLayer()">Duplicate layer</button>
-  <button type="button" (click)="addLayer()">New layer</button>
+  <button type="button" (click)="renameLayerPrompt(layerMenu.index)">{{ 'modal.rename' | t }}</button>
+  <button type="button" (click)="duplicateLayer()">{{ 'modal.duplicateLayer' | t }}</button>
+  <button type="button" (click)="addLayer()">{{ 'modal.newLayer' | t }}</button>
   <span class="menu-sep"></span>
   <button type="button" (click)="toggleLayerVisibility(layerMenu.index)">
-    {{ isLayerVisible(layerMenu.index) ? 'Hide layer' : 'Show layer' }}
+    {{ isLayerVisible(layerMenu.index) ? ('modal.hideLayer' | t) : ('modal.showLayer' | t) }}
   </button>
   <button type="button" (click)="toggleLayerLock(layerMenu.index)">
-    {{ isLayerLocked(layerMenu.index) ? 'Unlock layer' : 'Lock layer' }}
+    {{ isLayerLocked(layerMenu.index) ? ('modal.unlockLayer' | t) : ('modal.lockLayer' | t) }}
   </button>
   <span class="menu-sep"></span>
-  <button type="button" (click)="moveLayer(-1)">Move up</button>
-  <button type="button" (click)="moveLayer(1)">Move down</button>
+  <button type="button" (click)="moveLayer(-1)">{{ 'modal.moveUp' | t }}</button>
+  <button type="button" (click)="moveLayer(1)">{{ 'modal.moveDown' | t }}</button>
   <span class="menu-sep"></span>
-  <button type="button" *ngIf="layerGroupId(layerMenu.index) == null" (click)="createGroupFromActive()">New group</button>
+  <button type="button" *ngIf="layerGroupId(layerMenu.index) == null" (click)="createGroupFromActive()">{{ 'modal.newGroup' | t }}</button>
   <button
     type="button"
     *ngFor="let g of groups"
     (click)="moveLayerToGroup(layerMenu.index, g.id)">
-    Move to {{ g.name }}
+    {{ 'modal.moveTo' | t }} {{ g.name }}
   </button>
-  <button type="button" *ngIf="layerGroupId(layerMenu.index) != null" (click)="moveLayerToGroup(layerMenu.index, null)">Remove from group</button>
+  <button type="button" *ngIf="layerGroupId(layerMenu.index) != null" (click)="moveLayerToGroup(layerMenu.index, null)">{{ 'modal.removeFromGroup' | t }}</button>
   <span class="menu-sep"></span>
-  <button type="button" class="danger-action" (click)="deleteLayer()">Delete layer</button>
+  <button type="button" class="danger-action" (click)="deleteLayer()">{{ 'modal.deleteLayer' | t }}</button>
 </div>
 
 <!-- ============================================================
@@ -1167,14 +1191,14 @@
   [style.left.px]="tagMenu.x"
   [style.top.px]="tagMenu.y">
   <span class="menu-label">{{ tagById(tagMenu.id)?.name }}</span>
-  <button type="button" (click)="renameTag(tagMenu.id)">Rename…</button>
+  <button type="button" (click)="renameTag(tagMenu.id)">{{ 'modal.rename' | t }}</button>
   <button type="button" (click)="cycleTagDirection(tagMenu.id); $event.stopPropagation()">
-    Direction: {{ tagDirectionLabel(tagById(tagMenu.id)!.direction) }} {{ tagDirectionGlyph(tagById(tagMenu.id)!.direction) }}
+    {{ 'modal.direction' | t }} {{ tagDirectionLabel(tagById(tagMenu.id)!.direction) }} {{ tagDirectionGlyph(tagById(tagMenu.id)!.direction) }}
   </button>
-  <button type="button" (click)="cycleTagColor(tagMenu.id); $event.stopPropagation()">Change color</button>
-  <button type="button" (click)="setTagRepeat(tagMenu.id)">Repeat: {{ tagById(tagMenu.id)!.repeat || '∞' }}…</button>
+  <button type="button" (click)="cycleTagColor(tagMenu.id); $event.stopPropagation()">{{ 'modal.changeColor' | t }}</button>
+  <button type="button" (click)="setTagRepeat(tagMenu.id)">{{ 'modal.repeat' | t }} {{ tagById(tagMenu.id)!.repeat || '∞' }}…</button>
   <span class="menu-sep"></span>
-  <button type="button" class="danger-action" (click)="deleteTag(tagMenu.id)">Delete tag</button>
+  <button type="button" class="danger-action" (click)="deleteTag(tagMenu.id)">{{ 'modal.deleteTag' | t }}</button>
 </div>
 
 <!-- ============================================================
@@ -1187,24 +1211,24 @@
   [style.left.px]="groupMenu.x"
   [style.top.px]="groupMenu.y">
   <span class="menu-label">{{ getGroup(groupMenu.id)?.name }}</span>
-  <button type="button" (click)="renameGroup(groupMenu.id)">Rename…</button>
+  <button type="button" (click)="renameGroup(groupMenu.id)">{{ 'modal.rename' | t }}</button>
   <button type="button" (click)="toggleGroupVisibility(groupMenu.id); $event.stopPropagation()">
-    {{ getGroup(groupMenu.id)!.visible ? 'Hide group' : 'Show group' }}
+    {{ getGroup(groupMenu.id)!.visible ? ('modal.hideGroup' | t) : ('modal.showGroup' | t) }}
   </button>
   <button type="button" (click)="toggleGroupLock(groupMenu.id); $event.stopPropagation()">
-    {{ getGroup(groupMenu.id)!.locked ? 'Unlock group' : 'Lock group' }}
+    {{ getGroup(groupMenu.id)!.locked ? ('modal.unlockGroup' | t) : ('modal.lockGroup' | t) }}
   </button>
-  <button type="button" (click)="cycleGroupColor(groupMenu.id); $event.stopPropagation()">Change color</button>
+  <button type="button" (click)="cycleGroupColor(groupMenu.id); $event.stopPropagation()">{{ 'modal.changeColor' | t }}</button>
   <span class="menu-sep"></span>
-  <button type="button" (click)="addLayerAboveGroup(groupMenu.id)">＋ Add layer above group</button>
+  <button type="button" (click)="addLayerAboveGroup(groupMenu.id)">{{ 'modal.addLayerAboveGroup' | t }}</button>
   <label class="menu-range" (click)="$event.stopPropagation()">
-    <span>Opacity</span>
+    <span>{{ 'common.opacity' | t }}</span>
     <input type="range" min="0" max="1" step="0.05"
       [value]="getGroup(groupMenu.id)!.opacity"
       (input)="setGroupOpacity(groupMenu.id, $event)" />
   </label>
   <span class="menu-sep"></span>
-  <button type="button" class="danger-action" (click)="ungroup(groupMenu.id)">Ungroup</button>
+  <button type="button" class="danger-action" (click)="ungroup(groupMenu.id)">{{ 'modal.ungroup' | t }}</button>
 </div>
 
 <!-- ============================================================
@@ -1220,23 +1244,23 @@
     <span class="menu-swatch" [style.background]="palette[paletteMenu.index]"></span>
     {{ palette[paletteMenu.index] }}
   </span>
-  <button type="button" (click)="paletteMenuSetColor(false)">Set as primary</button>
-  <button type="button" (click)="paletteMenuSetColor(true)">Set as secondary</button>
+  <button type="button" (click)="paletteMenuSetColor(false)">{{ 'modal.setAsPrimary' | t }}</button>
+  <button type="button" (click)="paletteMenuSetColor(true)">{{ 'modal.setAsSecondary' | t }}</button>
   <span class="menu-sep"></span>
-  <button type="button" (click)="editPaletteColor()">Edit colour…</button>
-  <button type="button" class="danger-action" (click)="deletePaletteColor()">Remove from palette</button>
+  <button type="button" (click)="editPaletteColor()">{{ 'modal.editColour' | t }}</button>
+  <button type="button" class="danger-action" (click)="deletePaletteColor()">{{ 'modal.removeFromPalette' | t }}</button>
 </div>
 
 <!-- ============================================================
      Command palette (Ctrl+K)
      ============================================================ -->
 <div class="modal-overlay palette-overlay" *ngIf="paletteOpen" (click)="closeCommandPalette()">
-  <div class="command-palette" (click)="$event.stopPropagation()" role="dialog" aria-label="Command palette">
+  <div class="command-palette" (click)="$event.stopPropagation()" role="dialog" [attr.aria-label]="'modal.commandPaletteAria' | t">
     <input
       #cmdInput
       class="command-input"
       type="text"
-      placeholder="Search commands…  (↑↓ to move, Enter to run, Esc to close)"
+      [placeholder]="'modal.commandSearchPlaceholder' | t"
       [(ngModel)]="commandQuery"
       (ngModelChange)="onCommandQueryChange()"
       (keydown)="commandKeydown($event)" />
@@ -1251,7 +1275,7 @@
         <span class="command-label">{{ cmd.label }}</span>
         <span class="command-hint" *ngIf="cmd.hint">{{ cmd.hint }}</span>
       </button>
-      <p class="command-empty" *ngIf="!filteredCommands.length">No matching command</p>
+      <p class="command-empty" *ngIf="!filteredCommands.length">{{ 'modal.noMatchingCommand' | t }}</p>
     </div>
   </div>
 </div>
@@ -1260,27 +1284,87 @@
      Colour adjustments (Hue / Saturation / Brightness)
      ============================================================ -->
 <div class="modal-overlay" *ngIf="adjustOpen" (click)="cancelAdjust()">
-  <div class="modal" (click)="$event.stopPropagation()" role="dialog" aria-label="Colour adjustments">
+  <div class="modal" (click)="$event.stopPropagation()" role="dialog" [attr.aria-label]="'modal.colourAdjustmentsAria' | t">
     <header class="modal-head">
-      <h2>Adjust colours</h2>
-      <button type="button" class="dock-btn" title="Close" (click)="cancelAdjust()">✕</button>
+      <h2>{{ 'modal.adjustColours' | t }}</h2>
+      <button type="button" class="dock-btn" [title]="'modal.close' | t" (click)="cancelAdjust()">✕</button>
     </header>
     <div class="modal-body">
       <div class="modal-row">
-        <span class="modal-label">Scope</span>
+        <span class="modal-label">{{ 'modal.scope' | t }}</span>
         <div class="seg">
-          <button type="button" [class.on]="adjustScope === 'layer'" (click)="adjustScope = 'layer'; applyAdjustPreview()">Layer</button>
-          <button type="button" [class.on]="adjustScope === 'selection'" [disabled]="!hasSelection" (click)="adjustScope = 'selection'; applyAdjustPreview()">Selection</button>
+          <button type="button" [class.on]="adjustScope === 'layer'" (click)="adjustScope = 'layer'; applyAdjustPreview()">{{ 'modal.layer' | t }}</button>
+          <button type="button" [class.on]="adjustScope === 'selection'" [disabled]="!hasSelection" (click)="adjustScope = 'selection'; applyAdjustPreview()">{{ 'modal.selection' | t }}</button>
         </div>
       </div>
-      <label><span>Hue · {{ adjustHue }}°</span><input type="range" min="-180" max="180" [(ngModel)]="adjustHue" (input)="applyAdjustPreview()" /></label>
-      <label><span>Saturation · {{ adjustSat }}%</span><input type="range" min="-100" max="100" [(ngModel)]="adjustSat" (input)="applyAdjustPreview()" /></label>
-      <label><span>Brightness · {{ adjustBright }}%</span><input type="range" min="-100" max="100" [(ngModel)]="adjustBright" (input)="applyAdjustPreview()" /></label>
+      <label><span>{{ 'modal.hue' | t }} · {{ adjustHue }}°</span><input type="range" min="-180" max="180" [(ngModel)]="adjustHue" (input)="applyAdjustPreview()" /></label>
+      <label><span>{{ 'modal.saturation' | t }} · {{ adjustSat }}%</span><input type="range" min="-100" max="100" [(ngModel)]="adjustSat" (input)="applyAdjustPreview()" /></label>
+      <label><span>{{ 'modal.brightness' | t }} · {{ adjustBright }}%</span><input type="range" min="-100" max="100" [(ngModel)]="adjustBright" (input)="applyAdjustPreview()" /></label>
     </div>
     <footer class="modal-foot">
-      <button type="button" class="quiet-action" (click)="cancelAdjust()">Cancel</button>
-      <button type="button" class="primary-action" (click)="commitAdjust()">Apply</button>
+      <button type="button" class="quiet-action" (click)="cancelAdjust()">{{ 'common.cancel' | t }}</button>
+      <button type="button" class="primary-action" (click)="commitAdjust()">{{ 'modal.apply' | t }}</button>
     </footer>
+  </div>
+</div>
+
+<!-- ============================================================
+     Projects modal — Save current progress / Recent projects (IndexedDB)
+     ============================================================ -->
+<div class="modal-overlay" *ngIf="projectsModalOpen" (click)="closeProjectsModal()">
+  <div class="modal projects-modal" (click)="$event.stopPropagation()" role="dialog" [attr.aria-label]="'modal.projectsAria' | t">
+    <header class="modal-head">
+      <div class="projects-tabs">
+        <button type="button" [class.on]="projectsTab === 'save'" (click)="projectsTab = 'save'">{{ 'projects.tabSave' | t }}</button>
+        <button type="button" [class.on]="projectsTab === 'recent'" (click)="projectsTab = 'recent'">{{ 'projects.tabRecent' | t }}</button>
+      </div>
+      <button type="button" class="dock-btn" [title]="'modal.close' | t" (click)="closeProjectsModal()">✕</button>
+    </header>
+
+    <!-- SAVE tab -->
+    <div class="modal-body" *ngIf="projectsTab === 'save'">
+      <label class="save-name">
+        <span>{{ 'projects.name' | t }}</span>
+        <input type="text" [(ngModel)]="saveName" [disabled]="saveState === 'saving'"
+          [placeholder]="'modal.saveNamePlaceholder' | t" (keydown.enter)="saveProject()" />
+      </label>
+      <p class="save-status" [class.ok]="saveState === 'saved'" [class.err]="saveState === 'error'">
+        <ng-container [ngSwitch]="saveState">
+          <span *ngSwitchCase="'saving'">{{ 'projects.saving' | t }}</span>
+          <span *ngSwitchCase="'saved'">{{ 'projects.saved' | t }}</span>
+          <span *ngSwitchCase="'error'">{{ 'projects.error' | t }}</span>
+          <span *ngSwitchDefault>{{ (currentProjectId ? 'projects.willOverwrite' : 'projects.localHint') | t }}</span>
+        </ng-container>
+      </p>
+      <div class="save-progress" *ngIf="saveState === 'saving'"><span></span></div>
+    </div>
+    <footer class="modal-foot" *ngIf="projectsTab === 'save'">
+      <button type="button" class="quiet-action" *ngIf="currentProjectId" [disabled]="saveState === 'saving'"
+        (click)="saveProject(true)">{{ 'projects.saveAsNew' | t }}</button>
+      <button type="button" class="primary-action" [disabled]="saveState === 'saving' || !saveName.trim()"
+        (click)="saveProject()">{{ (currentProjectId ? 'projects.saveBtn' : 'projects.saveBtnNew') | t }}</button>
+    </footer>
+
+    <!-- RECENT tab -->
+    <div class="modal-body projects-grid-body" *ngIf="projectsTab === 'recent'">
+      <p class="projects-empty" *ngIf="!recentProjects.length">{{ 'projects.empty' | t }}</p>
+      <div class="projects-grid" *ngIf="recentProjects.length">
+        <div class="project-card" *ngFor="let p of recentProjects"
+          [class.current]="p.id === currentProjectId"
+          (click)="openStoredProject(p.id)" role="button" tabindex="0"
+          (keydown.enter)="openStoredProject(p.id)">
+          <div class="project-thumb">
+            <img *ngIf="p.thumbnail" [src]="p.thumbnail" alt="" />
+          </div>
+          <div class="project-meta">
+            <span class="project-name" [title]="p.name">{{ p.name }}</span>
+            <span class="project-age">{{ projectAge(p.updatedAt) }}</span>
+          </div>
+          <button type="button" class="project-del danger-action" [title]="'modal.delete' | t"
+            (click)="deleteStoredProject(p.id, $event)">🗑</button>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -1304,7 +1388,7 @@
     </div>
     <footer class="modal-foot">
       <button type="button" class="quiet-action" *ngIf="dialog.type !== 'alert'" (click)="dialogCancel()">
-        {{ dialog.cancelLabel || 'Cancel' }}
+        {{ dialog.cancelLabel || ('common.cancel' | t) }}
       </button>
       <button type="button" class="primary-action" [class.danger-action]="dialog.danger" (click)="dialogOk()">
         {{ dialog.okLabel }}

@@ -24,6 +24,10 @@ import {
 import { GIFEncoder, quantize, applyPalette } from 'gifenc';
 import { DockService } from './dock/dock.service';
 import { PremiumService } from './premium.service';
+import { ProjectStoreService, ProjectMeta } from './projects/project-store.service';
+import { LocaleService } from '../i18n/locale.service';
+import { TranslatePipe } from '../i18n/translate.pipe';
+import { Lang } from '../i18n/translations';
 import { BUILTIN_PALETTES, NamedPalette, PALETTE_STORAGE_KEY } from './palettes';
 import { DockPanelDefDirective } from './dock/dock-panel-def.directive';
 import {
@@ -242,7 +246,7 @@ interface PixelArtProjectFile {
 @Component({
   selector: 'app-editor',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, DragDropModule, DockPanelDefDirective],
+  imports: [CommonModule, FormsModule, RouterLink, DragDropModule, DockPanelDefDirective, TranslatePipe],
   templateUrl: './editor.component.html',
   styleUrl: './editor.component.scss',
   host: { class: 'editor-host' },
@@ -305,6 +309,7 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
 
   exportMenuOpen = false;
   fileMenuOpen = false;
+  editMenuOpen = false;
   convertModalOpen = false;
   /** Right-click context menu for a layer row ({x,y} viewport coords + layer index). */
   layerMenu: { x: number; y: number; index: number } | null = null;
@@ -324,6 +329,17 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
     danger?: boolean;
   } | null = null;
   private dialogResolve: ((value: string | boolean | null) => void) | null = null;
+
+  // ---- Project library (IndexedDB-backed; swappable for a backend later) ----
+  /** localStorage key linking the current session to a saved project. */
+  private readonly currentProjectKey = 'pixelart.currentProjectId';
+  projectsModalOpen = false;
+  projectsTab: 'save' | 'recent' = 'save';
+  recentProjects: ProjectMeta[] = [];
+  currentProjectId: string | null = null;
+  /** Name field bound in the Save tab. */
+  saveName = '';
+  saveState: 'idle' | 'saving' | 'saved' | 'error' = 'idle';
   /** Where an imported image should land. */
   importTarget: 'current' | 'new' = 'current';
   /** Sanitized inline SVG icons keyed by tool id. */
@@ -339,6 +355,8 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
   constructor(
     public dock: DockService,
     public premium: PremiumService,
+    public locale: LocaleService,
+    private projectStore: ProjectStoreService,
     private hostRef: ElementRef<HTMLElement>,
     private sanitizer: DomSanitizer,
     @Inject(PLATFORM_ID) platformId: object,
@@ -347,6 +365,13 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
     this.buildToolIcons();
     this.buildUiIcons();
     this.loadSavedPalettes();
+    if (this.isBrowser) {
+      try {
+        this.currentProjectId = localStorage.getItem(this.currentProjectKey);
+      } catch {
+        /* storage unavailable */
+      }
+    }
   }
 
   private buildUiIcons(): void {
@@ -378,6 +403,21 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
     const open = !this.fileMenuOpen;
     this.closeTopMenus();
     this.fileMenuOpen = open;
+  }
+
+  toggleEditMenu(): void {
+    const open = !this.editMenuOpen;
+    this.closeTopMenus();
+    this.editMenuOpen = open;
+  }
+
+  /** Localized panel title (falls back to the static English title). */
+  panelTitle(id: PanelId): string {
+    return this.locale.t('panel.' + id);
+  }
+
+  setLang(lang: Lang): void {
+    this.locale.setLang(lang);
   }
 
   openConvertModal(): void {
@@ -675,6 +715,11 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
   /** Timelapse recording of the drawing process. */
   recording = false;
   timelapseFrames: HTMLCanvasElement[] = [];
+  /** Hard cap on recorded frames (ring buffer drops the oldest beyond this). */
+  static readonly MAX_TIMELAPSE_FRAMES = 900;
+  readonly maxTimelapseFrames = EditorComponent.MAX_TIMELAPSE_FRAMES;
+  /** True once the cap is hit this session — used to warn the user just once. */
+  timelapseLimitHit = false;
   /** Pivot/anchor for sprite-sheet export (and on-canvas marker). */
   pivotPreset: 'center' | 'feet' | 'topleft' = 'feet';
   /** Sprite-sheet columns; 0 = auto (square-ish grid). */
@@ -4178,6 +4223,133 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
     URL.revokeObjectURL(link.href);
   }
 
+  // ===================== Project library (IndexedDB) =====================
+
+  /** Open the Save / Recent projects modal on the given tab. */
+  async openProjectsModal(tab: 'save' | 'recent'): Promise<void> {
+    this.exportMenuOpen = false;
+    this.projectsTab = tab;
+    this.saveState = 'idle';
+    this.saveName =
+      this.recentProjects.find((p) => p.id === this.currentProjectId)?.name ||
+      this.activeWorkspace?.name ||
+      'Untitled';
+    this.projectsModalOpen = true;
+    await this.refreshRecentProjects();
+  }
+
+  closeProjectsModal(): void {
+    this.projectsModalOpen = false;
+  }
+
+  private async refreshRecentProjects(): Promise<void> {
+    try {
+      this.recentProjects = await this.projectStore.list();
+    } catch {
+      this.recentProjects = [];
+    }
+  }
+
+  /** Small PNG preview of the active frame for the library card. */
+  private projectThumbnail(): string {
+    if (!this.isBrowser) return '';
+    try {
+      return this.renderFrameCanvas(this.activeFrameIndex, 1).toDataURL('image/png');
+    } catch {
+      return '';
+    }
+  }
+
+  /** Save the whole project. `asNew` forces a new library entry (Save As). */
+  async saveProject(asNew = false): Promise<void> {
+    const name = this.saveName.trim() || 'Untitled';
+    this.saveState = 'saving';
+    try {
+      const now = Date.now();
+      const reuse = !asNew && this.currentProjectId;
+      const existing = reuse
+        ? this.recentProjects.find((p) => p.id === this.currentProjectId)
+        : undefined;
+      const id = reuse && this.currentProjectId
+        ? this.currentProjectId
+        : this.newProjectId();
+      await this.projectStore.put({
+        id,
+        name,
+        createdAt: existing?.createdAt ?? now,
+        updatedAt: now,
+        thumbnail: this.projectThumbnail(),
+        data: this.buildProjectFile(),
+      });
+      this.setCurrentProject(id);
+      this.saveState = 'saved';
+      await this.refreshRecentProjects();
+      // Auto-close shortly after a successful save.
+      setTimeout(() => {
+        if (this.saveState === 'saved') this.projectsModalOpen = false;
+      }, 900);
+    } catch {
+      this.saveState = 'error';
+    }
+  }
+
+  /** Load a saved project into the editor. */
+  async openStoredProject(id: string): Promise<void> {
+    const project = await this.projectStore.get(id);
+    if (!project) return;
+    try {
+      this.loadProject(project.data as Parameters<typeof this.loadProject>[0]);
+      this.setCurrentProject(id);
+      this.projectsModalOpen = false;
+    } catch {
+      await this.showAlert({ title: 'Mở thất bại', message: 'Project không hợp lệ.' });
+    }
+  }
+
+  async deleteStoredProject(id: string, event?: Event): Promise<void> {
+    event?.stopPropagation();
+    const meta = this.recentProjects.find((p) => p.id === id);
+    const ok = await this.askConfirm({
+      title: this.locale.t('projects.deleteTitle'),
+      message: this.locale.t('projects.deleteMsg', { name: meta?.name ?? '—' }),
+      okLabel: this.locale.t('common.delete'),
+      danger: true,
+    });
+    if (!ok) return;
+    await this.projectStore.delete(id);
+    if (this.currentProjectId === id) this.setCurrentProject(null);
+    await this.refreshRecentProjects();
+  }
+
+  private setCurrentProject(id: string | null): void {
+    this.currentProjectId = id;
+    try {
+      if (id) localStorage.setItem(this.currentProjectKey, id);
+      else localStorage.removeItem(this.currentProjectKey);
+    } catch {
+      /* storage unavailable */
+    }
+  }
+
+  private newProjectId(): string {
+    try {
+      return crypto.randomUUID();
+    } catch {
+      return `p_${Date.now().toString(36)}_${Math.floor(Math.random() * 1e6).toString(36)}`;
+    }
+  }
+
+  /** Relative "x phút trước" label for the library cards. */
+  projectAge(updatedAt: number): string {
+    const s = Math.max(0, Math.round((Date.now() - updatedAt) / 1000));
+    if (s < 60) return 'vừa xong';
+    const m = Math.round(s / 60);
+    if (m < 60) return `${m} phút trước`;
+    const h = Math.round(m / 60);
+    if (h < 24) return `${h} giờ trước`;
+    return `${Math.round(h / 24)} ngày trước`;
+  }
+
   // ===================== Autosave =====================
 
   private readonly autosaveKey = 'pixelart.autosave.v1';
@@ -5155,6 +5327,7 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
 
   closeTopMenus(): void {
     this.fileMenuOpen = false;
+    this.editMenuOpen = false;
     this.exportMenuOpen = false;
     this.panelsMenuOpen = false;
   }
@@ -8684,6 +8857,7 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
     this.recording = !this.recording;
     if (this.recording) {
       this.timelapseFrames = [];
+      this.timelapseLimitHit = false;
       this.captureTimelapseFrame();
     }
   }
@@ -8691,7 +8865,16 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
   private captureTimelapseFrame(): void {
     if (!this.isBrowser) return;
     this.timelapseFrames.push(this.renderFrameCanvas(this.activeFrameIndex, 1));
-    if (this.timelapseFrames.length > 900) this.timelapseFrames.shift();
+    if (this.timelapseFrames.length > EditorComponent.MAX_TIMELAPSE_FRAMES) {
+      this.timelapseFrames.shift();
+      if (!this.timelapseLimitHit) {
+        this.timelapseLimitHit = true;
+        void this.showAlert({
+          title: 'Timelapse đã đầy',
+          message: `Đã đạt giới hạn ${EditorComponent.MAX_TIMELAPSE_FRAMES} frame — từ giờ các bước cũ nhất sẽ bị bỏ dần để giữ phần mới nhất. Export GIF nếu muốn lưu lại.`,
+        });
+      }
+    }
   }
 
   /** Encode the recorded frames into a shareable GIF (free, watermarked). */
