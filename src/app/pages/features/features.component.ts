@@ -1,50 +1,82 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { TranslatePipe } from '../../i18n/translate.pipe';
 
 interface FeatureGroup {
-  area: string;
-  items: string[];
+  areaKey: string;
+  itemKeys: string[];
 }
 
 @Component({
   selector: 'app-features',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, TranslatePipe],
   templateUrl: './features.component.html',
   styleUrl: './features.component.scss',
 })
 export class FeaturesComponent {
   readonly groups: FeatureGroup[] = [
     {
-      area: 'Drawing',
-      items: ['Pen, eraser, fill, picker', 'Line, rectangle, ellipse', 'Select & move', 'Mirror-X drawing'],
+      areaKey: 'features.group.drawing',
+      itemKeys: [
+        'features.group.drawing.item1',
+        'features.group.drawing.item2',
+        'features.group.drawing.item3',
+        'features.group.drawing.item4',
+      ],
     },
     {
-      area: 'Animation',
-      items: ['Frame timeline', 'Layer timeline', 'Live playback', 'Per-frame duration', 'Onion skin'],
+      areaKey: 'features.group.animation',
+      itemKeys: [
+        'features.group.animation.item1',
+        'features.group.animation.item2',
+        'features.group.animation.item3',
+        'features.group.animation.item4',
+        'features.group.animation.item5',
+      ],
     },
     {
-      area: 'Canvas',
-      items: ['Adjustable grid', 'Zoom & pan', 'Display preview', 'Resizable workspace panes'],
+      areaKey: 'features.group.canvas',
+      itemKeys: [
+        'features.group.canvas.item1',
+        'features.group.canvas.item2',
+        'features.group.canvas.item3',
+        'features.group.canvas.item4',
+      ],
     },
     {
-      area: 'Color',
-      items: ['Primary & secondary colors', 'Palette swatches', 'Color swap', 'On-screen eyedropper'],
+      areaKey: 'features.group.color',
+      itemKeys: [
+        'features.group.color.item1',
+        'features.group.color.item2',
+        'features.group.color.item3',
+        'features.group.color.item4',
+      ],
     },
     {
-      area: 'Image convert',
-      items: ['Resize & fit modes', 'Palette reduction', 'Error-diffusion dither', 'Sharpen & contrast'],
+      areaKey: 'features.group.convert',
+      itemKeys: [
+        'features.group.convert.item1',
+        'features.group.convert.item2',
+        'features.group.convert.item3',
+        'features.group.convert.item4',
+      ],
     },
     {
-      area: 'Export',
-      items: ['PNG at 1x', 'PNG at zoom scale', '.pixelart.json project files', 'Import existing projects'],
+      areaKey: 'features.group.export',
+      itemKeys: [
+        'features.group.export.item1',
+        'features.group.export.item2',
+        'features.group.export.item3',
+        'features.group.export.item4',
+      ],
     },
   ];
 
-  readonly shortcuts = [
-    ['P', 'Pen'], ['E', 'Eraser'], ['B', 'Fill'], ['I', 'Picker'],
-    ['L', 'Line'], ['R', 'Rectangle'], ['O', 'Ellipse'], ['S', 'Select'],
-    ['M', 'Move'], ['Space', 'Pan'], ['Ctrl+Z', 'Undo'], ['Ctrl+Y', 'Redo'],
+  readonly shortcuts: [string, string][] = [
+    ['P', 'features.shortcut.pen'], ['E', 'features.shortcut.eraser'], ['B', 'features.shortcut.fill'], ['I', 'features.shortcut.picker'],
+    ['L', 'features.shortcut.line'], ['R', 'features.shortcut.rectangle'], ['O', 'features.shortcut.ellipse'], ['S', 'features.shortcut.select'],
+    ['M', 'features.shortcut.move'], ['Space', 'features.shortcut.pan'], ['Ctrl+Z', 'features.shortcut.undo'], ['Ctrl+Y', 'features.shortcut.redo'],
   ];
 }

@@ -1,14 +1,15 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { TranslatePipe } from '../../i18n/translate.pipe';
 
 interface Plan {
-  name: string;
+  nameKey: string;
   price: string;
-  period: string;
-  blurb: string;
-  features: string[];
-  cta: string;
+  periodKey: string;
+  blurbKey: string;
+  featureKeys: string[];
+  ctaKey: string;
   ctaLink: string;
   featured?: boolean;
 }
@@ -16,55 +17,55 @@ interface Plan {
 @Component({
   selector: 'app-pricing',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, TranslatePipe],
   templateUrl: './pricing.component.html',
   styleUrl: './pricing.component.scss',
 })
 export class PricingComponent {
   readonly plans: Plan[] = [
     {
-      name: 'Free',
+      nameKey: 'pricing.planFreeName',
       price: '$0',
-      period: 'forever',
-      blurb: 'The full editor, in your browser, with nothing to pay.',
-      features: [
-        'All drawing tools',
-        'Frame & layer animation',
-        'Image-to-pixel conversion',
-        'PNG & project export',
-        'Runs fully offline',
+      periodKey: 'pricing.planFreePeriod',
+      blurbKey: 'pricing.planFreeBlurb',
+      featureKeys: [
+        'pricing.featureAllTools',
+        'pricing.featureFrameLayer',
+        'pricing.featureImageToPixel',
+        'pricing.featurePngExport',
+        'pricing.featureOffline',
       ],
-      cta: 'Launch the app',
+      ctaKey: 'pricing.ctaLaunch',
       ctaLink: '/editor',
       featured: true,
     },
     {
-      name: 'Pro',
+      nameKey: 'pricing.planProName',
       price: '$5',
-      period: 'per month',
-      blurb: 'For frequent creators who want cloud sync and more.',
-      features: [
-        'Everything in Free',
-        'Cloud project sync',
-        'Larger canvases & palettes',
-        'Animated GIF / sprite-sheet export',
-        'Priority support',
+      periodKey: 'pricing.planProPeriod',
+      blurbKey: 'pricing.planProBlurb',
+      featureKeys: [
+        'pricing.featureEverythingFree',
+        'pricing.featureCloudSync',
+        'pricing.featureLargerCanvas',
+        'pricing.featureGifExport',
+        'pricing.featurePrioritySupport',
       ],
-      cta: 'Coming soon',
+      ctaKey: 'pricing.ctaComingSoon',
       ctaLink: '/contact',
     },
     {
-      name: 'Team',
+      nameKey: 'pricing.planTeamName',
       price: 'Custom',
-      period: 'contact us',
-      blurb: 'Shared libraries and collaboration for studios.',
-      features: [
-        'Everything in Pro',
-        'Shared palettes & assets',
-        'Team workspaces',
-        'SSO & admin controls',
+      periodKey: 'pricing.planTeamPeriod',
+      blurbKey: 'pricing.planTeamBlurb',
+      featureKeys: [
+        'pricing.featureEverythingPro',
+        'pricing.featureSharedAssets',
+        'pricing.featureTeamWorkspaces',
+        'pricing.featureSso',
       ],
-      cta: 'Talk to us',
+      ctaKey: 'pricing.ctaTalkToUs',
       ctaLink: '/contact',
     },
   ];

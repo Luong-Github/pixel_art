@@ -3,30 +3,32 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { SITE } from '../../core/seo/seo.data';
 import { SeoService } from '../../core/seo/seo.service';
+import { LocaleService } from '../../i18n/locale.service';
+import { TranslatePipe } from '../../i18n/translate.pipe';
 import { BlogPost, getPost } from './posts.data';
 
 @Component({
   selector: 'app-blog-post',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, TranslatePipe],
   template: `
     <article class="section-tight" *ngIf="post">
       <div class="container narrow">
-        <a routerLink="/blog" class="back">← All posts</a>
+        <a routerLink="/blog" class="back">{{ 'blogpost.allPosts' | t }}</a>
         <div class="meta">
           <time [attr.datetime]="post.date">{{ post.date | date: 'mediumDate' }}</time>
-          <span>·</span><span>{{ post.readMins }} min read</span>
+          <span>·</span><span>{{ 'blogpost.minRead' | t: { mins: post.readMins } }}</span>
         </div>
-        <h1 class="h-xl">{{ post.title }}</h1>
+        <h1 class="h-xl">{{ post.titleKey | t }}</h1>
         <div class="tags">
-          <span class="tag" *ngFor="let t of post.tags">{{ t }}</span>
+          <span class="tag" *ngFor="let t of post.tagKeys">{{ t | t }}</span>
         </div>
-        <div class="body" [innerHTML]="post.body"></div>
+        <div class="body" [innerHTML]="post.bodyKey | t"></div>
 
         <div class="cta card">
-          <h2 class="h-lg">Try it yourself</h2>
-          <p>Open the studio and put this into practice.</p>
-          <a routerLink="/editor" class="btn btn-primary btn-lg">Launch the app →</a>
+          <h2 class="h-lg">{{ 'blogpost.ctaTitle' | t }}</h2>
+          <p>{{ 'blogpost.ctaText' | t }}</p>
+          <a routerLink="/editor" class="btn btn-primary btn-lg">{{ 'blogpost.ctaButton' | t }}</a>
         </div>
       </div>
     </article>
@@ -55,6 +57,7 @@ export class BlogPostComponent implements OnInit {
     private readonly route: ActivatedRoute,
     private readonly router: Router,
     private readonly seo: SeoService,
+    private readonly locale: LocaleService,
   ) {}
 
   ngOnInit(): void {
@@ -66,17 +69,19 @@ export class BlogPostComponent implements OnInit {
         return;
       }
       this.post = post;
+      const title = this.locale.t(post.titleKey);
+      const excerpt = this.locale.t(post.excerptKey);
       this.seo.setPage({
-        title: post.title,
-        description: post.excerpt,
+        title,
+        description: excerpt,
         path: `blog/${post.slug}`,
         jsonLd: {
           '@context': 'https://schema.org',
           '@type': 'BlogPosting',
-          headline: post.title,
-          description: post.excerpt,
+          headline: title,
+          description: excerpt,
           datePublished: post.date,
-          keywords: post.tags.join(', '),
+          keywords: post.tagKeys.map((k) => this.locale.t(k)).join(', '),
           author: { '@type': 'Organization', name: SITE.name },
           publisher: { '@type': 'Organization', name: SITE.name },
           mainEntityOfPage: `${SITE.url}/blog/${post.slug}`,

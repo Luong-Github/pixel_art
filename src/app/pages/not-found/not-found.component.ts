@@ -1,19 +1,20 @@
 import { Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { TranslatePipe } from '../../i18n/translate.pipe';
 
 @Component({
   selector: 'app-not-found',
   standalone: true,
-  imports: [RouterLink],
+  imports: [RouterLink, TranslatePipe],
   template: `
     <section class="section">
       <div class="container center">
         <span class="code">404</span>
-        <h1 class="h-lg">This pixel is missing</h1>
-        <p class="lead">The page you’re after doesn’t exist or has moved.</p>
+        <h1 class="h-lg">{{ 'notfound.title' | t }}</h1>
+        <p class="lead">{{ 'notfound.lead' | t }}</p>
         <div class="cta">
-          <a routerLink="/" class="btn btn-primary">Back home</a>
-          <a routerLink="/editor" class="btn btn-ghost">Open the editor</a>
+          <a routerLink="/" class="btn btn-primary">{{ 'notfound.backHome' | t }}</a>
+          <a routerLink="/editor" class="btn btn-ghost">{{ 'notfound.openEditor' | t }}</a>
         </div>
       </div>
     </section>

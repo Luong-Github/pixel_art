@@ -1,43 +1,39 @@
 import { Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { TranslatePipe } from '../../i18n/translate.pipe';
 
 @Component({
   selector: 'app-about',
   standalone: true,
-  imports: [RouterLink],
+  imports: [RouterLink, TranslatePipe],
   template: `
     <section class="section-tight page-hero">
       <div class="container narrow">
-        <span class="eyebrow">About</span>
-        <h1 class="h-xl">Pixel art, without the friction</h1>
+        <span class="eyebrow">{{ 'about.eyebrow' | t }}</span>
+        <h1 class="h-xl">{{ 'about.heroTitle' | t }}</h1>
       </div>
     </section>
 
     <section class="section-tight">
       <div class="container narrow prose">
         <p class="lead">
-          Pixel Art Studio started as a simple idea: a serious pixel editor that opens instantly in
-          a browser tab, with no downloads, accounts or setup. Just open it and draw.
+          {{ 'about.lead' | t }}
         </p>
         <p>
-          Most pixel tools force a choice between “powerful but heavy desktop app” and “toy web
-          drawing pad.” We wanted the middle: a focused, production-style workspace — a tool rail,
-          a real canvas with zoom and pan, a frame and layer timeline, and an inspector for image
-          conversion and exports — all running locally in your browser.
+          {{ 'about.para2' | t }}
         </p>
         <p>
-          Everything happens on your machine. Your sprites never leave the page, the editor works
-          offline, and you can export a PNG or a portable project file whenever you like.
+          {{ 'about.para3' | t }}
         </p>
-        <h2 class="h-lg">What we believe</h2>
+        <h2 class="h-lg">{{ 'about.believeTitle' | t }}</h2>
         <ul>
-          <li><strong>Instant.</strong> The best tool is the one already open.</li>
-          <li><strong>Focused.</strong> Pixel art deserves purpose-built controls, not generic brushes.</li>
-          <li><strong>Yours.</strong> Local-first, exportable, no lock-in.</li>
+          <li><strong>{{ 'about.believeInstantLabel' | t }}</strong> {{ 'about.believeInstantText' | t }}</li>
+          <li><strong>{{ 'about.believeFocusedLabel' | t }}</strong> {{ 'about.believeFocusedText' | t }}</li>
+          <li><strong>{{ 'about.believeYoursLabel' | t }}</strong> {{ 'about.believeYoursText' | t }}</li>
         </ul>
         <div class="cta">
-          <a routerLink="/editor" class="btn btn-primary btn-lg">Open the studio →</a>
-          <a routerLink="/contact" class="btn btn-ghost btn-lg">Get in touch</a>
+          <a routerLink="/editor" class="btn btn-primary btn-lg">{{ 'about.openStudio' | t }}</a>
+          <a routerLink="/contact" class="btn btn-ghost btn-lg">{{ 'about.getInTouch' | t }}</a>
         </div>
       </div>
     </section>

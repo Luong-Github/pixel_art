@@ -3,11 +3,12 @@ import { Component, HostListener } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { LocaleService } from '../i18n/locale.service';
 import { Lang } from '../i18n/translations';
+import { TranslatePipe } from '../i18n/translate.pipe';
 
 @Component({
   selector: 'app-site-header',
   standalone: true,
-  imports: [CommonModule, RouterLink, RouterLinkActive],
+  imports: [CommonModule, RouterLink, RouterLinkActive, TranslatePipe],
   templateUrl: './site-header.component.html',
   styleUrl: './site-header.component.scss',
 })
@@ -38,11 +39,11 @@ export class SiteHeaderComponent {
   }
 
   readonly nav = [
-    { label: 'Features', path: '/features' },
-    { label: 'Guide', path: '/guide' },
-    { label: 'Pricing', path: '/pricing' },
-    { label: 'Blog', path: '/blog' },
-    { label: 'About', path: '/about' },
+    { key: 'nav.features', path: '/features' },
+    { key: 'nav.guide', path: '/guide' },
+    { key: 'nav.pricing', path: '/pricing' },
+    { key: 'nav.blog', path: '/blog' },
+    { key: 'nav.about', path: '/about' },
   ];
 
   toggle(): void {

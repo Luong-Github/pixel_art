@@ -6579,7 +6579,7 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
     this.primaryColor = workspace.primaryColor;
     this.secondaryColor = workspace.secondaryColor;
     this.selection = null;
-    this.clipboard = null;
+    // Keep `clipboard` across workspace switches so copy/paste works tab→tab.
     this.previewPixels = null;
     this.moveStartSelection = null;
     this.undoStack = [];

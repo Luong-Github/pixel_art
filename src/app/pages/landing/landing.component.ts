@@ -1,11 +1,12 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { TranslatePipe } from '../../i18n/translate.pipe';
 
 @Component({
   selector: 'app-landing',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, TranslatePipe],
   templateUrl: './landing.component.html',
   styleUrl: './landing.component.scss',
 })
@@ -13,39 +14,39 @@ export class LandingComponent {
   readonly highlights = [
     {
       icon: '✏️',
-      title: 'Full drawing toolkit',
-      text: 'Pen, eraser, fill, picker, line, rectangle, ellipse, select and move — with mirror-X drawing.',
+      titleKey: 'landing.featDrawingTitle',
+      textKey: 'landing.featDrawingText',
     },
     {
       icon: '🎞️',
-      title: 'Frame animation',
-      text: 'Build animations on a frame timeline with onion skin, per-frame duration and live playback.',
+      titleKey: 'landing.featAnimTitle',
+      textKey: 'landing.featAnimText',
     },
     {
       icon: '🧅',
-      title: 'Layers',
-      text: 'Stack editable layers with visibility and opacity, organised per frame.',
+      titleKey: 'landing.featLayersTitle',
+      textKey: 'landing.featLayersText',
     },
     {
       icon: '🖼️',
-      title: 'Image to pixel art',
-      text: 'Import any image and reduce it to a palette with dithering, contrast and sharpen controls.',
+      titleKey: 'landing.featImageTitle',
+      textKey: 'landing.featImageText',
     },
     {
       icon: '🎨',
-      title: 'Color tools',
-      text: 'Primary/secondary swatches, palette management, color swap and an on-screen picker.',
+      titleKey: 'landing.featColorTitle',
+      textKey: 'landing.featColorText',
     },
     {
       icon: '📦',
-      title: 'Export anywhere',
-      text: 'Export PNG at 1x or zoom scale, or save a full .pixelart.json project to reload later.',
+      titleKey: 'landing.featExportTitle',
+      textKey: 'landing.featExportText',
     },
   ];
 
   readonly steps = [
-    { n: '01', title: 'Open the editor', text: 'Launch the studio instantly in your browser — nothing to install.' },
-    { n: '02', title: 'Draw & animate', text: 'Sketch sprites, add frames and layers, and preview the motion live.' },
-    { n: '03', title: 'Export & share', text: 'Download a PNG or save your project file to keep iterating.' },
+    { n: '01', titleKey: 'landing.step1Title', textKey: 'landing.step1Text' },
+    { n: '02', titleKey: 'landing.step2Title', textKey: 'landing.step2Text' },
+    { n: '03', titleKey: 'landing.step3Title', textKey: 'landing.step3Text' },
   ];
 }

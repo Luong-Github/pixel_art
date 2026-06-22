@@ -2,24 +2,22 @@
   <div class="hero-glow" aria-hidden="true"></div>
   <div class="container hero-grid">
     <div class="hero-copy">
-      <span class="badge">✦ Free · Browser-based · No sign-up</span>
+      <span class="badge">{{ 'landing.heroBadge' | t }}</span>
       <h1 class="h-xl">
-        Draw, animate &amp; export<br />
-        <span class="gradient-text">pixel art</span> in your browser
+        {{ 'landing.heroTitleLine1' | t }}<br />
+        <span class="gradient-text">{{ 'landing.heroTitleHighlight' | t }}</span> {{ 'landing.heroTitleLine2' | t }}
       </h1>
       <p class="lead">
-        Pixel Art Studio is a focused workspace for sprites and animations — full drawing
-        tools, a frame-by-frame timeline, layers, image conversion and one-click export.
-        Nothing to install.
+        {{ 'landing.heroLead' | t }}
       </p>
       <div class="hero-cta">
-        <a routerLink="/editor" class="btn btn-primary btn-lg">Launch the app →</a>
-        <a routerLink="/features" class="btn btn-ghost btn-lg">Explore features</a>
+        <a routerLink="/editor" class="btn btn-primary btn-lg">{{ 'landing.heroCtaLaunch' | t }}</a>
+        <a routerLink="/features" class="btn btn-ghost btn-lg">{{ 'landing.heroCtaFeatures' | t }}</a>
       </div>
       <ul class="hero-points">
-        <li>Free forever</li>
-        <li>Works offline</li>
-        <li>PNG &amp; project export</li>
+        <li>{{ 'landing.heroPointFree' | t }}</li>
+        <li>{{ 'landing.heroPointOffline' | t }}</li>
+        <li>{{ 'landing.heroPointExport' | t }}</li>
       </ul>
     </div>
 
@@ -31,31 +29,31 @@
         </div>
         <img src="/assets/idle-preset.webp" alt="" loading="eager" />
       </div>
-      <div class="float-chip chip-a">9 tools</div>
-      <div class="float-chip chip-b">onion skin</div>
+      <div class="float-chip chip-a">{{ 'landing.chipTools' | t }}</div>
+      <div class="float-chip chip-b">{{ 'landing.chipOnionSkin' | t }}</div>
     </div>
   </div>
 
   <div class="hero-stats container">
-    <div><strong>9</strong><span>drawing tools</span></div>
-    <div><strong>∞</strong><span>frames &amp; layers</span></div>
-    <div><strong>0</strong><span>install steps</span></div>
-    <div><strong>3</strong><span>export formats</span></div>
+    <div><strong>9</strong><span>{{ 'landing.statToolsLabel' | t }}</span></div>
+    <div><strong>∞</strong><span>{{ 'landing.statFramesLabel' | t }}</span></div>
+    <div><strong>0</strong><span>{{ 'landing.statInstallLabel' | t }}</span></div>
+    <div><strong>3</strong><span>{{ 'landing.statExportLabel' | t }}</span></div>
   </div>
 </section>
 
 <section class="section">
   <div class="container">
     <div class="sec-head">
-      <span class="eyebrow">Everything you need</span>
-      <h2 class="h-lg">A complete pixel art toolkit</h2>
-      <p class="lead">From first pixel to finished animation — without leaving the tab.</p>
+      <span class="eyebrow">{{ 'landing.featuresEyebrow' | t }}</span>
+      <h2 class="h-lg">{{ 'landing.featuresTitle' | t }}</h2>
+      <p class="lead">{{ 'landing.featuresLead' | t }}</p>
     </div>
     <div class="grid grid-3">
       <article class="card card-hover feat" *ngFor="let f of highlights">
         <div class="ico" aria-hidden="true">{{ f.icon }}</div>
-        <h3>{{ f.title }}</h3>
-        <p>{{ f.text }}</p>
+        <h3>{{ f.titleKey | t }}</h3>
+        <p>{{ f.textKey | t }}</p>
       </article>
     </div>
   </div>
@@ -64,14 +62,14 @@
 <section class="section steps-sec pixel-grid">
   <div class="container">
     <div class="sec-head">
-      <span class="eyebrow">How it works</span>
-      <h2 class="h-lg">From blank canvas to export in three steps</h2>
+      <span class="eyebrow">{{ 'landing.stepsEyebrow' | t }}</span>
+      <h2 class="h-lg">{{ 'landing.stepsTitle' | t }}</h2>
     </div>
     <div class="grid grid-3 steps">
       <div class="step" *ngFor="let s of steps">
         <span class="n">{{ s.n }}</span>
-        <h3>{{ s.title }}</h3>
-        <p>{{ s.text }}</p>
+        <h3>{{ s.titleKey | t }}</h3>
+        <p>{{ s.textKey | t }}</p>
       </div>
     </div>
   </div>
@@ -81,9 +79,9 @@
   <div class="container">
     <div class="cta-band">
       <div class="cta-glow" aria-hidden="true"></div>
-      <h2 class="h-lg">Ready to make some pixels?</h2>
-      <p class="lead">Open the studio and start drawing in seconds.</p>
-      <a routerLink="/editor" class="btn btn-primary btn-lg">Launch Pixel Art Studio →</a>
+      <h2 class="h-lg">{{ 'landing.ctaTitle' | t }}</h2>
+      <p class="lead">{{ 'landing.ctaLead' | t }}</p>
+      <a routerLink="/editor" class="btn btn-primary btn-lg">{{ 'landing.ctaLaunch' | t }}</a>
     </div>
   </div>
 </section>

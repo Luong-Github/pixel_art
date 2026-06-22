@@ -1,12 +1,11 @@
 <section class="section-tight page-hero">
   <div class="container">
-    <span class="eyebrow">Features</span>
-    <h1 class="h-xl">Everything in the studio</h1>
+    <span class="eyebrow">{{ 'features.eyebrow' | t }}</span>
+    <h1 class="h-xl">{{ 'features.title' | t }}</h1>
     <p class="lead">
-      A production-style workspace: a left tool rail, a center canvas, a bottom timeline for
-      layers and frames, and a right inspector for preview, conversion and transforms.
+      {{ 'features.lead' | t }}
     </p>
-    <a routerLink="/editor" class="btn btn-primary btn-lg">Try it now →</a>
+    <a routerLink="/editor" class="btn btn-primary btn-lg">{{ 'features.tryNow' | t }}</a>
   </div>
 </section>
 
@@ -14,9 +13,9 @@
   <div class="container">
     <div class="grid grid-3">
       <article class="card card-hover group" *ngFor="let g of groups">
-        <h2>{{ g.area }}</h2>
+        <h2>{{ g.areaKey | t }}</h2>
         <ul>
-          <li *ngFor="let i of g.items">{{ i }}</li>
+          <li *ngFor="let i of g.itemKeys">{{ i | t }}</li>
         </ul>
       </article>
     </div>
@@ -26,13 +25,13 @@
 <section class="section">
   <div class="container">
     <div class="sec-head">
-      <span class="eyebrow">Keyboard-first</span>
-      <h2 class="h-lg">Fast shortcuts for every tool</h2>
+      <span class="eyebrow">{{ 'features.keyboardFirst' | t }}</span>
+      <h2 class="h-lg">{{ 'features.shortcutsTitle' | t }}</h2>
     </div>
     <div class="keys">
       <div class="key" *ngFor="let k of shortcuts">
         <kbd>{{ k[0] }}</kbd>
-        <span>{{ k[1] }}</span>
+        <span>{{ k[1] | t }}</span>
       </div>
     </div>
   </div>

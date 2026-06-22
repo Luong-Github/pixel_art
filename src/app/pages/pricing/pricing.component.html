@@ -1,8 +1,8 @@
 <section class="section-tight page-hero">
   <div class="container center">
-    <span class="eyebrow">Pricing</span>
-    <h1 class="h-xl">Start free. Upgrade when you grow.</h1>
-    <p class="lead">The core editor is free forever. Paid plans add cloud sync and extras.</p>
+    <span class="eyebrow">{{ 'pricing.eyebrow' | t }}</span>
+    <h1 class="h-xl">{{ 'pricing.heroTitle' | t }}</h1>
+    <p class="lead">{{ 'pricing.heroLead' | t }}</p>
   </div>
 </section>
 
@@ -10,25 +10,25 @@
   <div class="container">
     <div class="grid grid-3 plans">
       <article class="card plan" *ngFor="let p of plans" [class.featured]="p.featured">
-        <span class="badge" *ngIf="p.featured">Most popular</span>
-        <h2>{{ p.name }}</h2>
+        <span class="badge" *ngIf="p.featured">{{ 'pricing.mostPopular' | t }}</span>
+        <h2>{{ p.nameKey | t }}</h2>
         <div class="price">
           <strong>{{ p.price }}</strong>
-          <span>{{ p.period }}</span>
+          <span>{{ p.periodKey | t }}</span>
         </div>
-        <p class="blurb">{{ p.blurb }}</p>
+        <p class="blurb">{{ p.blurbKey | t }}</p>
         <a
           [routerLink]="p.ctaLink"
           class="btn"
           [class.btn-primary]="p.featured"
           [class.btn-ghost]="!p.featured"
-          >{{ p.cta }}</a
+          >{{ p.ctaKey | t }}</a
         >
         <ul>
-          <li *ngFor="let f of p.features">{{ f }}</li>
+          <li *ngFor="let f of p.featureKeys">{{ f | t }}</li>
         </ul>
       </article>
     </div>
-    <p class="note">Prices shown are illustrative — billing isn’t enabled yet.</p>
+    <p class="note">{{ 'pricing.note' | t }}</p>
   </div>
 </section>

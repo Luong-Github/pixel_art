@@ -2,17 +2,18 @@ import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { POSTS } from './posts.data';
+import { TranslatePipe } from '../../i18n/translate.pipe';
 
 @Component({
   selector: 'app-blog-list',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, TranslatePipe],
   template: `
     <section class="section-tight page-hero">
       <div class="container narrow">
-        <span class="eyebrow">Blog</span>
-        <h1 class="h-xl">Tutorials &amp; tips</h1>
-        <p class="lead">Guides for getting more out of Pixel Art Studio.</p>
+        <span class="eyebrow">{{ 'blog.eyebrow' | t }}</span>
+        <h1 class="h-xl">{{ 'blog.heroTitle' | t }}</h1>
+        <p class="lead">{{ 'blog.heroLead' | t }}</p>
       </div>
     </section>
 
@@ -24,12 +25,12 @@ import { POSTS } from './posts.data';
               <div class="meta">
                 <time [attr.datetime]="p.date">{{ p.date | date: 'mediumDate' }}</time>
                 <span>·</span>
-                <span>{{ p.readMins }} min read</span>
+                <span>{{ 'blog.minRead' | t: { mins: p.readMins } }}</span>
               </div>
-              <h2>{{ p.title }}</h2>
-              <p>{{ p.excerpt }}</p>
+              <h2>{{ p.titleKey | t }}</h2>
+              <p>{{ p.excerptKey | t }}</p>
               <div class="tags">
-                <span class="tag" *ngFor="let t of p.tags">{{ t }}</span>
+                <span class="tag" *ngFor="let tk of p.tagKeys">{{ tk | t }}</span>
               </div>
             </a>
           </li>

@@ -1,11 +1,12 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { TranslatePipe } from '../i18n/translate.pipe';
 
 @Component({
   selector: 'app-site-footer',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, TranslatePipe],
   templateUrl: './site-footer.component.html',
   styleUrl: './site-footer.component.scss',
 })
@@ -14,26 +15,26 @@ export class SiteFooterComponent {
 
   readonly columns = [
     {
-      title: 'Product',
+      title: 'footer.colProduct',
       links: [
-        { label: 'Features', path: '/features' },
-        { label: 'Pricing', path: '/pricing' },
-        { label: 'Launch App', path: '/editor' },
+        { label: 'footer.linkFeatures', path: '/features' },
+        { label: 'footer.linkPricing', path: '/pricing' },
+        { label: 'footer.linkLaunchApp', path: '/editor' },
       ],
     },
     {
-      title: 'Resources',
+      title: 'footer.colResources',
       links: [
-        { label: 'Guide', path: '/guide' },
-        { label: 'Blog', path: '/blog' },
-        { label: 'FAQ', path: '/faq' },
+        { label: 'footer.linkGuide', path: '/guide' },
+        { label: 'footer.linkBlog', path: '/blog' },
+        { label: 'footer.linkFaq', path: '/faq' },
       ],
     },
     {
-      title: 'Company',
+      title: 'footer.colCompany',
       links: [
-        { label: 'About', path: '/about' },
-        { label: 'Contact', path: '/contact' },
+        { label: 'footer.linkAbout', path: '/about' },
+        { label: 'footer.linkContact', path: '/contact' },
       ],
     },
   ];

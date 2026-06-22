@@ -1,10 +1,9 @@
 <section class="section-tight page-hero pixel-grid">
   <div class="container">
-    <span class="eyebrow">Documentation</span>
-    <h1 class="h-xl">Pixel Art Studio guide</h1>
+    <span class="eyebrow">{{ 'guide.eyebrow' | t }}</span>
+    <h1 class="h-xl">{{ 'guide.title' | t }}</h1>
     <p class="lead">
-      Everything the editor can do, and how to use it — tools, layers, animation, palettes,
-      import and export. New here? <a routerLink="/editor">Open the editor</a> and follow along.
+      {{ 'guide.lead.text' | t }} <a routerLink="/editor">{{ 'guide.lead.link' | t }}</a>
     </p>
   </div>
 </section>
@@ -14,227 +13,192 @@
     <!-- Table of contents -->
     <aside class="toc">
       <nav>
-        <span class="toc-title">On this page</span>
-        <a *ngFor="let t of toc" [href]="'#' + t.id" (click)="jumpTo($event, t.id)">{{ t.label }}</a>
-        <a routerLink="/editor" class="toc-cta">Launch editor →</a>
+        <span class="toc-title">{{ 'guide.toc.title' | t }}</span>
+        <a *ngFor="let t of toc" [href]="'#' + t.id" (click)="jumpTo($event, t.id)">{{ t.labelKey | t }}</a>
+        <a routerLink="/editor" class="toc-cta">{{ 'guide.toc.launch' | t }}</a>
       </nav>
     </aside>
 
     <article class="doc">
       <section id="start" class="doc-section">
-        <h2 class="h-lg">Getting started</h2>
+        <h2 class="h-lg">{{ 'guide.start.heading' | t }}</h2>
         <p>
-          Pixel Art Studio runs entirely in your browser — nothing to install, and your work stays
-          on your device. Open the <a routerLink="/editor">editor</a>, pick a tool from the left
-          rail, choose a color, and start drawing on the center canvas. Zoom with
-          <kbd>Ctrl</kbd> + scroll (or <kbd>+</kbd>/<kbd>−</kbd>) and pan by holding <kbd>Space</kbd>.
+          {{ 'guide.start.p1.a' | t }} <a routerLink="/editor">{{ 'guide.start.p1.link' | t }}</a>{{ 'guide.start.p1.b' | t }}
+          <kbd>Ctrl</kbd> + scroll (<kbd>+</kbd>/<kbd>−</kbd>) {{ 'guide.start.p1.c' | t }} <kbd>Space</kbd>.
         </p>
         <ol class="steps">
-          <li>Set the canvas size in the <strong>Canvas</strong> panel (Width × Height).</li>
-          <li>Draw with the <strong>Pen</strong>; flood areas with <strong>Fill</strong>.</li>
-          <li>Add frames &amp; layers in the <strong>Timeline</strong> to animate.</li>
-          <li>Export a PNG, animated GIF, or sprite sheet from <strong>Export ▾</strong>.</li>
+          <li>{{ 'guide.start.step1' | t }}</li>
+          <li>{{ 'guide.start.step2' | t }}</li>
+          <li>{{ 'guide.start.step3' | t }}</li>
+          <li>{{ 'guide.start.step4' | t }}</li>
         </ol>
       </section>
 
       <section id="interface" class="doc-section">
-        <h2 class="h-lg">Interface &amp; panels</h2>
-        <p>
-          The workspace is built from <strong>dockable panels</strong>, like a desktop app. Every
-          panel (Tools, Color &amp; Palette, Display, Canvas, Timeline) can be rearranged:
-        </p>
+        <h2 class="h-lg">{{ 'guide.interface.heading' | t }}</h2>
+        <p>{{ 'guide.interface.intro' | t }}</p>
         <ul class="bullets">
-          <li><strong>Drag</strong> a panel by its title bar to move it between the left, right or bottom dock zones, or reorder it.</li>
-          <li><strong>Tear off</strong> a panel by dragging it out of any zone — it becomes a floating window you can move and resize, then drag back to re-dock.</li>
-          <li>Use the header buttons to <strong>collapse</strong> (▬), <strong>float</strong> (⧉) or <strong>close</strong> (✕) a panel.</li>
-          <li>Re-open closed panels from <strong>View ▾</strong>; restore everything with <strong>Reset layout</strong>.</li>
-          <li>Your layout is saved automatically and restored next visit.</li>
-          <li><strong>Command palette</strong> — press <kbd>Ctrl</kbd>+<kbd>K</kbd> to search and run any tool or action.</li>
-          <li><strong>Autosave</strong> — your whole project is saved to the browser and restored on reload; <strong>File ▾ → Start fresh</strong> clears it.</li>
-          <li><strong>Minimap</strong> — appears bottom-right when zoomed in; click/drag it to pan. <strong>Brush stabilizer</strong> (Tools panel) smooths jittery freehand strokes.</li>
-          <li><strong>Colour</strong> — <strong>Edit ▾ → Adjust colours</strong> (hue/saturation/brightness), and <strong>Recolor sprite</strong> (Palette tab) snaps the whole sprite to the current palette.</li>
+          <li>{{ 'guide.interface.drag' | t }}</li>
+          <li>{{ 'guide.interface.tearoff' | t }}</li>
+          <li>{{ 'guide.interface.headerBtns' | t }}</li>
+          <li>{{ 'guide.interface.reopen' | t }}</li>
+          <li>{{ 'guide.interface.autolayout' | t }}</li>
+          <li>{{ 'guide.interface.commandPalette' | t }}</li>
+          <li>{{ 'guide.interface.autosave' | t }}</li>
+          <li>{{ 'guide.interface.minimap' | t }}</li>
+          <li>{{ 'guide.interface.colour' | t }}</li>
         </ul>
-        <p class="note">The top bar keeps only undo/redo and the File, Export and View menus. A <strong>selection bar</strong> under it holds rotate / flip / copy / cut / paste (they act on the selection, or the whole layer when nothing is selected). The <strong>Tools</strong> panel is grouped into Draw, Shape and Select, with brush size, pixel-perfect and symmetry options below it.</p>
+        <p class="note">{{ 'guide.interface.note' | t }}</p>
       </section>
 
       <section id="tools" class="doc-section">
-        <h2 class="h-lg">Tools</h2>
-        <p>Pick tools from the <strong>Tools</strong> panel or with a shortcut key.</p>
+        <h2 class="h-lg">{{ 'guide.tools.heading' | t }}</h2>
+        <p>{{ 'guide.tools.intro' | t }}</p>
         <table class="doc-table">
-          <thead><tr><th>Key</th><th>Tool</th><th>What it does</th></tr></thead>
+          <thead><tr><th>{{ 'guide.tools.colKey' | t }}</th><th>{{ 'guide.tools.colTool' | t }}</th><th>{{ 'guide.tools.colDesc' | t }}</th></tr></thead>
           <tbody>
             <tr *ngFor="let t of tools">
               <td><kbd>{{ t.key }}</kbd></td>
-              <td><strong>{{ t.name }}</strong></td>
-              <td>{{ t.desc }}</td>
+              <td><strong>{{ t.nameKey | t }}</strong></td>
+              <td>{{ t.descKey | t }}</td>
             </tr>
           </tbody>
         </table>
       </section>
 
       <section id="drawing" class="doc-section">
-        <h2 class="h-lg">Drawing &amp; dithering</h2>
+        <h2 class="h-lg">{{ 'guide.drawing.heading' | t }}</h2>
         <ul class="bullets">
-          <li><strong>Brush size</strong> — set in the Canvas panel, or press <kbd>[</kbd> / <kbd>]</kbd>.</li>
-          <li><strong>Symmetry</strong> — in the Canvas panel choose Off, Mirror&nbsp;X, Mirror&nbsp;Y, Both (4-way) or Mandala (8-way, square canvas); strokes, fills and shapes mirror live. <kbd>Shift</kbd>+<kbd>M</kbd> toggles Mirror&nbsp;X.</li>
-          <li><strong>Pixel-perfect</strong> — tick <em>Pixel-perfect</em> (Tools panel) so freehand 1px strokes drop redundant L-corners for clean lines, like Aseprite.</li>
-          <li><strong>Gradient tool</strong> (<kbd>D</kbd>) — drag from the primary to the secondary colour to fill the selection (or whole layer). Choose <strong>Linear/Radial</strong> and toggle <strong>Bayer dither</strong> (pixel-art) vs smooth RGB.</li>
-          <li><strong>Shading ink</strong> (<kbd>A</kbd>) — drag over pixels to step them one shade <strong>darker</strong> (hold <kbd>Alt</kbd> to lighten) along the palette ramp — pair it with the <strong>Shadow Ramp</strong> palette.</li>
-          <li><strong>Custom brush</strong> — select a region, then <em>Brush from selection</em> (Tools panel) to stamp it with the Pen.</li>
-          <li><strong>Outline / Replace color</strong> — from <strong>Edit ▾</strong>: outline the layer in the secondary colour, or replace every secondary-coloured pixel with the primary.</li>
-          <li><strong>Reference image</strong> — load a photo overlay (Canvas panel) at adjustable opacity, above or below the art, to trace from. You can also load a <strong>Pixel Studio <code>.json</code> export</strong> — it's flattened into a crisp, pixel-exact reference (no smoothing). <strong>Tiled preview</strong> (Preview panel) repeats the sprite 3×3 to check seamless tiling.</li>
-          <li><strong>Timelapse</strong> — <strong>Export ▾ → Timelapse → Record</strong>, draw, then <strong>Export timelapse (GIF)</strong> to share your process. Forgot to record? <strong>From undo history</strong> rebuilds an approximate timelapse from this session's undo steps — but only while the editor tab is still open (it's lost on reload).</li>
-          <li><strong>Grid</strong> — toggle the pixel grid with <kbd>G</kbd> (auto-hidden when zoomed far out).</li>
-          <li><strong>Dither brush</strong> — in Color &amp; Palette, choose 25% / 50% / 75%. The pen then alternates primary &amp; secondary in a pixel-perfect pattern.</li>
-          <li><strong>Selection</strong> — mark a region with <strong>Select</strong> (rectangle), <strong>Magic wand</strong> (contiguous same-color area) or <strong>Lasso</strong> (freehand shape), then Move, Copy / Cut / Paste, Rotate, Flip and Nudge it. Hold <kbd>Shift</kbd> to add to, or <kbd>Alt</kbd> to subtract from, the current selection (wand &amp; lasso).</li>
-          <li><strong>Free transform</strong> — with a selection, press <kbd>T</kbd>: drag the box <strong>handles</strong> to scale, the top <strong>knob</strong> to rotate freely, or inside the box to move. <kbd>Enter</kbd> commits, <kbd>Esc</kbd> cancels (clicking outside also commits).</li>
+          <li>{{ 'guide.drawing.brushSize' | t }}</li>
+          <li>{{ 'guide.drawing.symmetry' | t }}</li>
+          <li>{{ 'guide.drawing.pixelPerfect' | t }}</li>
+          <li>{{ 'guide.drawing.gradient' | t }}</li>
+          <li>{{ 'guide.drawing.shading' | t }}</li>
+          <li>{{ 'guide.drawing.customBrush' | t }}</li>
+          <li>{{ 'guide.drawing.outline' | t }}</li>
+          <li>{{ 'guide.drawing.reference' | t }}</li>
+          <li>{{ 'guide.drawing.timelapse' | t }}</li>
+          <li>{{ 'guide.drawing.grid' | t }}</li>
+          <li>{{ 'guide.drawing.dither' | t }}</li>
+          <li>{{ 'guide.drawing.selection' | t }}</li>
+          <li>{{ 'guide.drawing.transform' | t }}</li>
         </ul>
       </section>
 
       <section id="generate" class="doc-section">
-        <h2 class="h-lg">Generate (procedural)</h2>
-        <p>
-          The <strong>Generate</strong> panel fills the <strong>active layer</strong> with a procedural
-          pattern (Pixel&nbsp;Composer-style) using your <strong>primary</strong> (and optionally
-          <strong>secondary</strong>) colour. Every result is <strong>undoable</strong>, and if a region is
-          selected it's confined to that selection.
-        </p>
+        <h2 class="h-lg">{{ 'guide.generate.heading' | t }}</h2>
+        <p>{{ 'guide.generate.intro' | t }}</p>
         <ul class="bullets">
-          <li><strong>Noise</strong> — smooth value noise; tune <em>Scale</em> (blob size), <em>Density</em> (coverage) and <em>Seed</em>.</li>
-          <li><strong>Gradient (dither)</strong> — a Bayer-dithered ramp along <em>Vertical / Horizontal / Diagonal</em>; <em>Density</em> shifts the midpoint.</li>
-          <li><strong>Checker</strong> — chequerboard with cell size set by <em>Scale</em>.</li>
-          <li><strong>Bricks</strong> — staggered brick wall; mortar lines use the second tone.</li>
-          <li><strong>Stipple</strong> — random dots at the chosen <em>Density</em>.</li>
+          <li>{{ 'guide.generate.noise' | t }}</li>
+          <li>{{ 'guide.generate.gradient' | t }}</li>
+          <li>{{ 'guide.generate.checker' | t }}</li>
+          <li>{{ 'guide.generate.bricks' | t }}</li>
+          <li>{{ 'guide.generate.stipple' | t }}</li>
         </ul>
-        <p class="note">
-          <strong>Two colours</strong> uses the secondary as the second tone (off = transparent).
-          <strong>Replace</strong> clears the area first (off = overlay on top). A <strong>Seed</strong> +
-          <strong>🎲 Random</strong> make noise/stipple reproducible. Open the panel from <strong>View ▾</strong>
-          if it's hidden.
-        </p>
+        <p class="note">{{ 'guide.generate.note' | t }}</p>
       </section>
 
       <section id="color" class="doc-section">
-        <h2 class="h-lg">Color &amp; palette</h2>
+        <h2 class="h-lg">{{ 'guide.color.heading' | t }}</h2>
         <ul class="bullets">
-          <li><strong>HSV picker</strong> — drag the saturation/value square and the hue slider, or type a <strong>HEX</strong> / <strong>R G B</strong> value, to set the primary color.</li>
-          <li><strong>Primary / Secondary</strong> colors — left-click a swatch sets primary; <strong>right-click</strong> opens a menu to set it as primary/secondary, <strong>edit the colour</strong> (native picker, replaces it in place) or <strong>remove it</strong> from the palette. Swap primary/secondary with <kbd>X</kbd>. <strong>Recent</strong> colors appear above the palette.</li>
-          <li><strong>Palette tools</strong> — Sort by hue / brightness, add a primary→secondary <strong>Gradient</strong> ramp, generate <strong>Harmony</strong> colours from the primary, build the palette <strong>From sprite</strong> (its used colours) or <strong>From sel</strong> (only the colours inside the current selection — handy for grabbing one object's palette).</li>
-          <li><strong>Pick from screen</strong> — the eyedropper buttons sample any on-screen color.</li>
-          <li><strong>Built-in palettes</strong> — load PICO-8, Game Boy, NES, DawnBringer 16, ENDESGA 32 or the <strong>Shadow Ramp</strong> (a light→dark shading ramp) from the dropdown.</li>
-          <li><strong>Purpose palettes</strong> — ready-made ramps for common subjects, each spanning deep shadow → bright highlight for strong contrast: <strong>Water</strong> (deep blue → cyan → foam), <strong>Tech / Devices</strong> (brushed-steel greys + LED accents), <strong>Nature</strong> (foliage greens + bark + sky/flower pops), and <strong>Glass</strong> — paint it on a layer (or brush) at <strong>reduced opacity</strong> so the background shows through for a see-through effect.</li>
-          <li><strong>Save</strong> your current palette (kept in the browser) and reload it later.</li>
-          <li><strong>Palette lock</strong> — when on (🔒), every stroke snaps to the nearest palette color so you never stray off-palette.</li>
+          <li>{{ 'guide.color.hsv' | t }}</li>
+          <li>{{ 'guide.color.primarySecondary' | t }}</li>
+          <li>{{ 'guide.color.paletteTools' | t }}</li>
+          <li>{{ 'guide.color.pickScreen' | t }}</li>
+          <li>{{ 'guide.color.builtin' | t }}</li>
+          <li>{{ 'guide.color.purpose' | t }}</li>
+          <li>{{ 'guide.color.save' | t }}</li>
+          <li>{{ 'guide.color.lock' | t }}</li>
         </ul>
       </section>
 
       <section id="layers" class="doc-section">
-        <h2 class="h-lg">Layers</h2>
-        <p>Layers live in the <strong>Timeline</strong>’s left column (one row per layer).</p>
+        <h2 class="h-lg">{{ 'guide.layers.heading' | t }}</h2>
+        <p>{{ 'guide.layers.intro' | t }}</p>
         <ul class="bullets">
-          <li><strong>Add / Duplicate / Delete</strong> layers from the timeline toolbar.</li>
-          <li><strong>Selection → new layer</strong> — with a selection active, use <strong>⧉ Layer</strong> / <strong>✂ Layer</strong> on the selection bar (or <kbd>Ctrl</kbd>+<kbd>J</kbd> to copy, <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>J</kbd> to cut) to lift the selected pixels onto a fresh layer above.</li>
-          <li><strong>Reorder</strong> by dragging the ⠿ handle, or with the ▲ / ▼ buttons.</li>
-          <li><strong>Visibility</strong> (◉/○) and <strong>lock</strong> (🔒) per layer — a locked layer can’t be drawn on or edited.</li>
-          <li><strong>Rename</strong> inline, and set the active layer’s <strong>opacity</strong> with the slider.</li>
-          <li><strong>Blend mode</strong> — pick how the active layer mixes with the layers below from the <strong>Blend</strong> dropdown in the timeline toolbar: Normal, Multiply, Screen, Overlay, Darken, Lighten, Add or Difference. Try <strong>File ▾ → Examples → Blend tree</strong> for a worked example (Multiply shadow + Screen highlight + Add glow, grouped).</li>
-          <li><strong>Groups (folders)</strong> — press <strong>📁</strong> in the Layer toolbar (or right-click → <em>New group</em>) to wrap the active layer in a folder. A group header row appears with a <strong>caret</strong> to collapse/expand, plus group <strong>visibility</strong>, <strong>lock</strong> and (right-click) <strong>opacity</strong>, <strong>color</strong> and <strong>rename / ungroup</strong>. Hiding, locking or fading a group affects all its layers. Move layers in or out via the layer’s right-click menu. While the active layer is inside a group, the <strong>＋ Add</strong> button adds the new layer <em>into</em> that group — to add one outside, right-click the group header and choose <strong>＋ Add layer above group</strong>.</li>
-          <li><strong>Right-click a layer</strong> for a context menu — rename, duplicate, new, show/hide, lock/unlock, move up/down, group/ungroup or delete.</li>
+          <li>{{ 'guide.layers.addDup' | t }}</li>
+          <li>{{ 'guide.layers.selToLayer' | t }}</li>
+          <li>{{ 'guide.layers.reorder' | t }}</li>
+          <li>{{ 'guide.layers.visibility' | t }}</li>
+          <li>{{ 'guide.layers.rename' | t }}</li>
+          <li>{{ 'guide.layers.blend' | t }}</li>
+          <li>{{ 'guide.layers.groups' | t }}</li>
+          <li>{{ 'guide.layers.contextMenu' | t }}</li>
         </ul>
       </section>
 
       <section id="animation" class="doc-section">
-        <h2 class="h-lg">Animation &amp; timeline</h2>
-        <p>The timeline is a frame × layer grid with thumbnails per frame.</p>
+        <h2 class="h-lg">{{ 'guide.animation.heading' | t }}</h2>
+        <p>{{ 'guide.animation.intro' | t }}</p>
         <ul class="bullets">
-          <li><strong>Playback</strong> — ⏮ ▶ ⏭ with <strong>Loop</strong>, <strong>FPS</strong> (applies to all frames) and per-frame <strong>ms</strong>. Press <kbd>Enter</kbd> to play, <kbd>,</kbd>/<kbd>.</kbd> to step.</li>
-          <li><strong>Frame ops</strong> — Add, Duplicate, Insert before/after, Reverse, and Delete (removes all selected frames).</li>
-          <li><strong>Select frames</strong> — click a frame to select it; <kbd>Shift</kbd>+click (or Shift-drag) for a range; <kbd>Ctrl</kbd>+click to toggle individual frames. Clicking the canvas or empty timeline clears the selection.</li>
-          <li><strong>Move frames</strong> — drag a frame header to reposition it; if it’s part of a multi-selection the whole block moves.</li>
-          <li><strong>Copy &amp; paste frames</strong> — use the ⧉ / 📋 buttons in the Frame group to copy the selected frames and paste them right after the current frame.</li>
-          <li>
-            <strong>Animation tags</strong> — select one or more frames and press <strong>🏷</strong> in the Frame group to name that range (e.g. <em>idle</em>, <em>walk</em>, <em>attack</em>). Tags appear as colored bars above the frames. <strong>Click</strong> a bar to select its range; <strong>right-click</strong> for options — rename, cycle <strong>direction</strong> (forward → / reverse ← / ping-pong ↔), change color, set <strong>repeat</strong>, or delete. Choose a tag in the <strong>Play</strong> dropdown to loop just that range during playback. Tags are written into the sprite-sheet JSON (<code>frameTags</code>) for your game engine.
-          </li>
-          <li><strong>Onion skin</strong> — shows ghosts of the previous (red) and next (blue) frames; adjust opacity and tint in the Canvas panel.</li>
-          <li>Toggle the layer/frame views from <strong>View ▾</strong> in the timeline toolbar.</li>
+          <li>{{ 'guide.animation.playback' | t }}</li>
+          <li>{{ 'guide.animation.frameOps' | t }}</li>
+          <li>{{ 'guide.animation.selectFrames' | t }}</li>
+          <li>{{ 'guide.animation.moveFrames' | t }}</li>
+          <li>{{ 'guide.animation.copyPaste' | t }}</li>
+          <li>{{ 'guide.animation.tags' | t }}</li>
+          <li>{{ 'guide.animation.onion' | t }}</li>
+          <li>{{ 'guide.animation.toggleViews' | t }}</li>
         </ul>
       </section>
 
       <section id="import" class="doc-section">
-        <h2 class="h-lg">Import &amp; convert</h2>
-        <p>
-          Turn any image into pixel art via <strong>File ▾ → Import / convert image…</strong>. The
-          dialog lets you choose:
-        </p>
+        <h2 class="h-lg">{{ 'guide.import.heading' | t }}</h2>
+        <p>{{ 'guide.import.intro' | t }}</p>
         <ul class="bullets">
-          <li><strong>Target size</strong> (64 / 96 / 128 or a custom long side) and <strong>palette</strong> count.</li>
-          <li><strong>Fit</strong> (contain / cover / stretch), <strong>contrast</strong>, <strong>sharpen</strong> and <strong>dithering</strong>.</li>
-          <li><strong>Import into</strong> the current tab (overwrites, with confirmation) or a <strong>new tab</strong>.</li>
+          <li>{{ 'guide.import.targetSize' | t }}</li>
+          <li>{{ 'guide.import.fit' | t }}</li>
+          <li>{{ 'guide.import.into' | t }}</li>
         </ul>
       </section>
 
       <section id="tilemap" class="doc-section">
-        <h2 class="h-lg">Tilemap</h2>
-        <p>
-          Open the <strong>Tilemap</strong> panel from <strong>View ▾</strong>. It slices your
-          current sprite into a grid of tiles, then lets you paint a map with them — great for
-          building levels and reusing tiles.
-        </p>
+        <h2 class="h-lg">{{ 'guide.tilemap.heading' | t }}</h2>
+        <p>{{ 'guide.tilemap.intro' | t }}</p>
         <ul class="bullets">
-          <li><strong>Tile size</strong> — pick 8 / 16 / 24 / 32; the sprite is sliced left-to-right, top-to-bottom into that many tiles. Hit <strong>↻ Tiles</strong> after editing the sprite to re-slice.</li>
-          <li><strong>Map size</strong> — set Cols × Rows and the on-screen Zoom.</li>
-          <li><strong>Paint</strong> — pick a tile from the strip, then click / drag on the map. <strong>Right-click</strong> (or the <strong>Erase</strong> button) clears cells; <strong>Clear</strong> empties the map.</li>
-          <li><strong>Auto-tiling</strong> — toggle <strong>⊞ Auto</strong> to auto-pick edge/corner variants from neighbours. It uses <strong>16 tiles</strong> starting at the selected one, ordered by a 4-bit cardinal bitmask (N=1, E=2, S=4, W=8): tile 0 = isolated, tile 15 = fully surrounded. Lay your auto-tile block out in that order, select its first tile, then paint — variants update automatically as you connect cells.</li>
-          <li><strong>Export</strong> (Pro) — writes the rendered <strong>map PNG</strong>, the <strong>tileset PNG</strong>, and a <strong>JSON</strong> map (tile size, columns/rows, tileset info and the cell index array) for your engine.</li>
+          <li>{{ 'guide.tilemap.tileSize' | t }}</li>
+          <li>{{ 'guide.tilemap.mapSize' | t }}</li>
+          <li>{{ 'guide.tilemap.paint' | t }}</li>
+          <li>{{ 'guide.tilemap.autoTiling' | t }}</li>
+          <li>{{ 'guide.tilemap.export' | t }}</li>
         </ul>
       </section>
 
       <section id="export" class="doc-section">
-        <h2 class="h-lg">Export</h2>
-        <p>From <strong>Export ▾</strong>:</p>
+        <h2 class="h-lg">{{ 'guide.export.heading' | t }}</h2>
+        <p>{{ 'guide.export.intro' | t }}</p>
         <ul class="bullets">
-          <li><strong>PNG</strong> at 1× / 2× (free) or 4× / 8× (Pro), with transparency preserved.</li>
-          <li><strong>Animated GIF</strong> (Pro) at 1× / 2× / 4× / 8× of the visible frames, using each frame’s duration (transparency preserved).</li>
-          <li><strong>Video for social media</strong> (Pro) — <strong>MP4</strong> (or WebM where MP4 isn’t supported) at 4× / 8×, since many platforms reject GIF. Video has no transparency, so pick a <strong>Video background</strong> colour first.</li>
-          <li><strong>Sprite sheet</strong> (Pro) — grid or single row — plus an engine-ready <strong>JSON atlas</strong> (frame size, count, durations, columns, pivot and <strong>animation tags</strong>).</li>
-          <li><strong>Pivot / anchor</strong> — set Center / Feet / Top-left in the Canvas panel; it’s written into the sprite-sheet JSON.</li>
+          <li>{{ 'guide.export.png' | t }}</li>
+          <li>{{ 'guide.export.gif' | t }}</li>
+          <li>{{ 'guide.export.video' | t }}</li>
+          <li>{{ 'guide.export.spriteSheet' | t }}</li>
+          <li>{{ 'guide.export.pivot' | t }}</li>
         </ul>
-        <p class="note">Free exports add a small watermark; <a routerLink="/pricing">Pro</a> removes it and unlocks GIF, sprite sheets and higher scales.</p>
+        <p class="note">{{ 'guide.export.note.a' | t }} <a routerLink="/pricing">{{ 'guide.export.note.pro' | t }}</a> {{ 'guide.export.note.b' | t }}</p>
       </section>
 
       <section id="projects" class="doc-section">
-        <h2 class="h-lg">Projects</h2>
-        <p>
-          Everything in <strong>File ▾ → Project</strong>. <strong>💾 Save project</strong> stores the whole
-          project (all workspaces, frames, layers, palette, settings) into a local library in your browser
-          (IndexedDB); a modal shows the save progress. Reopen any of them from <strong>🕘 Recent projects</strong>
-          — a grid of thumbnails you can open or delete. Saving again overwrites the open project, or use
-          <strong>Save as new</strong> to branch a copy.
-        </p>
-        <p>
-          To move work between machines, use <strong>Export project (.json)</strong> for a portable
-          <code>.pixelart.json</code> file, and bring it back with <strong>Import as tab(s)</strong> (adds its
-          workspaces as new tabs) or <strong>Open project (.json)</strong> (loads it as a fresh session).
-          The local library is per-browser, so export a <code>.json</code> now and then as a backup.
-        </p>
+        <h2 class="h-lg">{{ 'guide.projects.heading' | t }}</h2>
+        <p>{{ 'guide.projects.p1' | t }}</p>
+        <p>{{ 'guide.projects.p2' | t }}</p>
       </section>
 
       <section id="shortcuts" class="doc-section">
-        <h2 class="h-lg">Keyboard shortcuts</h2>
+        <h2 class="h-lg">{{ 'guide.shortcuts.heading' | t }}</h2>
         <table class="doc-table">
-          <thead><tr><th>Shortcut</th><th>Action</th></tr></thead>
+          <thead><tr><th>{{ 'guide.shortcuts.colShortcut' | t }}</th><th>{{ 'guide.shortcuts.colAction' | t }}</th></tr></thead>
           <tbody>
             <tr *ngFor="let s of shortcuts">
               <td><kbd>{{ s.keys }}</kbd></td>
-              <td>{{ s.action }}</td>
+              <td>{{ s.actionKey | t }}</td>
             </tr>
           </tbody>
         </table>
       </section>
 
       <div class="doc-cta">
-        <h2 class="h-lg">Ready to draw?</h2>
-        <a routerLink="/editor" class="btn btn-primary btn-lg">Open Pixel Art Studio →</a>
+        <h2 class="h-lg">{{ 'guide.cta.heading' | t }}</h2>
+        <a routerLink="/editor" class="btn btn-primary btn-lg">{{ 'guide.cta.button' | t }}</a>
       </div>
     </article>
   </div>

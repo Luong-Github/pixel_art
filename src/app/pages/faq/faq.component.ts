@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { TranslatePipe } from '../../i18n/translate.pipe';
 
 interface Qa {
   q: string;
@@ -10,13 +11,13 @@ interface Qa {
 @Component({
   selector: 'app-faq',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, TranslatePipe],
   template: `
     <section class="section-tight page-hero">
       <div class="container narrow center">
-        <span class="eyebrow">FAQ</span>
-        <h1 class="h-xl">Frequently asked questions</h1>
-        <p class="lead">Everything about using Pixel Art Studio.</p>
+        <span class="eyebrow">{{ 'faq.eyebrow' | t }}</span>
+        <h1 class="h-xl">{{ 'faq.title' | t }}</h1>
+        <p class="lead">{{ 'faq.lead' | t }}</p>
       </div>
     </section>
 
@@ -25,16 +26,16 @@ interface Qa {
         <div class="acc">
           <details class="item" *ngFor="let item of faqs; let i = index" [open]="i === 0">
             <summary>
-              <span>{{ item.q }}</span>
+              <span>{{ item.q | t }}</span>
               <span class="chev" aria-hidden="true">+</span>
             </summary>
-            <p>{{ item.a }}</p>
+            <p>{{ item.a | t }}</p>
           </details>
         </div>
 
         <div class="more">
-          <p>Still stuck?</p>
-          <a routerLink="/contact" class="btn btn-ghost">Contact support</a>
+          <p>{{ 'faq.stillStuck' | t }}</p>
+          <a routerLink="/contact" class="btn btn-ghost">{{ 'faq.contactSupport' | t }}</a>
         </div>
       </div>
     </section>
@@ -75,32 +76,32 @@ interface Qa {
 export class FaqComponent {
   readonly faqs: Qa[] = [
     {
-      q: 'Is Pixel Art Studio free?',
-      a: 'Yes. The full editor — drawing tools, animation, layers, image conversion and export — is free to use in your browser with no account required.',
+      q: 'faq.q1',
+      a: 'faq.a1',
     },
     {
-      q: 'Do I need to install anything?',
-      a: 'No. It runs entirely in the browser. Just open the app and start drawing. It also works offline once loaded.',
+      q: 'faq.q2',
+      a: 'faq.a2',
     },
     {
-      q: 'Where are my drawings stored?',
-      a: 'Everything stays on your device. Nothing is uploaded. Use “Export Project” to save a .pixelart.json file you can reload later, or export a PNG.',
+      q: 'faq.q3',
+      a: 'faq.a3',
     },
     {
-      q: 'Can I animate sprites?',
-      a: 'Yes. There is a frame timeline with per-frame duration, onion skin and live playback, plus a layer timeline for organising your art.',
+      q: 'faq.q4',
+      a: 'faq.a4',
     },
     {
-      q: 'Can I turn a photo into pixel art?',
-      a: 'Yes. The Image Convert panel imports any image and reduces it to a palette, with controls for size, fit, dithering, contrast and sharpening.',
+      q: 'faq.q5',
+      a: 'faq.a5',
     },
     {
-      q: 'What can I export?',
-      a: 'PNG at 1x, PNG scaled to your current zoom, and a full .pixelart.json project containing your workspaces, frames, layers, palette and settings.',
+      q: 'faq.q6',
+      a: 'faq.a6',
     },
     {
-      q: 'Which browsers are supported?',
-      a: 'Any modern browser (Chrome, Edge, Firefox, Safari). The on-screen color picker uses the EyeDropper API where available.',
+      q: 'faq.q7',
+      a: 'faq.a7',
     },
   ];
 }

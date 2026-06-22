@@ -1,23 +1,23 @@
 <footer class="ftr">
   <div class="inner">
     <div class="brand">
-      <a routerLink="/" class="logo" aria-label="Pixel Art Studio home">
+      <a routerLink="/" class="logo" [attr.aria-label]="'footer.logoAria' | t">
         <span class="mark" aria-hidden="true"></span>
         <span class="name">Pixel<strong>Studio</strong></span>
       </a>
-      <p>Draw, animate and export pixel art right in your browser. Free and no install.</p>
+      <p>{{ 'footer.tagline' | t }}</p>
     </div>
 
-    <nav class="cols" aria-label="Footer">
+    <nav class="cols" [attr.aria-label]="'footer.navAria' | t">
       <div class="col" *ngFor="let c of columns">
-        <h3>{{ c.title }}</h3>
-        <a *ngFor="let l of c.links" [routerLink]="l.path">{{ l.label }}</a>
+        <h3>{{ c.title | t }}</h3>
+        <a *ngFor="let l of c.links" [routerLink]="l.path">{{ l.label | t }}</a>
       </div>
     </nav>
   </div>
 
   <div class="legal">
-    <span>© {{ year }} Pixel Art Studio. All rights reserved.</span>
-    <span>Built with Angular.</span>
+    <span>© {{ year }} {{ 'footer.copyright' | t }}</span>
+    <span>{{ 'footer.builtWith' | t }}</span>
   </div>
 </footer>

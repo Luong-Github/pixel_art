@@ -22,7 +22,7 @@
         [routerLink]="item.path"
         routerLinkActive="active"
         (click)="close()"
-        >{{ item.label }}</a
+        >{{ item.key | t }}</a
       >
       <div class="lang-menu" [class.open]="langOpen">
         <button type="button" class="lang-trigger" (click)="toggleLang($event)"
@@ -41,7 +41,7 @@
           </li>
         </ul>
       </div>
-      <a routerLink="/editor" class="cta" (click)="close()">Launch App</a>
+      <a routerLink="/editor" class="cta" (click)="close()">{{ 'nav.launch' | t }}</a>
     </nav>
   </div>
 </header>
