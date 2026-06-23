@@ -665,6 +665,10 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
   /** Hue retained for the HSV picker when the colour is grayscale. */
   pickerHue = 0;
   private svDragging = false;
+  /** Picker alpha (0–255) applied to the primary colour; 255 = opaque. */
+  pickerAlpha = 255;
+  /** Slider model shown in the colour picker. */
+  pickerColorMode: 'hsv' | 'hsl' = 'hsv';
   /** Recently used drawing colours (most-recent first). */
   recentColors: string[] = [];
   brushSize = 1;
@@ -1550,6 +1554,7 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
     if (index === this.activeWorkspaceIndex) {
       return;
     }
+    this.flushAdjust();
     this.saveCurrentWorkspace();
     this.activeWorkspaceIndex = index;
     this.applyWorkspace(this.activeWorkspace);
@@ -3228,6 +3233,8 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
       this.beginPan(event);
       return;
     }
+    // Drawing bakes any pending adjustment first, so strokes land on adjusted pixels.
+    this.flushAdjust();
     // Free-transform handles can sit outside the pixel grid, so handle it before
     // the in-bounds point check below.
     if (this.activeTool === 'transform') {
@@ -4456,6 +4463,7 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
   }
 
   selectLayer(index: number): void {
+    this.flushAdjust();
     this.activeLayerIndex = index;
     this.render();
   }
@@ -5347,6 +5355,7 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
   }
 
   selectTimelineCell(frameIndex: number, layerIndex: number): void {
+    this.flushAdjust();
     this.activeFrameIndex = frameIndex;
     this.previewFrameIndex = frameIndex;
     this.activeLayerIndex = layerIndex;
@@ -5505,6 +5514,15 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
     );
   }
 
+  /** Primary as plain #rrggbb (for the native colour input, which has no alpha). */
+  get primaryHex6(): string {
+    return this.rgbToHex(...this.hexToRgb(this.primaryColor));
+  }
+  set primaryHex6(v: string) {
+    const [r, g, b] = this.hexToRgb(v);
+    this.applyPrimaryRgb(r, g, b);
+  }
+
   colorChannel(i: number): number {
     return this.hexToRgb(this.primaryColor)[i];
   }
@@ -5515,21 +5533,27 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
       0,
       255,
     );
-    this.primaryColor = this.rgbToHex(rgb[0], rgb[1], rgb[2]);
+    this.applyPrimaryRgb(rgb[0], rgb[1], rgb[2]);
   }
 
   onHexInput(event: Event): void {
-    const v = (event.target as HTMLInputElement).value.trim();
-    if (/^#?[0-9a-f]{6}$/i.test(v)) {
-      this.primaryColor = (v[0] === '#' ? v : '#' + v).toLowerCase();
+    const raw = (event.target as HTMLInputElement).value.trim().replace(/^#/, '');
+    if (/^[0-9a-f]{6}([0-9a-f]{2})?$/i.test(raw)) {
+      this.primaryColor = ('#' + raw).toLowerCase();
+      this.pickerAlpha = this.colorAlpha(this.primaryColor);
     }
+  }
+
+  /** Set the primary colour from rgb, folding in the current picker alpha. */
+  private applyPrimaryRgb(r: number, g: number, b: number): void {
+    this.primaryColor = this.withAlpha(this.rgbToHex(r, g, b), this.pickerAlpha);
   }
 
   setHue(deg: number): void {
     this.pickerHue = deg;
     const [, s, v] = this.primaryHsv();
     const [r, g, b] = this.hsvToRgb(deg, s, v);
-    this.primaryColor = this.rgbToHex(r, g, b);
+    this.applyPrimaryRgb(r, g, b);
   }
 
   onSvDown(event: PointerEvent): void {
@@ -5554,7 +5578,128 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
     const s = this.clamp((event.clientX - r.left) / r.width, 0, 1);
     const v = this.clamp(1 - (event.clientY - r.top) / r.height, 0, 1);
     const [rr, gg, bb] = this.hsvToRgb(this.pickerHueDeg, s, v);
-    this.primaryColor = this.rgbToHex(rr, gg, bb);
+    this.applyPrimaryRgb(rr, gg, bb);
+  }
+
+  // ----- HSV / HSL sliders, alpha, shades -----
+
+  /** Apply HSV directly (used by the H/S/B sliders). */
+  private applyHsv(h: number, s: number, v: number): void {
+    const [r, g, b] = this.hsvToRgb(h, this.clamp(s, 0, 1), this.clamp(v, 0, 1));
+    if (s > 0.004) this.pickerHue = h;
+    this.applyPrimaryRgb(r, g, b);
+  }
+  setSat(pct: number): void {
+    const [h, , v] = this.primaryHsv();
+    this.applyHsv(h, pct / 100, v);
+  }
+  setVal(pct: number): void {
+    const [h, s] = this.primaryHsv();
+    this.applyHsv(h, s, pct / 100);
+  }
+
+  private rgbToHsl(r: number, g: number, b: number): [number, number, number] {
+    r /= 255; g /= 255; b /= 255;
+    const max = Math.max(r, g, b), min = Math.min(r, g, b), d = max - min;
+    const l = (max + min) / 2;
+    let h = 0, s = 0;
+    if (d !== 0) {
+      s = d / (1 - Math.abs(2 * l - 1));
+      if (max === r) h = ((g - b) / d) % 6;
+      else if (max === g) h = (b - r) / d + 2;
+      else h = (r - g) / d + 4;
+      h = (h * 60 + 360) % 360;
+    }
+    return [h, s, l];
+  }
+  private hslToRgb(h: number, s: number, l: number): [number, number, number] {
+    const c = (1 - Math.abs(2 * l - 1)) * s;
+    const x = c * (1 - Math.abs(((h / 60) % 2) - 1));
+    const m = l - c / 2;
+    let r = 0, g = 0, b = 0;
+    if (h < 60) [r, g] = [c, x];
+    else if (h < 120) [r, g] = [x, c];
+    else if (h < 180) [g, b] = [c, x];
+    else if (h < 240) [g, b] = [x, c];
+    else if (h < 300) [r, b] = [x, c];
+    else [r, b] = [c, x];
+    return [(r + m) * 255, (g + m) * 255, (b + m) * 255];
+  }
+  private primaryHsl(): [number, number, number] {
+    const [r, g, b] = this.hexToRgb(this.primaryColor);
+    const [h, s, l] = this.rgbToHsl(r, g, b);
+    return [s > 0.004 ? h : this.pickerHue, s, l];
+  }
+  get pickerHslSatPct(): number { return this.primaryHsl()[1] * 100; }
+  get pickerHslLightPct(): number { return this.primaryHsl()[2] * 100; }
+  private applyHsl(h: number, s: number, l: number): void {
+    const [r, g, b] = this.hslToRgb(h, this.clamp(s, 0, 1), this.clamp(l, 0, 1));
+    if (s > 0.004) this.pickerHue = h;
+    this.applyPrimaryRgb(r, g, b);
+  }
+  setHslSat(pct: number): void {
+    const [h, , l] = this.primaryHsl();
+    this.applyHsl(h, pct / 100, l);
+  }
+  setHslLight(pct: number): void {
+    const [h, s] = this.primaryHsl();
+    this.applyHsl(h, s, pct / 100);
+  }
+
+  /** Gradient track background for a slider as its value sweeps min→max. */
+  hueTrack(): string {
+    return 'linear-gradient(to right,#f00,#ff0,#0f0,#0ff,#00f,#f0f,#f00)';
+  }
+  satTrack(): string {
+    const [h, , v] = this.primaryHsv();
+    const a = this.rgbToHex(...this.hsvToRgb(h, 0, v));
+    const b = this.rgbToHex(...this.hsvToRgb(h, 1, v));
+    return `linear-gradient(to right, ${a}, ${b})`;
+  }
+  valTrack(): string {
+    const [h, s] = this.primaryHsv();
+    const b = this.rgbToHex(...this.hsvToRgb(h, s, 1));
+    return `linear-gradient(to right, #000, ${b})`;
+  }
+  lightTrack(): string {
+    const [h, s] = this.primaryHsl();
+    const mid = this.rgbToHex(...this.hslToRgb(h, s, 0.5));
+    return `linear-gradient(to right, #000, ${mid}, #fff)`;
+  }
+  get alphaTrack(): string {
+    const base = this.rgbToHex(...this.hexToRgb(this.primaryColor));
+    return `linear-gradient(to right, rgba(0,0,0,0), ${base})`;
+  }
+
+  // ----- Alpha -----
+  get pickerAlphaPct(): number {
+    return Math.round((this.pickerAlpha / 255) * 100);
+  }
+  setAlpha(pct: number): void {
+    this.pickerAlpha = this.clamp(Math.round((pct / 100) * 255), 0, 255);
+    this.primaryColor = this.withAlpha(this.primaryColor, this.pickerAlpha);
+  }
+
+  // ----- Shades & tints -----
+  /** 9 brightness variants (dark→light) of the primary, keeping hue/sat/alpha. */
+  get shadeSwatches(): string[] {
+    const [h, s] = this.primaryHsv();
+    return Array.from({ length: 9 }, (_, i) => {
+      const v = (i + 1) / 9;
+      return this.withAlpha(this.rgbToHex(...this.hsvToRgb(h, s, v)), this.pickerAlpha);
+    });
+  }
+  /** 9 saturation variants (gray→vivid) of the primary at its brightness. */
+  get tintSwatches(): string[] {
+    const [h, , v] = this.primaryHsv();
+    return Array.from({ length: 9 }, (_, i) => {
+      const s = i / 8;
+      return this.withAlpha(this.rgbToHex(...this.hsvToRgb(h, s, v)), this.pickerAlpha);
+    });
+  }
+  pickVariant(hex: string): void {
+    this.primaryColor = hex;
+    this.pickerAlpha = this.colorAlpha(hex);
   }
 
   // ===================== Palette helpers & tools =====================
@@ -5562,6 +5707,7 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
   /** Pick primary/secondary from a swatch and remember the choice. */
   selectPrimary(color: string): void {
     this.primaryColor = color;
+    this.pickerAlpha = this.colorAlpha(color);
     this.pushRecent(color);
   }
 
@@ -5673,21 +5819,76 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
 
   // ----- Colour adjustments (Hue / Saturation / Brightness) -----
 
-  adjustOpen = false;
+  /** A live adjust session is in progress (base captured, preview shown). */
+  adjustActive = false;
   adjustHue = 0;
   adjustSat = 0;
   adjustBright = 0;
+  // Brightness / Contrast (-100..100)
+  adjustBrightness = 0;
+  adjustContrast = 0;
+  // Shadows / Highlights (-100..100)
+  adjustShadows = 0;
+  adjustHighlights = 0;
+  // Levels
+  levelInBlack = 0;
+  levelInWhite = 255;
+  levelGamma = 1;
+  levelOutBlack = 0;
+  levelOutWhite = 255;
   adjustScope: 'layer' | 'selection' = 'layer';
+  adjustTab: 'hsb' | 'bc' | 'sh' | 'levels' = 'bc';
   private adjustBase: Pixel[] | null = null;
 
+  /** Edit ▾ → Adjustments: reveal the dock panel and start a fresh session. */
   openAdjust(): void {
     if (this.activeLayerLocked) return;
+    this.editMenuOpen = false;
+    this.dock.show('adjust');
+    this.beginAdjust(true);
+  }
+
+  /** Capture the current layer as the adjust base (optionally zero the sliders). */
+  private beginAdjust(reset: boolean): void {
+    if (reset) this.resetAdjustValues();
+    this.adjustScope = this.selection ? 'selection' : 'layer';
+    this.adjustBase = [...this.activeLayer.pixels];
+    this.adjustActive = true;
+    this.applyAdjustPreview();
+  }
+
+  /** A slider / scope changed in the panel — ensure a session, then live-preview. */
+  onAdjustChange(): void {
+    if (this.activeLayerLocked) return;
+    if (!this.adjustActive) {
+      this.beginAdjust(false);
+      return;
+    }
+    this.applyAdjustPreview();
+  }
+
+  /** Commit any pending adjust before drawing / switching layer-frame-tab. */
+  private flushAdjust(): void {
+    if (this.adjustActive) this.commitAdjust();
+  }
+
+  private resetAdjustValues(): void {
     this.adjustHue = 0;
     this.adjustSat = 0;
     this.adjustBright = 0;
-    this.adjustScope = this.selection ? 'selection' : 'layer';
-    this.adjustBase = [...this.activeLayer.pixels];
-    this.adjustOpen = true;
+    this.adjustBrightness = 0;
+    this.adjustContrast = 0;
+    this.adjustShadows = 0;
+    this.adjustHighlights = 0;
+    this.levelInBlack = 0;
+    this.levelInWhite = 255;
+    this.levelGamma = 1;
+    this.levelOutBlack = 0;
+    this.levelOutWhite = 255;
+  }
+
+  resetAdjust(): void {
+    this.resetAdjustValues();
     this.applyAdjustPreview();
   }
 
@@ -5711,34 +5912,76 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
   }
 
   private adjustPixel(hex: string): string {
-    const [r, g, b] = this.hexToRgb(hex);
-    let [h, s, v] = this.rgbToHsv(r, g, b);
-    h = (h + this.adjustHue + 360) % 360;
-    s = this.clamp(s * (1 + this.adjustSat / 100), 0, 1);
-    v = this.clamp(v * (1 + this.adjustBright / 100), 0, 1);
-    const [nr, ng, nb] = this.hsvToRgb(h, s, v);
-    return this.rgbToHex(nr, ng, nb);
+    let [r, g, b] = this.hexToRgb(hex);
+    const a = this.colorAlpha(hex);
+
+    // 1) Levels — remap input range → output range with gamma.
+    if (
+      this.levelInBlack > 0 || this.levelInWhite < 255 || this.levelGamma !== 1 ||
+      this.levelOutBlack > 0 || this.levelOutWhite < 255
+    ) {
+      const span = Math.max(1, this.levelInWhite - this.levelInBlack);
+      const lv = (vv: number) => {
+        let n = this.clamp((vv - this.levelInBlack) / span, 0, 1);
+        n = Math.pow(n, 1 / this.levelGamma);
+        return this.levelOutBlack + n * (this.levelOutWhite - this.levelOutBlack);
+      };
+      r = lv(r); g = lv(g); b = lv(b);
+    }
+
+    // 2) Brightness / Contrast.
+    if (this.adjustBrightness || this.adjustContrast) {
+      const br = (this.adjustBrightness / 100) * 127;
+      const c = (this.adjustContrast / 100) * 255;
+      const f = (259 * (c + 255)) / (255 * (259 - c));
+      const bc = (vv: number) => f * (vv + br - 128) + 128;
+      r = bc(r); g = bc(g); b = bc(b);
+    }
+
+    // 3) Shadows / Highlights — luminance-masked gain (PS sign convention).
+    if (this.adjustShadows || this.adjustHighlights) {
+      const L = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+      const sMask = this.clamp(1 - L * 2, 0, 1);
+      const hMask = this.clamp(L * 2 - 1, 0, 1);
+      const gain =
+        1 + (this.adjustShadows / 100) * sMask - (this.adjustHighlights / 100) * hMask;
+      r *= gain; g *= gain; b *= gain;
+    }
+
+    // 4) HSB (hue / saturation / brightness).
+    if (this.adjustHue || this.adjustSat || this.adjustBright) {
+      let [h, s, v] = this.rgbToHsv(
+        this.clamp(r, 0, 255), this.clamp(g, 0, 255), this.clamp(b, 0, 255),
+      );
+      h = (h + this.adjustHue + 360) % 360;
+      s = this.clamp(s * (1 + this.adjustSat / 100), 0, 1);
+      v = this.clamp(v * (1 + this.adjustBright / 100), 0, 1);
+      [r, g, b] = this.hsvToRgb(h, s, v);
+    }
+
+    return this.withAlpha(this.rgbToHex(r, g, b), a);
   }
 
+  /** Bake the live preview into the active layer and end the session. */
   commitAdjust(): void {
-    if (!this.adjustBase || !this.previewPixels) {
-      this.cancelAdjust();
-      return;
+    if (this.adjustActive && this.adjustBase && this.previewPixels) {
+      this.pushUndo();
+      this.activeLayer.pixels = [...this.previewPixels];
+      this.refreshAllFrameThumbnails();
     }
-    const result = [...this.previewPixels];
-    this.pushUndo();
-    this.activeLayer.pixels = result;
     this.previewPixels = null;
     this.adjustBase = null;
-    this.adjustOpen = false;
-    this.refreshAllFrameThumbnails();
+    this.adjustActive = false;
+    this.resetAdjustValues();
     this.render();
   }
 
+  /** Discard the preview and end the session (sliders back to neutral). */
   cancelAdjust(): void {
     this.previewPixels = null;
     this.adjustBase = null;
-    this.adjustOpen = false;
+    this.adjustActive = false;
+    this.resetAdjustValues();
     this.render();
   }
 
@@ -6114,8 +6357,22 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
   private hexToRgb(hex: string): [number, number, number] {
     let h = hex.replace('#', '');
     if (h.length === 3) h = h.split('').map((c) => c + c).join('');
-    const n = parseInt(h, 16);
+    // For #rrggbbaa only the rgb part matters here (alpha handled separately).
+    const n = parseInt(h.slice(0, 6), 16);
     return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+  }
+
+  /** Alpha (0–255) of a colour string; 255 for 6-digit hex. */
+  private colorAlpha(hex: string): number {
+    const h = hex.replace('#', '');
+    return h.length >= 8 ? parseInt(h.slice(6, 8), 16) : 255;
+  }
+
+  /** Combine an #rrggbb with alpha (0–255) → #rrggbb (a=255) or #rrggbbaa. */
+  private withAlpha(hex: string, a: number): string {
+    const base = this.rgbToHex(...this.hexToRgb(hex));
+    const aa = this.clamp(Math.round(a), 0, 255);
+    return aa >= 255 ? base : base + aa.toString(16).padStart(2, '0');
   }
 
   /** Ordered 4×4 Bayer matrix for pixel-perfect dithering. */
@@ -7140,6 +7397,7 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
       this.secondaryColor = value;
     } else {
       this.primaryColor = value;
+      this.pickerAlpha = this.colorAlpha(value);
     }
     if (!existing) this.addPaletteColor(value);
   }
@@ -7699,12 +7957,20 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
     for (let i = 0; i < pixels.length; i += 1) {
       const color = pixels[i];
       if (!color) continue;
-      const rgb = this.hexInt(color);
+      const c = this.hexInt(color);
       const o = i * 4;
-      d[o] = (rgb >> 16) & 255;
-      d[o + 1] = (rgb >> 8) & 255;
-      d[o + 2] = rgb & 255;
-      d[o + 3] = 255;
+      if (color.length > 7) {
+        // #rrggbbaa — per-pixel alpha
+        d[o] = (c >>> 24) & 255;
+        d[o + 1] = (c >>> 16) & 255;
+        d[o + 2] = (c >>> 8) & 255;
+        d[o + 3] = c & 255;
+      } else {
+        d[o] = (c >> 16) & 255;
+        d[o + 1] = (c >> 8) & 255;
+        d[o + 2] = c & 255;
+        d[o + 3] = 255;
+      }
     }
     sc.ctx.putImageData(sc.img, 0, 0);
     ctx.save();

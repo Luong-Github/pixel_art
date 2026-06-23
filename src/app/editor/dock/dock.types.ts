@@ -5,6 +5,7 @@ export type PanelId =
   | 'display'
   | 'canvas'
   | 'generate'
+  | 'adjust'
   | 'timeline'
   | 'tilemap';
 
@@ -14,6 +15,7 @@ export const PANEL_IDS: PanelId[] = [
   'display',
   'canvas',
   'generate',
+  'adjust',
   'timeline',
   'tilemap',
 ];
@@ -52,6 +54,7 @@ export const PANEL_TITLES: Record<PanelId, string> = {
   display: 'Preview',
   canvas: 'Canvas',
   generate: 'Generate',
+  adjust: 'Adjust',
   timeline: 'Timeline',
   tilemap: 'Tilemap',
 };
@@ -60,13 +63,13 @@ export function defaultDockState(): DockState {
   return {
     zones: {
       left: ['tools', 'color'],
-      right: ['display', 'canvas', 'generate'],
+      right: ['display', 'canvas', 'generate', 'adjust'],
       bottom: ['timeline'],
     },
     floating: [],
     collapsed: [],
-    // Tilemap is an optional workflow — hidden until opened from View ▾.
-    hidden: ['tilemap'],
+    // Optional panels — hidden until opened from View ▾.
+    hidden: ['tilemap', 'adjust'],
   };
 }
 

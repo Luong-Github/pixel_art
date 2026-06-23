@@ -34,7 +34,7 @@ const en: Dict = {
   'example.bush': 'Bush tree',
 
   'edit.colour': 'Colour',
-  'edit.adjust': 'Adjust colours (HSB)…',
+  'edit.adjust': 'Adjustments…',
   'edit.replace': 'Replace secondary → primary',
   'edit.outline': 'Outline layer (secondary)',
   'edit.clear': 'Clear active layer',
@@ -807,6 +807,28 @@ const en: Dict = {
   'guide.shortcut.zoomCanvas': 'Zoom the canvas',
   'guide.cta.heading': 'Ready to draw?',
   'guide.cta.button': 'Open Pixel Art Studio →',
+  'color.shades': 'Shades',
+  'color.tints': 'Tints',
+
+  /* ---- adjustments (generated) ---- */
+  'adj.tabBC': 'B / C',
+  'adj.tabSH': 'Shadow/Light',
+  'adj.tabLevels': 'Levels',
+  'adj.tabHSB': 'HSB',
+  'adj.brightness': 'Brightness',
+  'adj.contrast': 'Contrast',
+  'adj.shadows': 'Shadows',
+  'adj.highlights': 'Highlights',
+  'adj.inBlack': 'Input black',
+  'adj.inWhite': 'Input white',
+  'adj.gamma': 'Gamma',
+  'adj.outBlack': 'Output black',
+  'adj.outWhite': 'Output white',
+  'adj.reset': 'Reset',
+
+  /* ---- adjust panel (generated) ---- */
+  'panel.adjust': 'Adjust',
+  'adj.hint': 'Drag sliders to preview live on the canvas, then Apply.',
 };
 
 const vi: Dict = {
@@ -833,7 +855,7 @@ const vi: Dict = {
   'example.bush': 'Cây bụi',
 
   'edit.colour': 'Màu',
-  'edit.adjust': 'Chỉnh màu (HSB)…',
+  'edit.adjust': 'Điều chỉnh (sáng/màu)…',
   'edit.replace': 'Thay màu phụ → chính',
   'edit.outline': 'Viền layer (màu phụ)',
   'edit.clear': 'Xoá layer hiện tại',
@@ -1606,6 +1628,28 @@ const vi: Dict = {
   'guide.shortcut.zoomCanvas': 'Phóng to canvas',
   'guide.cta.heading': 'Sẵn sàng vẽ chưa?',
   'guide.cta.button': 'Mở Pixel Art Studio →',
+  'color.shades': 'Sắc độ',
+  'color.tints': 'Sắc thái',
+
+  /* ---- adjustments (generated) ---- */
+  'adj.tabBC': 'Sáng/T.phản',
+  'adj.tabSH': 'Tối/Sáng',
+  'adj.tabLevels': 'Levels',
+  'adj.tabHSB': 'HSB',
+  'adj.brightness': 'Độ sáng',
+  'adj.contrast': 'Tương phản',
+  'adj.shadows': 'Vùng tối',
+  'adj.highlights': 'Vùng sáng',
+  'adj.inBlack': 'Vào: đen',
+  'adj.inWhite': 'Vào: trắng',
+  'adj.gamma': 'Gamma',
+  'adj.outBlack': 'Ra: đen',
+  'adj.outWhite': 'Ra: trắng',
+  'adj.reset': 'Đặt lại',
+
+  /* ---- adjust panel (generated) ---- */
+  'panel.adjust': 'Điều chỉnh',
+  'adj.hint': 'Kéo thanh để xem trực tiếp trên canvas, rồi bấm Apply.',
 };
 
 const zh: Dict = {
@@ -1632,7 +1676,7 @@ const zh: Dict = {
   'example.bush': '灌木',
 
   'edit.colour': '颜色',
-  'edit.adjust': '调整颜色 (HSB)…',
+  'edit.adjust': '调整（亮度/色阶）…',
   'edit.replace': '替换 次要色 → 主色',
   'edit.outline': '描边图层（次要色）',
   'edit.clear': '清除当前图层',
@@ -2405,6 +2449,28 @@ const zh: Dict = {
   'guide.shortcut.zoomCanvas': '缩放画布',
   'guide.cta.heading': '准备好绘制了吗？',
   'guide.cta.button': '打开 Pixel Art Studio →',
+  'color.shades': '明暗',
+  'color.tints': '色调',
+
+  /* ---- adjustments (generated) ---- */
+  'adj.tabBC': '亮度/对比',
+  'adj.tabSH': '阴影/高光',
+  'adj.tabLevels': '色阶',
+  'adj.tabHSB': 'HSB',
+  'adj.brightness': '亮度',
+  'adj.contrast': '对比度',
+  'adj.shadows': '阴影',
+  'adj.highlights': '高光',
+  'adj.inBlack': '输入黑场',
+  'adj.inWhite': '输入白场',
+  'adj.gamma': '伽马',
+  'adj.outBlack': '输出黑场',
+  'adj.outWhite': '输出白场',
+  'adj.reset': '重置',
+
+  /* ---- adjust panel (generated) ---- */
+  'panel.adjust': '调整',
+  'adj.hint': '拖动滑块在画布上实时预览，然后点击应用。',
 };
 
 const fr: Dict = {
@@ -2431,7 +2497,7 @@ const fr: Dict = {
   'example.bush': 'Buisson',
 
   'edit.colour': 'Couleur',
-  'edit.adjust': 'Ajuster les couleurs (HSB)…',
+  'edit.adjust': 'Réglages…',
   'edit.replace': 'Remplacer secondaire → primaire',
   'edit.outline': 'Contour du calque (secondaire)',
   'edit.clear': 'Effacer le calque actif',
@@ -3204,6 +3270,28 @@ const fr: Dict = {
   'guide.shortcut.zoomCanvas': 'Zoomer le canevas',
   'guide.cta.heading': 'Prêt à dessiner ?',
   'guide.cta.button': 'Ouvrir Pixel Art Studio →',
+  'color.shades': 'Nuances',
+  'color.tints': 'Teintes',
+
+  /* ---- adjustments (generated) ---- */
+  'adj.tabBC': 'Lum/Contr',
+  'adj.tabSH': 'Ombr/Haut',
+  'adj.tabLevels': 'Niveaux',
+  'adj.tabHSB': 'HSB',
+  'adj.brightness': 'Luminosité',
+  'adj.contrast': 'Contraste',
+  'adj.shadows': 'Ombres',
+  'adj.highlights': 'Hautes lumières',
+  'adj.inBlack': 'Entrée noir',
+  'adj.inWhite': 'Entrée blanc',
+  'adj.gamma': 'Gamma',
+  'adj.outBlack': 'Sortie noir',
+  'adj.outWhite': 'Sortie blanc',
+  'adj.reset': 'Réinitialiser',
+
+  /* ---- adjust panel (generated) ---- */
+  'panel.adjust': 'Réglages',
+  'adj.hint': 'Glissez les curseurs pour prévisualiser sur le canevas, puis Appliquer.',
 };
 
 const ru: Dict = {
@@ -3230,7 +3318,7 @@ const ru: Dict = {
   'example.bush': 'Куст',
 
   'edit.colour': 'Цвет',
-  'edit.adjust': 'Настроить цвета (HSB)…',
+  'edit.adjust': 'Коррекция…',
   'edit.replace': 'Заменить вторичный → основной',
   'edit.outline': 'Обводка слоя (вторичный)',
   'edit.clear': 'Очистить активный слой',
@@ -4003,6 +4091,28 @@ const ru: Dict = {
   'guide.shortcut.zoomCanvas': 'Масштабировать холст',
   'guide.cta.heading': 'Готовы рисовать?',
   'guide.cta.button': 'Открыть Pixel Art Studio →',
+  'color.shades': 'Оттенки',
+  'color.tints': 'Тона',
+
+  /* ---- adjustments (generated) ---- */
+  'adj.tabBC': 'Ярк/Контр',
+  'adj.tabSH': 'Тени/Света',
+  'adj.tabLevels': 'Уровни',
+  'adj.tabHSB': 'HSB',
+  'adj.brightness': 'Яркость',
+  'adj.contrast': 'Контраст',
+  'adj.shadows': 'Тени',
+  'adj.highlights': 'Света',
+  'adj.inBlack': 'Вход: чёрный',
+  'adj.inWhite': 'Вход: белый',
+  'adj.gamma': 'Гамма',
+  'adj.outBlack': 'Выход: чёрный',
+  'adj.outWhite': 'Выход: белый',
+  'adj.reset': 'Сброс',
+
+  /* ---- adjust panel (generated) ---- */
+  'panel.adjust': 'Коррекция',
+  'adj.hint': 'Двигайте ползунки для предпросмотра на холсте, затем «Применить».',
 };
 
 export const TRANSLATIONS: Record<Lang, Dict> = { en, vi, zh, fr, ru };

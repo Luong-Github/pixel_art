@@ -95,7 +95,7 @@
   <div class="swatches-large">
     <label>
       <span>{{ 'color.primary' | t }}</span>
-      <input type="color" [(ngModel)]="primaryColor" (change)="addPaletteColor()" />
+      <input type="color" [(ngModel)]="primaryHex6" (change)="addPaletteColor()" />
     </label>
     <label>
       <span>{{ 'color.secondary' | t }}</span>
@@ -132,11 +132,55 @@
       max="360"
       [ngModel]="pickerHueDeg"
       (ngModelChange)="setHue($event)" />
+
+    <div class="ch-mode">
+      <button type="button" [class.on]="pickerColorMode === 'hsv'" (click)="pickerColorMode = 'hsv'">HSV</button>
+      <button type="button" [class.on]="pickerColorMode === 'hsl'" (click)="pickerColorMode = 'hsl'">HSL</button>
+    </div>
+
+    <div class="ch-sliders" *ngIf="pickerColorMode === 'hsv'">
+      <label class="ch" title="Hue / Tông màu"><span>H</span>
+        <input type="range" min="0" max="360" [style.background]="hueTrack()" [ngModel]="pickerHueDeg" (ngModelChange)="setHue($event)" />
+        <em>{{ pickerHueDeg }}</em></label>
+      <label class="ch" title="Saturation / Độ bão hoà"><span>S</span>
+        <input type="range" min="0" max="100" [style.background]="satTrack()" [ngModel]="pickerSatPct" (ngModelChange)="setSat($event)" />
+        <em>{{ pickerSatPct | number:'1.0-0' }}</em></label>
+      <label class="ch" title="Brightness / Độ sáng-tối — kéo để sáng/tối"><span>B</span>
+        <input type="range" min="0" max="100" [style.background]="valTrack()" [ngModel]="pickerValPct" (ngModelChange)="setVal($event)" />
+        <em>{{ pickerValPct | number:'1.0-0' }}</em></label>
+    </div>
+    <div class="ch-sliders" *ngIf="pickerColorMode === 'hsl'">
+      <label class="ch"><span>H</span>
+        <input type="range" min="0" max="360" [style.background]="hueTrack()" [ngModel]="pickerHueDeg" (ngModelChange)="setHue($event)" />
+        <em>{{ pickerHueDeg }}</em></label>
+      <label class="ch"><span>S</span>
+        <input type="range" min="0" max="100" [ngModel]="pickerHslSatPct" (ngModelChange)="setHslSat($event)" />
+        <em>{{ pickerHslSatPct | number:'1.0-0' }}</em></label>
+      <label class="ch"><span>L</span>
+        <input type="range" min="0" max="100" [style.background]="lightTrack()" [ngModel]="pickerHslLightPct" (ngModelChange)="setHslLight($event)" />
+        <em>{{ pickerHslLightPct | number:'1.0-0' }}</em></label>
+    </div>
+
+    <label class="ch alpha"><span>A</span>
+      <input type="range" min="0" max="100" class="alpha-range" [style.background]="alphaTrack" [ngModel]="pickerAlphaPct" (ngModelChange)="setAlpha($event)" />
+      <em>{{ pickerAlphaPct }}</em></label>
+
     <div class="color-fields">
       <label class="hex-field"><span>HEX</span><input type="text" [ngModel]="primaryColor" (change)="onHexInput($event)" /></label>
       <label><span>R</span><input type="number" min="0" max="255" [ngModel]="colorChannel(0)" (change)="setColorChannel(0, $event)" /></label>
       <label><span>G</span><input type="number" min="0" max="255" [ngModel]="colorChannel(1)" (change)="setColorChannel(1, $event)" /></label>
       <label><span>B</span><input type="number" min="0" max="255" [ngModel]="colorChannel(2)" (change)="setColorChannel(2, $event)" /></label>
+    </div>
+
+    <div class="variants">
+      <span class="variants-label">{{ 'color.shades' | t }}</span>
+      <div class="variant-row">
+        <button type="button" class="swatch" *ngFor="let c of shadeSwatches" [style.background]="c" [title]="c" (click)="pickVariant(c)"></button>
+      </div>
+      <span class="variants-label">{{ 'color.tints' | t }}</span>
+      <div class="variant-row">
+        <button type="button" class="swatch" *ngFor="let c of tintSwatches" [style.background]="c" [title]="c" (click)="pickVariant(c)"></button>
+      </div>
     </div>
   </div>
 
@@ -1283,30 +1327,54 @@
 <!-- ============================================================
      Colour adjustments (Hue / Saturation / Brightness)
      ============================================================ -->
-<div class="modal-overlay" *ngIf="adjustOpen" (click)="cancelAdjust()">
-  <div class="modal" (click)="$event.stopPropagation()" role="dialog" [attr.aria-label]="'modal.colourAdjustmentsAria' | t">
-    <header class="modal-head">
-      <h2>{{ 'modal.adjustColours' | t }}</h2>
-      <button type="button" class="dock-btn" [title]="'modal.close' | t" (click)="cancelAdjust()">✕</button>
-    </header>
-    <div class="modal-body">
-      <div class="modal-row">
-        <span class="modal-label">{{ 'modal.scope' | t }}</span>
-        <div class="seg">
-          <button type="button" [class.on]="adjustScope === 'layer'" (click)="adjustScope = 'layer'; applyAdjustPreview()">{{ 'modal.layer' | t }}</button>
-          <button type="button" [class.on]="adjustScope === 'selection'" [disabled]="!hasSelection" (click)="adjustScope = 'selection'; applyAdjustPreview()">{{ 'modal.selection' | t }}</button>
-        </div>
+<ng-template dockPanelDef="adjust">
+  <div class="adj-panel">
+    <div class="modal-row">
+      <span class="modal-label">{{ 'modal.scope' | t }}</span>
+      <div class="seg">
+        <button type="button" [class.on]="adjustScope === 'layer'" (click)="adjustScope = 'layer'; onAdjustChange()">{{ 'modal.layer' | t }}</button>
+        <button type="button" [class.on]="adjustScope === 'selection'" [disabled]="!hasSelection" (click)="adjustScope = 'selection'; onAdjustChange()">{{ 'modal.selection' | t }}</button>
       </div>
-      <label><span>{{ 'modal.hue' | t }} · {{ adjustHue }}°</span><input type="range" min="-180" max="180" [(ngModel)]="adjustHue" (input)="applyAdjustPreview()" /></label>
-      <label><span>{{ 'modal.saturation' | t }} · {{ adjustSat }}%</span><input type="range" min="-100" max="100" [(ngModel)]="adjustSat" (input)="applyAdjustPreview()" /></label>
-      <label><span>{{ 'modal.brightness' | t }} · {{ adjustBright }}%</span><input type="range" min="-100" max="100" [(ngModel)]="adjustBright" (input)="applyAdjustPreview()" /></label>
     </div>
-    <footer class="modal-foot">
-      <button type="button" class="quiet-action" (click)="cancelAdjust()">{{ 'common.cancel' | t }}</button>
-      <button type="button" class="primary-action" (click)="commitAdjust()">{{ 'modal.apply' | t }}</button>
-    </footer>
+
+    <div class="adj-tabs">
+      <button type="button" [class.on]="adjustTab === 'bc'" (click)="adjustTab = 'bc'">{{ 'adj.tabBC' | t }}</button>
+      <button type="button" [class.on]="adjustTab === 'sh'" (click)="adjustTab = 'sh'">{{ 'adj.tabSH' | t }}</button>
+      <button type="button" [class.on]="adjustTab === 'levels'" (click)="adjustTab = 'levels'">{{ 'adj.tabLevels' | t }}</button>
+      <button type="button" [class.on]="adjustTab === 'hsb'" (click)="adjustTab = 'hsb'">{{ 'adj.tabHSB' | t }}</button>
+    </div>
+
+    <ng-container *ngIf="adjustTab === 'bc'">
+      <label><span>{{ 'adj.brightness' | t }} · {{ adjustBrightness }}</span><input type="range" min="-100" max="100" [(ngModel)]="adjustBrightness" (input)="onAdjustChange()" /></label>
+      <label><span>{{ 'adj.contrast' | t }} · {{ adjustContrast }}</span><input type="range" min="-100" max="100" [(ngModel)]="adjustContrast" (input)="onAdjustChange()" /></label>
+    </ng-container>
+
+    <ng-container *ngIf="adjustTab === 'sh'">
+      <label><span>{{ 'adj.shadows' | t }} · {{ adjustShadows }}</span><input type="range" min="-100" max="100" [(ngModel)]="adjustShadows" (input)="onAdjustChange()" /></label>
+      <label><span>{{ 'adj.highlights' | t }} · {{ adjustHighlights }}</span><input type="range" min="-100" max="100" [(ngModel)]="adjustHighlights" (input)="onAdjustChange()" /></label>
+    </ng-container>
+
+    <ng-container *ngIf="adjustTab === 'levels'">
+      <label><span>{{ 'adj.inBlack' | t }} · {{ levelInBlack }}</span><input type="range" min="0" max="254" [(ngModel)]="levelInBlack" (input)="onAdjustChange()" /></label>
+      <label><span>{{ 'adj.gamma' | t }} · {{ levelGamma }}</span><input type="range" min="0.1" max="3" step="0.05" [(ngModel)]="levelGamma" (input)="onAdjustChange()" /></label>
+      <label><span>{{ 'adj.inWhite' | t }} · {{ levelInWhite }}</span><input type="range" min="1" max="255" [(ngModel)]="levelInWhite" (input)="onAdjustChange()" /></label>
+      <label><span>{{ 'adj.outBlack' | t }} · {{ levelOutBlack }}</span><input type="range" min="0" max="255" [(ngModel)]="levelOutBlack" (input)="onAdjustChange()" /></label>
+      <label><span>{{ 'adj.outWhite' | t }} · {{ levelOutWhite }}</span><input type="range" min="0" max="255" [(ngModel)]="levelOutWhite" (input)="onAdjustChange()" /></label>
+    </ng-container>
+
+    <ng-container *ngIf="adjustTab === 'hsb'">
+      <label><span>{{ 'modal.hue' | t }} · {{ adjustHue }}°</span><input type="range" min="-180" max="180" [(ngModel)]="adjustHue" (input)="onAdjustChange()" /></label>
+      <label><span>{{ 'modal.saturation' | t }} · {{ adjustSat }}%</span><input type="range" min="-100" max="100" [(ngModel)]="adjustSat" (input)="onAdjustChange()" /></label>
+      <label><span>{{ 'modal.brightness' | t }} · {{ adjustBright }}%</span><input type="range" min="-100" max="100" [(ngModel)]="adjustBright" (input)="onAdjustChange()" /></label>
+    </ng-container>
+
+    <div class="adj-actions">
+      <button type="button" class="quiet-action" [disabled]="!adjustActive" (click)="resetAdjust()">{{ 'adj.reset' | t }}</button>
+      <button type="button" class="gen-apply" [disabled]="!adjustActive" (click)="commitAdjust()">{{ 'modal.apply' | t }}</button>
+    </div>
+    <p class="gen-hint">{{ 'adj.hint' | t }}</p>
   </div>
-</div>
+</ng-template>
 
 <!-- ============================================================
      Projects modal — Save current progress / Recent projects (IndexedDB)

@@ -2432,3 +2432,156 @@ input[type="color"] {
   color: var(--ink);
   font-size: 12px;
 }
+
+/* ---- Advanced colour picker (sliders / alpha / shades) ---- */
+.ch-mode {
+  display: inline-flex;
+  gap: 4px;
+  margin: 8px 0 6px;
+}
+.ch-mode button {
+  padding: 3px 12px;
+  font-size: 11px;
+  font-weight: 700;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--field);
+  color: var(--muted);
+  cursor: pointer;
+}
+.ch-mode button.on {
+  color: var(--accent-strong);
+  border-color: var(--accent-line);
+  background: var(--accent-soft);
+}
+.ch-sliders {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+.ch {
+  display: grid;
+  grid-template-columns: 14px 1fr 30px;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  color: var(--muted);
+}
+.ch > span {
+  font-weight: 700;
+  text-align: center;
+}
+.ch > em {
+  font-style: normal;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.ch input[type="range"] {
+  width: 100%;
+  height: 12px;
+  -webkit-appearance: none;
+  appearance: none;
+  border-radius: 7px;
+  border: 1px solid var(--line);
+  background-size: cover;
+  cursor: pointer;
+}
+.ch input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 12px;
+  height: 16px;
+  border-radius: 4px;
+  background: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.5);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+}
+.ch.alpha {
+  margin-top: 7px;
+}
+/* checker behind the alpha track so transparency reads */
+.ch.alpha input[type="range"] {
+  background-color: #fff;
+  background-image:
+    linear-gradient(45deg, #bbb 25%, transparent 25%),
+    linear-gradient(-45deg, #bbb 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #bbb 75%),
+    linear-gradient(-45deg, transparent 75%, #bbb 75%);
+  background-size: 8px 8px;
+  background-position: 0 0, 0 4px, 4px -4px, -4px 0;
+}
+.variants {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.variants-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--dim);
+}
+.variant-row {
+  display: grid;
+  grid-template-columns: repeat(9, 1fr);
+  gap: 3px;
+}
+.variant-row .swatch {
+  aspect-ratio: 1;
+  border-radius: 4px;
+  border: 1px solid rgba(0, 0, 0, 0.35);
+  cursor: pointer;
+  padding: 0;
+}
+.variant-row .swatch:hover {
+  outline: 2px solid var(--accent-strong);
+}
+
+/* Adjustments modal tabs */
+.adj-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin: 4px 0 8px;
+}
+.adj-tabs button {
+  flex: 1;
+  min-width: 64px;
+  padding: 5px 8px;
+  font-size: 11px;
+  font-weight: 700;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: var(--field);
+  color: var(--muted);
+  cursor: pointer;
+}
+.adj-tabs button.on {
+  color: var(--accent-strong);
+  border-color: var(--accent-line);
+  background: var(--accent-soft);
+}
+
+/* Adjust dock panel */
+.adj-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.adj-panel label {
+  display: grid;
+  gap: 4px;
+}
+.adj-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+}
+.adj-actions .quiet-action {
+  flex: 0 0 auto;
+}
+.adj-actions .gen-apply {
+  flex: 1;
+}
