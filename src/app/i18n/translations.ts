@@ -824,6 +824,10 @@ const en: Dict = {
   'adj.gamma': 'Gamma',
   'adj.outBlack': 'Output black',
   'adj.outWhite': 'Output white',
+  'adj.inLevels': 'Input Levels',
+  'adj.outLevels': 'Output Levels',
+  'adj.tabCurves': 'Curves',
+  'curve.hint': 'Click to add a point, drag to bend the curve, double-click to remove. RGB affects all channels; R/G/B tint one.',
   'adj.reset': 'Reset',
 
   /* ---- adjust panel (generated) ---- */
@@ -1645,6 +1649,10 @@ const vi: Dict = {
   'adj.gamma': 'Gamma',
   'adj.outBlack': 'Ra: đen',
   'adj.outWhite': 'Ra: trắng',
+  'adj.inLevels': 'Mức vào',
+  'adj.outLevels': 'Mức ra',
+  'adj.tabCurves': 'Đường cong',
+  'curve.hint': 'Bấm để thêm điểm, kéo để uốn đường cong, bấm đúp để xóa. RGB tác động mọi kênh; R/G/B chỉnh riêng một kênh.',
   'adj.reset': 'Đặt lại',
 
   /* ---- adjust panel (generated) ---- */
@@ -2466,6 +2474,10 @@ const zh: Dict = {
   'adj.gamma': '伽马',
   'adj.outBlack': '输出黑场',
   'adj.outWhite': '输出白场',
+  'adj.inLevels': '输入色阶',
+  'adj.outLevels': '输出色阶',
+  'adj.tabCurves': '曲线',
+  'curve.hint': '点击添加节点，拖动弯曲曲线，双击删除。RGB 影响所有通道；R/G/B 单独调整。',
   'adj.reset': '重置',
 
   /* ---- adjust panel (generated) ---- */
@@ -3287,6 +3299,10 @@ const fr: Dict = {
   'adj.gamma': 'Gamma',
   'adj.outBlack': 'Sortie noir',
   'adj.outWhite': 'Sortie blanc',
+  'adj.inLevels': 'Niveaux d\'entrée',
+  'adj.outLevels': 'Niveaux de sortie',
+  'adj.tabCurves': 'Courbes',
+  'curve.hint': 'Cliquez pour ajouter un point, glissez pour courber, double-cliquez pour supprimer. RGB agit sur tous les canaux ; R/G/B sur un seul.',
   'adj.reset': 'Réinitialiser',
 
   /* ---- adjust panel (generated) ---- */
@@ -4108,6 +4124,10 @@ const ru: Dict = {
   'adj.gamma': 'Гамма',
   'adj.outBlack': 'Выход: чёрный',
   'adj.outWhite': 'Выход: белый',
+  'adj.inLevels': 'Входные уровни',
+  'adj.outLevels': 'Выходные уровни',
+  'adj.tabCurves': 'Кривые',
+  'curve.hint': 'Щёлкните, чтобы добавить точку, тяните для изгиба, двойной щелчок — удалить. RGB влияет на все каналы; R/G/B — на один.',
   'adj.reset': 'Сброс',
 
   /* ---- adjust panel (generated) ---- */

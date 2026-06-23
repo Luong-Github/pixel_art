@@ -1332,15 +1332,16 @@
     <div class="modal-row">
       <span class="modal-label">{{ 'modal.scope' | t }}</span>
       <div class="seg">
-        <button type="button" [class.on]="adjustScope === 'layer'" (click)="adjustScope = 'layer'; onAdjustChange()">{{ 'modal.layer' | t }}</button>
-        <button type="button" [class.on]="adjustScope === 'selection'" [disabled]="!hasSelection" (click)="adjustScope = 'selection'; onAdjustChange()">{{ 'modal.selection' | t }}</button>
+        <button type="button" [class.on]="adjustScope === 'layer'" (click)="setAdjustScope('layer')">{{ 'modal.layer' | t }}</button>
+        <button type="button" [class.on]="adjustScope === 'selection'" [disabled]="!hasSelection" (click)="setAdjustScope('selection')">{{ 'modal.selection' | t }}</button>
       </div>
     </div>
 
     <div class="adj-tabs">
       <button type="button" [class.on]="adjustTab === 'bc'" (click)="adjustTab = 'bc'">{{ 'adj.tabBC' | t }}</button>
       <button type="button" [class.on]="adjustTab === 'sh'" (click)="adjustTab = 'sh'">{{ 'adj.tabSH' | t }}</button>
-      <button type="button" [class.on]="adjustTab === 'levels'" (click)="adjustTab = 'levels'">{{ 'adj.tabLevels' | t }}</button>
+      <button type="button" [class.on]="adjustTab === 'levels'" (click)="openLevelsTab()">{{ 'adj.tabLevels' | t }}</button>
+      <button type="button" [class.on]="adjustTab === 'curves'" (click)="openCurvesTab()">{{ 'adj.tabCurves' | t }}</button>
       <button type="button" [class.on]="adjustTab === 'hsb'" (click)="adjustTab = 'hsb'">{{ 'adj.tabHSB' | t }}</button>
     </div>
 
@@ -1355,11 +1356,65 @@
     </ng-container>
 
     <ng-container *ngIf="adjustTab === 'levels'">
-      <label><span>{{ 'adj.inBlack' | t }} · {{ levelInBlack }}</span><input type="range" min="0" max="254" [(ngModel)]="levelInBlack" (input)="onAdjustChange()" /></label>
-      <label><span>{{ 'adj.gamma' | t }} · {{ levelGamma }}</span><input type="range" min="0.1" max="3" step="0.05" [(ngModel)]="levelGamma" (input)="onAdjustChange()" /></label>
-      <label><span>{{ 'adj.inWhite' | t }} · {{ levelInWhite }}</span><input type="range" min="1" max="255" [(ngModel)]="levelInWhite" (input)="onAdjustChange()" /></label>
-      <label><span>{{ 'adj.outBlack' | t }} · {{ levelOutBlack }}</span><input type="range" min="0" max="255" [(ngModel)]="levelOutBlack" (input)="onAdjustChange()" /></label>
-      <label><span>{{ 'adj.outWhite' | t }} · {{ levelOutWhite }}</span><input type="range" min="0" max="255" [(ngModel)]="levelOutWhite" (input)="onAdjustChange()" /></label>
+      <div class="lvl">
+        <div class="lvl-chan seg">
+          <button type="button" [class.on]="levelChannel === 'rgb'" (click)="setLevelChannel('rgb')">RGB</button>
+          <button type="button" class="ch-r" [class.on]="levelChannel === 'r'" (click)="setLevelChannel('r')">R</button>
+          <button type="button" class="ch-g" [class.on]="levelChannel === 'g'" (click)="setLevelChannel('g')">G</button>
+          <button type="button" class="ch-b" [class.on]="levelChannel === 'b'" (click)="setLevelChannel('b')">B</button>
+        </div>
+
+        <span class="lvl-label">{{ 'adj.inLevels' | t }}</span>
+        <div class="lvl-hist" [attr.data-ch]="levelChannel">
+          <svg viewBox="0 0 256 100" preserveAspectRatio="none" class="hist-svg"><path [attr.d]="histPath" /></svg>
+          <div class="lvl-track">
+            <span class="lvl-h h-black" [style.left.%]="lvlPos(curLevel.inB)" (pointerdown)="startHistDrag('inB', $event)"></span>
+            <span class="lvl-h h-gamma" [style.left.%]="gammaPos" (pointerdown)="startHistDrag('gamma', $event)"></span>
+            <span class="lvl-h h-white" [style.left.%]="lvlPos(curLevel.inW)" (pointerdown)="startHistDrag('inW', $event)"></span>
+          </div>
+        </div>
+        <div class="lvl-nums">
+          <input type="number" min="0" max="254" [(ngModel)]="curLevel.inB" (input)="onAdjustChange()" />
+          <input type="number" min="0.1" max="9.99" step="0.01" [(ngModel)]="curLevel.gamma" (input)="onAdjustChange()" />
+          <input type="number" min="1" max="255" [(ngModel)]="curLevel.inW" (input)="onAdjustChange()" />
+        </div>
+
+        <span class="lvl-label">{{ 'adj.outLevels' | t }}</span>
+        <div class="lvl-out">
+          <div class="lvl-out-bar"></div>
+          <div class="lvl-track">
+            <span class="lvl-h h-black" [style.left.%]="lvlPos(curLevel.outB)" (pointerdown)="startHistDrag('outB', $event)"></span>
+            <span class="lvl-h h-white" [style.left.%]="lvlPos(curLevel.outW)" (pointerdown)="startHistDrag('outW', $event)"></span>
+          </div>
+        </div>
+        <div class="lvl-nums two">
+          <input type="number" min="0" max="254" [(ngModel)]="curLevel.outB" (input)="onAdjustChange()" />
+          <input type="number" min="1" max="255" [(ngModel)]="curLevel.outW" (input)="onAdjustChange()" />
+        </div>
+      </div>
+    </ng-container>
+
+    <ng-container *ngIf="adjustTab === 'curves'">
+      <div class="lvl">
+        <div class="lvl-chan seg">
+          <button type="button" [class.on]="curveChannel === 'rgb'" (click)="setCurveChannel('rgb')">RGB</button>
+          <button type="button" class="ch-r" [class.on]="curveChannel === 'r'" (click)="setCurveChannel('r')">R</button>
+          <button type="button" class="ch-g" [class.on]="curveChannel === 'g'" (click)="setCurveChannel('g')">G</button>
+          <button type="button" class="ch-b" [class.on]="curveChannel === 'b'" (click)="setCurveChannel('b')">B</button>
+        </div>
+
+        <div class="curve-wrap" [attr.data-ch]="curveChannel">
+          <svg viewBox="0 0 256 256" preserveAspectRatio="none" class="curve-svg" (pointerdown)="curveAddPoint($event)">
+            <path class="cv-hist" [attr.d]="curveHistPath" />
+            <path class="cv-grid" d="M64,0 V256 M128,0 V256 M192,0 V256 M0,64 H256 M0,128 H256 M0,192 H256" />
+            <line class="cv-base" x1="0" y1="256" x2="256" y2="0" />
+            <path class="cv-curve" [attr.d]="curvePath" />
+            <circle *ngFor="let p of curPts; let i = index" class="cv-pt" [attr.cx]="p.x" [attr.cy]="255 - p.y" r="5"
+              (pointerdown)="startCurveDrag(i, $event)" (dblclick)="removeCurvePoint(i)" />
+          </svg>
+        </div>
+        <p class="gen-hint">{{ 'curve.hint' | t }}</p>
+      </div>
     </ng-container>
 
     <ng-container *ngIf="adjustTab === 'hsb'">

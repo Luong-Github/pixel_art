@@ -2585,3 +2585,133 @@ input[type="color"] {
 .adj-actions .gen-apply {
   flex: 1;
 }
+
+/* Photoshop-style Levels (histogram + draggable triangle handles) */
+.lvl {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.lvl-chan {
+  width: 100%;
+}
+.lvl-chan .ch-r.on { color: #ff6b6b; border-color: #ff6b6b66; background: #ff6b6b1f; }
+.lvl-chan .ch-g.on { color: #5fd17a; border-color: #5fd17a66; background: #5fd17a1f; }
+.lvl-chan .ch-b.on { color: #6aa8ff; border-color: #6aa8ff66; background: #6aa8ff1f; }
+.lvl-label {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 2px;
+}
+.lvl-hist {
+  position: relative;
+}
+.hist-svg {
+  display: block;
+  width: 100%;
+  height: 84px;
+  background: repeating-linear-gradient(90deg, #000 0 1px, transparent 1px 64px) var(--field);
+  border: 1px solid var(--line);
+  border-radius: 6px 6px 0 0;
+}
+.hist-svg path {
+  fill: #aeb4bf;
+  stroke: none;
+}
+.lvl-hist[data-ch='r'] .hist-svg path { fill: #ff6b6b; }
+.lvl-hist[data-ch='g'] .hist-svg path { fill: #5fd17a; }
+.lvl-hist[data-ch='b'] .hist-svg path { fill: #6aa8ff; }
+/* Track that hosts the triangle handles */
+.lvl-track {
+  position: relative;
+  height: 16px;
+  background: var(--field);
+  border: 1px solid var(--line);
+  border-top: none;
+  border-radius: 0 0 6px 6px;
+  touch-action: none;
+}
+.lvl-out .lvl-track {
+  border-top: 1px solid var(--line);
+  border-radius: 6px;
+}
+.lvl-h {
+  position: absolute;
+  top: 2px;
+  width: 0;
+  height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  transform: translateX(-50%);
+  cursor: ew-resize;
+  filter: drop-shadow(0 0 1px rgba(0, 0, 0, 0.7));
+}
+.lvl-h.h-black { border-bottom: 11px solid #111; }
+.lvl-h.h-gamma { border-bottom: 11px solid #8a8f99; }
+.lvl-h.h-white { border-bottom: 11px solid #f2f2f2; }
+.lvl-out-bar {
+  height: 9px;
+  border-radius: 4px;
+  background: linear-gradient(90deg, #000, #fff);
+  border: 1px solid var(--line);
+}
+.lvl-nums {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 6px;
+}
+.lvl-nums.two {
+  grid-template-columns: 1fr 1fr;
+}
+.lvl-nums input {
+  width: 100%;
+  padding: 3px 5px;
+  font-size: 11px;
+  text-align: center;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  background: var(--field);
+  color: var(--text);
+}
+
+/* Curves editor (square grid + draggable spline) */
+.curve-wrap {
+  position: relative;
+  /* Stay square regardless of panel shape: don't let the flex column
+     stretch/shrink it, cap the size, and centre it. */
+  flex: 0 0 auto;
+  align-self: center;
+  width: 100%;
+  max-width: 280px;
+  aspect-ratio: 1 / 1;
+  margin: 2px auto 0;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  overflow: hidden;
+  background: var(--field);
+}
+.curve-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+  cursor: crosshair;
+}
+.curve-svg .cv-hist { fill: rgba(174, 180, 191, 0.22); stroke: none; }
+.curve-wrap[data-ch='r'] .cv-hist { fill: rgba(255, 107, 107, 0.22); }
+.curve-wrap[data-ch='g'] .cv-hist { fill: rgba(95, 209, 122, 0.22); }
+.curve-wrap[data-ch='b'] .cv-hist { fill: rgba(106, 168, 255, 0.22); }
+.curve-svg .cv-grid { stroke: rgba(255, 255, 255, 0.08); stroke-width: 1; fill: none; vector-effect: non-scaling-stroke; }
+.curve-svg .cv-base { stroke: rgba(255, 255, 255, 0.18); stroke-width: 1; stroke-dasharray: 3 3; vector-effect: non-scaling-stroke; }
+.curve-svg .cv-curve { stroke: #eef3f8; stroke-width: 2; fill: none; vector-effect: non-scaling-stroke; }
+.curve-wrap[data-ch='r'] .cv-curve { stroke: #ff6b6b; }
+.curve-wrap[data-ch='g'] .cv-curve { stroke: #5fd17a; }
+.curve-wrap[data-ch='b'] .cv-curve { stroke: #6aa8ff; }
+.curve-svg .cv-pt {
+  fill: var(--field);
+  stroke: #eef3f8;
+  stroke-width: 1.5;
+  cursor: grab;
+  vector-effect: non-scaling-stroke;
+}
+.curve-svg .cv-pt:hover { fill: #eef3f8; }

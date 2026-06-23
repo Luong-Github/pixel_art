@@ -65,6 +65,8 @@ type Tool =
   | 'move'
   | 'transform';
 type Pixel = string | null;
+/** One channel's Levels parameters (input black/white + gamma, output black/white). */
+interface LevelCh { inB: number; inW: number; gamma: number; outB: number; outW: number; }
 type ImportFit = 'contain' | 'cover' | 'stretch';
 /** Symmetry axes for drawing. 'mandala' = 8-fold radial (square canvas only). */
 type SymmetryMode = 'off' | 'x' | 'y' | 'both' | 'mandala';
@@ -5830,15 +5832,34 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
   // Shadows / Highlights (-100..100)
   adjustShadows = 0;
   adjustHighlights = 0;
-  // Levels
-  levelInBlack = 0;
-  levelInWhite = 255;
-  levelGamma = 1;
-  levelOutBlack = 0;
-  levelOutWhite = 255;
+  // Levels — per-channel (Photoshop-style). 'rgb' applies to all channels;
+  // r/g/b stack on top of it for that single channel.
+  levelChannel: 'rgb' | 'r' | 'g' | 'b' = 'rgb';
+  levels: Record<'rgb' | 'r' | 'g' | 'b', LevelCh> = {
+    rgb: { inB: 0, inW: 255, gamma: 1, outB: 0, outW: 255 },
+    r: { inB: 0, inW: 255, gamma: 1, outB: 0, outW: 255 },
+    g: { inB: 0, inW: 255, gamma: 1, outB: 0, outW: 255 },
+    b: { inB: 0, inW: 255, gamma: 1, outB: 0, outW: 255 },
+  };
+  /** Histogram bars (normalized 0..1) for the active channel — drawn as an SVG. */
+  histBars: number[] = [];
+  // Curves — per-channel control points (input/output 0..255), endpoints anchored.
+  curveChannel: 'rgb' | 'r' | 'g' | 'b' = 'rgb';
+  curves: Record<'rgb' | 'r' | 'g' | 'b', { x: number; y: number }[]> = {
+    rgb: [{ x: 0, y: 0 }, { x: 255, y: 255 }],
+    r: [{ x: 0, y: 0 }, { x: 255, y: 255 }],
+    g: [{ x: 0, y: 0 }, { x: 255, y: 255 }],
+    b: [{ x: 0, y: 0 }, { x: 255, y: 255 }],
+  };
+  /** Cached 256-entry lookup tables per channel (null = identity / skip). */
+  private curveLuts: Record<'rgb' | 'r' | 'g' | 'b', number[] | null> = {
+    rgb: null, r: null, g: null, b: null,
+  };
   adjustScope: 'layer' | 'selection' = 'layer';
-  adjustTab: 'hsb' | 'bc' | 'sh' | 'levels' = 'bc';
+  adjustTab: 'hsb' | 'bc' | 'sh' | 'levels' | 'curves' = 'bc';
   private adjustBase: Pixel[] | null = null;
+  /** Controls were touched since the last bake — avoids redundant undo entries. */
+  private adjustDirty = false;
 
   /** Edit ▾ → Adjustments: reveal the dock panel and start a fresh session. */
   openAdjust(): void {
@@ -5854,22 +5875,24 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
     this.adjustScope = this.selection ? 'selection' : 'layer';
     this.adjustBase = [...this.activeLayer.pixels];
     this.adjustActive = true;
+    this.adjustDirty = false;
+    this.computeHistogram();
     this.applyAdjustPreview();
   }
 
   /** A slider / scope changed in the panel — ensure a session, then live-preview. */
   onAdjustChange(): void {
     if (this.activeLayerLocked) return;
-    if (!this.adjustActive) {
-      this.beginAdjust(false);
-      return;
-    }
-    this.applyAdjustPreview();
+    if (!this.adjustActive) this.beginAdjust(false);
+    else this.applyAdjustPreview();
+    this.adjustDirty = true;
   }
 
-  /** Commit any pending adjust before drawing / switching layer-frame-tab. */
+  /** Auto-commit + end the session before drawing / switching layer-frame-tab. */
   private flushAdjust(): void {
-    if (this.adjustActive) this.commitAdjust();
+    if (!this.adjustActive) return;
+    this.bakeAdjust();
+    this.endAdjust();
   }
 
   private resetAdjustValues(): void {
@@ -5880,16 +5903,282 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
     this.adjustContrast = 0;
     this.adjustShadows = 0;
     this.adjustHighlights = 0;
-    this.levelInBlack = 0;
-    this.levelInWhite = 255;
-    this.levelGamma = 1;
-    this.levelOutBlack = 0;
-    this.levelOutWhite = 255;
+    for (const ch of ['rgb', 'r', 'g', 'b'] as const) {
+      this.levels[ch] = { inB: 0, inW: 255, gamma: 1, outB: 0, outW: 255 };
+      this.curves[ch] = [{ x: 0, y: 0 }, { x: 255, y: 255 }];
+      this.curveLuts[ch] = null;
+    }
   }
 
   resetAdjust(): void {
     this.resetAdjustValues();
+    this.adjustDirty = true;
     this.applyAdjustPreview();
+  }
+
+  /** The Levels params for the channel currently selected in the panel. */
+  get curLevel(): LevelCh { return this.levels[this.levelChannel]; }
+
+  /** Value (0..255) → percent across the track. */
+  lvlPos(v: number): number { return this.clamp(v / 255, 0, 1) * 100; }
+
+  /** Screen position (percent) of the gamma (midtone) handle. */
+  get gammaPos(): number {
+    const L = this.curLevel;
+    return this.clamp((L.inB + (L.inW - L.inB) * Math.pow(0.5, L.gamma)) / 255, 0, 1) * 100;
+  }
+
+  /** SVG area path for the active channel's histogram (viewBox 0 0 256 100). */
+  get histPath(): string {
+    const b = this.histBars;
+    if (!b.length) return '';
+    const step = 256 / b.length;
+    let d = 'M0,100';
+    for (let i = 0; i < b.length; i += 1) {
+      d += ` L${(i * step).toFixed(1)},${(100 - b[i] * 100).toFixed(1)}`;
+    }
+    return d + ' L256,100 Z';
+  }
+
+  /** Histogram channel for whichever tab (Levels / Curves) is showing. */
+  private histChannel(): 'rgb' | 'r' | 'g' | 'b' {
+    return this.adjustTab === 'curves' ? this.curveChannel : this.levelChannel;
+  }
+
+  /** Recompute the histogram (128 bins) for the active channel + scope. */
+  private computeHistogram(): void {
+    const px = this.adjustBase ?? this.activeLayer?.pixels;
+    if (!px) { this.histBars = []; return; }
+    const bins = new Array(128).fill(0);
+    const ch = this.histChannel();
+    const tally = (hex: string) => {
+      const [r, g, b] = this.hexToRgb(hex);
+      const v = ch === 'r' ? r : ch === 'g' ? g : ch === 'b' ? b : 0.299 * r + 0.587 * g + 0.114 * b;
+      bins[Math.min(127, Math.max(0, Math.floor(v / 2)))] += 1;
+    };
+    if (this.adjustScope === 'selection' && this.selection) {
+      this.eachSelectionPixel(this.selection, (x, y) => { const c = px[this.index(x, y)]; if (c) tally(c); });
+    } else {
+      for (const c of px) if (c) tally(c);
+    }
+    const max = Math.max(1, ...bins);
+    this.histBars = bins.map((v) => v / max);
+  }
+
+  /** Switch the active Levels channel and redraw its histogram. */
+  setLevelChannel(ch: 'rgb' | 'r' | 'g' | 'b'): void {
+    this.levelChannel = ch;
+    this.computeHistogram();
+  }
+
+  /** Show the Levels tab and ensure its histogram reflects the current pixels. */
+  openLevelsTab(): void {
+    this.adjustTab = 'levels';
+    this.computeHistogram();
+  }
+
+  /** Change adjust scope (layer/selection) — refresh histogram + preview. */
+  setAdjustScope(s: 'layer' | 'selection'): void {
+    this.adjustScope = s;
+    this.computeHistogram();
+    this.onAdjustChange();
+  }
+
+  // Dragging a Levels handle (triangle) directly on the histogram / output bar.
+  private histDragWhich: 'inB' | 'gamma' | 'inW' | 'outB' | 'outW' | null = null;
+  private histTrackEl: HTMLElement | null = null;
+
+  startHistDrag(which: 'inB' | 'gamma' | 'inW' | 'outB' | 'outW', ev: PointerEvent): void {
+    ev.preventDefault();
+    this.histDragWhich = which;
+    this.histTrackEl = (ev.target as HTMLElement).closest('.lvl-track') as HTMLElement;
+    const move = (e: PointerEvent) => this.histDragMove(e);
+    const up = () => {
+      window.removeEventListener('pointermove', move);
+      window.removeEventListener('pointerup', up);
+      this.histDragWhich = null;
+      this.histTrackEl = null;
+    };
+    window.addEventListener('pointermove', move);
+    window.addEventListener('pointerup', up);
+  }
+
+  private histDragMove(e: PointerEvent): void {
+    if (!this.histDragWhich || !this.histTrackEl) return;
+    const r = this.histTrackEl.getBoundingClientRect();
+    const v = Math.round(this.clamp((e.clientX - r.left) / r.width, 0, 1) * 255);
+    const L = this.curLevel;
+    switch (this.histDragWhich) {
+      case 'inB': L.inB = Math.min(v, L.inW - 1); break;
+      case 'inW': L.inW = Math.max(v, L.inB + 1); break;
+      case 'gamma': {
+        const f = this.clamp((v - L.inB) / Math.max(1, L.inW - L.inB), 0.001, 0.999);
+        L.gamma = this.clamp(Math.log(f) / Math.log(0.5), 0.1, 9.99);
+        break;
+      }
+      case 'outB': L.outB = Math.min(v, L.outW - 1); break;
+      case 'outW': L.outW = Math.max(v, L.outB + 1); break;
+    }
+    this.onAdjustChange();
+  }
+
+  // ----- Curves -----
+
+  /** Control points for the channel currently selected in the Curves tab. */
+  get curPts(): { x: number; y: number }[] { return this.curves[this.curveChannel]; }
+
+  private isIdentityCurve(p: { x: number; y: number }[]): boolean {
+    return p.length === 2 && p[0].x === 0 && p[0].y === 0 && p[1].x === 255 && p[1].y === 255;
+  }
+
+  setCurveChannel(ch: 'rgb' | 'r' | 'g' | 'b'): void {
+    this.curveChannel = ch;
+    this.computeHistogram();
+  }
+
+  openCurvesTab(): void {
+    this.adjustTab = 'curves';
+    this.computeHistogram();
+  }
+
+  /** SVG path for the histogram backdrop of the curve editor (viewBox 0 0 256 256). */
+  get curveHistPath(): string {
+    const b = this.histBars;
+    if (!b.length) return '';
+    const step = 256 / b.length;
+    let d = 'M0,256';
+    for (let i = 0; i < b.length; i += 1) {
+      d += ` L${(i * step).toFixed(1)},${(256 - b[i] * 90).toFixed(1)}`;
+    }
+    return d + ' L256,256 Z';
+  }
+
+  /** SVG path of the active channel's curve (y inverted: output up). */
+  get curvePath(): string {
+    const lut = this.curveLuts[this.curveChannel];
+    let d = '';
+    for (let i = 0; i < 256; i += 1) {
+      d += (i ? ' L' : 'M') + i + ',' + (255 - (lut ? lut[i] : i));
+    }
+    return d;
+  }
+
+  /** Build a smooth monotone-cubic (PCHIP) 256-entry LUT through the points. */
+  private buildCurveLut(pts: { x: number; y: number }[]): number[] {
+    const p = [...pts].sort((a, b) => a.x - b.x);
+    const n = p.length;
+    const lut = new Array(256);
+    if (n === 1) { lut.fill(this.clamp(Math.round(p[0].y), 0, 255)); return lut; }
+    const xs = p.map((q) => q.x);
+    const ys = p.map((q) => q.y);
+    const dx: number[] = [], dy: number[] = [], m: number[] = [];
+    for (let i = 0; i < n - 1; i += 1) {
+      dx[i] = (xs[i + 1] - xs[i]) || 1;
+      dy[i] = ys[i + 1] - ys[i];
+      m[i] = dy[i] / dx[i];
+    }
+    const t: number[] = new Array(n);
+    t[0] = m[0];
+    t[n - 1] = m[n - 2];
+    for (let i = 1; i < n - 1; i += 1) {
+      t[i] = m[i - 1] * m[i] <= 0 ? 0 : (m[i - 1] + m[i]) / 2;
+    }
+    // Fritsch–Carlson limiter keeps the spline monotone (no overshoot ringing).
+    for (let i = 0; i < n - 1; i += 1) {
+      if (m[i] === 0) { t[i] = 0; t[i + 1] = 0; continue; }
+      const a = t[i] / m[i], bb = t[i + 1] / m[i];
+      const h = Math.hypot(a, bb);
+      if (h > 3) { const tau = 3 / h; t[i] = tau * a * m[i]; t[i + 1] = tau * bb * m[i]; }
+    }
+    for (let xi = 0; xi < 256; xi += 1) {
+      if (xi <= xs[0]) { lut[xi] = this.clamp(Math.round(ys[0]), 0, 255); continue; }
+      if (xi >= xs[n - 1]) { lut[xi] = this.clamp(Math.round(ys[n - 1]), 0, 255); continue; }
+      let s = 0;
+      while (s < n - 1 && !(xi >= xs[s] && xi <= xs[s + 1])) s += 1;
+      const h = dx[s], u = (xi - xs[s]) / h;
+      const h00 = 2 * u ** 3 - 3 * u ** 2 + 1;
+      const h10 = u ** 3 - 2 * u ** 2 + u;
+      const h01 = -2 * u ** 3 + 3 * u ** 2;
+      const h11 = u ** 3 - u ** 2;
+      const v = h00 * ys[s] + h10 * h * t[s] + h01 * ys[s + 1] + h11 * h * t[s + 1];
+      lut[xi] = this.clamp(Math.round(v), 0, 255);
+    }
+    return lut;
+  }
+
+  /** Recompute the current channel's LUT and live-preview. */
+  private curveChanged(): void {
+    this.curveLuts[this.curveChannel] = this.isIdentityCurve(this.curPts)
+      ? null
+      : this.buildCurveLut(this.curPts);
+    this.onAdjustChange();
+  }
+
+  removeCurvePoint(i: number): void {
+    const pts = this.curPts;
+    if (i <= 0 || i >= pts.length - 1) return; // endpoints stay
+    pts.splice(i, 1);
+    this.curveChanged();
+  }
+
+  private curveSvgEl: SVGElement | null = null;
+  private curveDragIdx = -1;
+
+  private svgToVal(svg: SVGElement, e: PointerEvent): { x: number; y: number } {
+    const r = svg.getBoundingClientRect();
+    return {
+      x: this.clamp(Math.round(((e.clientX - r.left) / r.width) * 255), 0, 255),
+      y: this.clamp(Math.round((1 - (e.clientY - r.top) / r.height) * 255), 0, 255),
+    };
+  }
+
+  /** Pointer-down on an existing control point → start dragging it. */
+  startCurveDrag(i: number, ev: PointerEvent): void {
+    ev.stopPropagation();
+    ev.preventDefault();
+    this.beginCurveDrag((ev.target as Element).closest('svg') as SVGElement, i, ev);
+  }
+
+  /** Pointer-down on empty editor area → insert a point and drag it. */
+  curveAddPoint(ev: PointerEvent): void {
+    const svg = ev.currentTarget as SVGElement;
+    const { x, y } = this.svgToVal(svg, ev);
+    const pts = this.curPts;
+    let idx = pts.findIndex((p) => Math.abs(p.x - x) <= 4);
+    if (idx < 0) {
+      pts.push({ x, y });
+      pts.sort((a, b) => a.x - b.x);
+      idx = pts.findIndex((p) => p.x === x);
+    }
+    this.beginCurveDrag(svg, idx, ev);
+    this.curveChanged();
+  }
+
+  private beginCurveDrag(svg: SVGElement, index: number, _ev: PointerEvent): void {
+    this.curveSvgEl = svg;
+    this.curveDragIdx = index;
+    const move = (e: PointerEvent) => this.curveDragMove(e);
+    const up = () => {
+      window.removeEventListener('pointermove', move);
+      window.removeEventListener('pointerup', up);
+      this.curveSvgEl = null;
+      this.curveDragIdx = -1;
+    };
+    window.addEventListener('pointermove', move);
+    window.addEventListener('pointerup', up);
+  }
+
+  private curveDragMove(e: PointerEvent): void {
+    if (!this.curveSvgEl || this.curveDragIdx < 0) return;
+    const pts = this.curPts;
+    const i = this.curveDragIdx;
+    const { x, y } = this.svgToVal(this.curveSvgEl, e);
+    let nx = x;
+    if (i === 0) nx = 0;
+    else if (i === pts.length - 1) nx = 255;
+    else nx = this.clamp(x, pts[i - 1].x + 1, pts[i + 1].x - 1);
+    pts[i] = { x: nx, y };
+    this.curveChanged();
   }
 
   applyAdjustPreview(): void {
@@ -5915,18 +6204,28 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
     let [r, g, b] = this.hexToRgb(hex);
     const a = this.colorAlpha(hex);
 
-    // 1) Levels — remap input range → output range with gamma.
-    if (
-      this.levelInBlack > 0 || this.levelInWhite < 255 || this.levelGamma !== 1 ||
-      this.levelOutBlack > 0 || this.levelOutWhite < 255
-    ) {
-      const span = Math.max(1, this.levelInWhite - this.levelInBlack);
-      const lv = (vv: number) => {
-        let n = this.clamp((vv - this.levelInBlack) / span, 0, 1);
-        n = Math.pow(n, 1 / this.levelGamma);
-        return this.levelOutBlack + n * (this.levelOutWhite - this.levelOutBlack);
-      };
-      r = lv(r); g = lv(g); b = lv(b);
+    // 1) Levels — composite (rgb) then per-channel remap with gamma.
+    const isIdentity = (L: LevelCh) =>
+      L.inB === 0 && L.inW === 255 && L.gamma === 1 && L.outB === 0 && L.outW === 255;
+    const remap = (vv: number, L: LevelCh) => {
+      const n = Math.pow(this.clamp((vv - L.inB) / Math.max(1, L.inW - L.inB), 0, 1), 1 / L.gamma);
+      return L.outB + n * (L.outW - L.outB);
+    };
+    const rgbL = this.levels.rgb;
+    if (!isIdentity(rgbL)) {
+      r = remap(r, rgbL); g = remap(g, rgbL); b = remap(b, rgbL);
+    }
+    if (!isIdentity(this.levels.r)) r = remap(r, this.levels.r);
+    if (!isIdentity(this.levels.g)) g = remap(g, this.levels.g);
+    if (!isIdentity(this.levels.b)) b = remap(b, this.levels.b);
+
+    // 1.5) Curves — composite (rgb) then per-channel LUT remap.
+    const cl = this.curveLuts;
+    if (cl.rgb || cl.r || cl.g || cl.b) {
+      const ap = (v: number, lut: number[] | null) =>
+        lut ? lut[this.clamp(Math.round(v), 0, 255)] : v;
+      if (cl.rgb) { r = ap(r, cl.rgb); g = ap(g, cl.rgb); b = ap(b, cl.rgb); }
+      r = ap(r, cl.r); g = ap(g, cl.g); b = ap(b, cl.b);
     }
 
     // 2) Brightness / Contrast.
@@ -5962,27 +6261,42 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
     return this.withAlpha(this.rgbToHex(r, g, b), a);
   }
 
-  /** Bake the live preview into the active layer and end the session. */
-  commitAdjust(): void {
-    if (this.adjustActive && this.adjustBase && this.previewPixels) {
+  /** Bake the current preview into the active layer (no session change). */
+  private bakeAdjust(): void {
+    if (!this.adjustActive || !this.adjustBase || !this.adjustDirty) return;
+    this.applyAdjustPreview();
+    if (this.previewPixels) {
       this.pushUndo();
       this.activeLayer.pixels = [...this.previewPixels];
       this.refreshAllFrameThumbnails();
     }
+    this.adjustDirty = false;
+  }
+
+  /** End the session: drop the preview/base and reset the controls. */
+  private endAdjust(): void {
     this.previewPixels = null;
     this.adjustBase = null;
     this.adjustActive = false;
+    this.adjustDirty = false;
     this.resetAdjustValues();
+    this.render();
+  }
+
+  /**
+   * Apply button: bake the result into the layer but KEEP the session and the
+   * control values so the user can keep tuning. The base stays the original
+   * pixels, so re-previewing never double-applies.
+   */
+  commitAdjust(): void {
+    this.bakeAdjust();
+    this.previewPixels = null;
     this.render();
   }
 
   /** Discard the preview and end the session (sliders back to neutral). */
   cancelAdjust(): void {
-    this.previewPixels = null;
-    this.adjustBase = null;
-    this.adjustActive = false;
-    this.resetAdjustValues();
-    this.render();
+    this.endAdjust();
   }
 
   /** Build the palette from the distinct colours used in the active frame. */
