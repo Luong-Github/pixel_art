@@ -26,6 +26,8 @@ import { DockService } from './dock/dock.service';
 import { PremiumService } from './premium.service';
 import { ProjectStoreService, ProjectMeta } from './projects/project-store.service';
 import { LocaleService } from '../i18n/locale.service';
+import { NotificationService } from '../core/notify/notification.service';
+import { WelcomeComponent } from './onboarding/welcome.component';
 import { TranslatePipe } from '../i18n/translate.pipe';
 import { Lang } from '../i18n/translations';
 import { BUILTIN_PALETTES, NamedPalette, PALETTE_STORAGE_KEY } from './palettes';
@@ -248,7 +250,7 @@ interface PixelArtProjectFile {
 @Component({
   selector: 'app-editor',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, DragDropModule, DockPanelDefDirective, TranslatePipe],
+  imports: [CommonModule, FormsModule, RouterLink, DragDropModule, DockPanelDefDirective, TranslatePipe, WelcomeComponent],
   templateUrl: './editor.component.html',
   styleUrl: './editor.component.scss',
   host: { class: 'editor-host' },
@@ -359,6 +361,7 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
     public premium: PremiumService,
     public locale: LocaleService,
     private projectStore: ProjectStoreService,
+    private notify: NotificationService,
     private hostRef: ElementRef<HTMLElement>,
     private sanitizer: DomSanitizer,
     @Inject(PLATFORM_ID) platformId: object,
@@ -370,10 +373,31 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
     if (this.isBrowser) {
       try {
         this.currentProjectId = localStorage.getItem(this.currentProjectKey);
+        this.showWelcome = localStorage.getItem(this.onboardedKey) !== '1';
       } catch {
         /* storage unavailable */
       }
     }
+  }
+
+  // ----- First-run welcome -----
+  private readonly onboardedKey = 'pixelart.onboarded';
+  showWelcome = false;
+
+  /** Close the welcome card and remember it (so it won't show again). */
+  dismissWelcome(): void {
+    this.showWelcome = false;
+    try {
+      localStorage.setItem(this.onboardedKey, '1');
+    } catch {
+      /* storage unavailable */
+    }
+  }
+
+  /** Re-open the welcome card from View ▾. */
+  replayWelcome(): void {
+    this.panelsMenuOpen = false;
+    this.showWelcome = true;
   }
 
   private buildUiIcons(): void {
@@ -556,7 +580,8 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
       { label: 'Outline layer (secondary)', run: () => this.outlineLayer() },
       { label: 'Replace secondary → primary', run: () => this.replaceColor() },
       { label: 'Recolor sprite to palette', run: () => this.remapToPalette() },
-      { label: 'Color adjustments…', run: () => this.openAdjust() },
+      { label: 'Color adjustments…', hint: 'Ctrl+L', run: () => this.openAdjust() },
+      { label: 'Toggle tilemap panel', run: () => this.dock.toggleHidden('tilemap') },
       { label: 'Export PNG ×1', run: () => this.exportPngScale(1) },
       { label: 'Export PNG ×2', run: () => this.exportPngScale(2) },
       { label: 'Export animated GIF', run: () => this.exportGif(1) },
@@ -3817,7 +3842,14 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
     if (!file) {
       return;
     }
-    const image = await this.loadImage(file);
+    let image: HTMLImageElement;
+    try {
+      image = await this.loadImage(file);
+    } catch {
+      this.notify.error(this.locale.t('notify.importFailed'));
+      input.value = '';
+      return;
+    }
     // Land the import in a fresh tab when requested (keeps current work intact).
     if (this.importTarget === 'new') {
       this.addWorkspace();
@@ -3883,9 +3915,9 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
     });
     if (key == null) return;
     if (this.premium.activate(key)) {
-      await this.showAlert({ title: 'Pro unlocked', message: 'Thank you! ✦' });
+      this.notify.success(this.locale.t('notify.proUnlocked'));
     } else {
-      await this.showAlert({ title: 'Invalid key', message: 'That key was not recognised.' });
+      this.notify.error(this.locale.t('notify.proKeyInvalid'));
     }
   }
 
@@ -3956,116 +3988,140 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
   /** Pack every (visible) frame into a sprite sheet PNG + engine-ready JSON atlas. */
   async exportSpriteSheet(layout: 'grid' | 'row' = 'grid', scale = 1): Promise<void> {
     this.exportMenuOpen = false;
-    if (!(await this.requirePro('Sprite sheet export'))) return;
-    const indices = this.exportFrameIndices();
-    const count = indices.length;
-    let cols: number;
-    if (layout === 'row') {
-      cols = count; // single horizontal strip
-    } else if (this.sheetColumns > 0) {
-      cols = Math.min(this.sheetColumns, count); // user-configured columns
-    } else {
-      cols = Math.min(count, Math.ceil(Math.sqrt(count)) || 1); // auto square-ish
-    }
-    const rows = Math.ceil(count / cols);
-    const fw = this.width * scale;
-    const fh = this.height * scale;
+    if (this.exportBusy) return;
+    this.exportBusy = true;
+    try {
+      if (!(await this.requirePro('Sprite sheet export'))) return;
+      const indices = this.exportFrameIndices();
+      const count = indices.length;
+      let cols: number;
+      if (layout === 'row') {
+        cols = count; // single horizontal strip
+      } else if (this.sheetColumns > 0) {
+        cols = Math.min(this.sheetColumns, count); // user-configured columns
+      } else {
+        cols = Math.min(count, Math.ceil(Math.sqrt(count)) || 1); // auto square-ish
+      }
+      const rows = Math.ceil(count / cols);
+      const fw = this.width * scale;
+      const fh = this.height * scale;
 
-    const sheet = document.createElement('canvas');
-    sheet.width = cols * fw;
-    sheet.height = rows * fh;
-    const ctx = sheet.getContext('2d');
-    if (!ctx) return;
-    ctx.imageSmoothingEnabled = false;
+      const sheet = document.createElement('canvas');
+      sheet.width = cols * fw;
+      sheet.height = rows * fh;
+      const ctx = sheet.getContext('2d');
+      if (!ctx) return;
+      ctx.imageSmoothingEnabled = false;
 
-    const atlasFrames = indices.map((frameIndex, i) => {
-      const col = i % cols;
-      const row = Math.floor(i / cols);
-      const x = col * fw;
-      const y = row * fh;
-      const frameCanvas = this.renderFrameCanvas(frameIndex, scale);
-      ctx.drawImage(frameCanvas, x, y);
-      return {
-        index: i,
-        name: this.frames[frameIndex]?.name ?? `frame_${i}`,
-        x,
-        y,
-        w: fw,
-        h: fh,
-        duration: this.frames[frameIndex]?.duration ?? 100,
-      };
-    });
-
-    const base = `${this.exportBaseName()}-sheet`;
-    this.stampWatermark(ctx, sheet.width, sheet.height);
-    this.downloadCanvas(sheet, `${base}.png`);
-
-    // Map tag ranges (original frame indices) onto exported sheet positions.
-    const posOf = new Map<number, number>();
-    indices.forEach((orig, i) => posOf.set(orig, i));
-    const frameTags = this.tags
-      .map((t) => {
-        const positions: number[] = [];
-        for (let f = t.from; f <= t.to; f += 1) {
-          const p = posOf.get(f);
-          if (p != null) positions.push(p);
-        }
-        if (!positions.length) return null;
+      const atlasFrames = indices.map((frameIndex, i) => {
+        const col = i % cols;
+        const row = Math.floor(i / cols);
+        const x = col * fw;
+        const y = row * fh;
+        const frameCanvas = this.renderFrameCanvas(frameIndex, scale);
+        ctx.drawImage(frameCanvas, x, y);
         return {
-          name: t.name,
-          from: Math.min(...positions),
-          to: Math.max(...positions),
-          direction: t.direction,
-          repeat: t.repeat,
-          color: t.color,
+          index: i,
+          name: this.frames[frameIndex]?.name ?? `frame_${i}`,
+          x,
+          y,
+          w: fw,
+          h: fh,
+          duration: this.frames[frameIndex]?.duration ?? 100,
         };
-      })
-      .filter(Boolean);
+      });
 
-    const pivot = this.pivotPoint;
-    const atlas = {
-      app: 'Pixel Art Studio',
-      animation: this.activeWorkspace.name,
-      image: `${base}.png`,
-      layout,
-      frameWidth: fw,
-      frameHeight: fh,
-      scale,
-      columns: cols,
-      rows,
-      count,
-      pivot: { x: pivot.x * scale, y: pivot.y * scale, preset: this.pivotPreset },
-      frames: atlasFrames,
-      frameTags,
-    };
-    this.downloadBlob(
-      new Blob([JSON.stringify(atlas, null, 2)], { type: 'application/json' }),
-      `${base}.json`,
-    );
+      const base = `${this.exportBaseName()}-sheet`;
+      this.stampWatermark(ctx, sheet.width, sheet.height);
+      this.downloadCanvas(sheet, `${base}.png`);
+
+      // Map tag ranges (original frame indices) onto exported sheet positions.
+      const posOf = new Map<number, number>();
+      indices.forEach((orig, i) => posOf.set(orig, i));
+      const frameTags = this.tags
+        .map((t) => {
+          const positions: number[] = [];
+          for (let f = t.from; f <= t.to; f += 1) {
+            const p = posOf.get(f);
+            if (p != null) positions.push(p);
+          }
+          if (!positions.length) return null;
+          return {
+            name: t.name,
+            from: Math.min(...positions),
+            to: Math.max(...positions),
+            direction: t.direction,
+            repeat: t.repeat,
+            color: t.color,
+          };
+        })
+        .filter(Boolean);
+
+      const pivot = this.pivotPoint;
+      const atlas = {
+        app: 'Pixel Art Studio',
+        animation: this.activeWorkspace.name,
+        image: `${base}.png`,
+        layout,
+        frameWidth: fw,
+        frameHeight: fh,
+        scale,
+        columns: cols,
+        rows,
+        count,
+        pivot: { x: pivot.x * scale, y: pivot.y * scale, preset: this.pivotPreset },
+        frames: atlasFrames,
+        frameTags,
+      };
+      this.downloadBlob(
+        new Blob([JSON.stringify(atlas, null, 2)], { type: 'application/json' }),
+        `${base}.json`,
+      );
+      this.notify.success(this.locale.t('export.spritesheetDone'));
+    } finally {
+      this.exportBusy = false;
+    }
   }
 
   /** Export the (visible) frames as an animated GIF at the given scale. */
   async exportGif(scale = 1): Promise<void> {
     this.exportMenuOpen = false;
-    if (!(await this.requirePro('Animated GIF export'))) return;
-    const indices = this.exportFrameIndices();
-    const gif = GIFEncoder();
-    for (const frameIndex of indices) {
-      const canvas = this.renderFrameCanvas(frameIndex, scale);
-      const ctx = canvas.getContext('2d');
-      if (!ctx) continue;
-      const delay = Math.max(20, Math.round(this.frames[frameIndex]?.duration ?? 100));
-      this.writeGifFrame(gif, ctx, canvas.width, canvas.height, delay);
+    if (this.exportBusy) return;
+    this.exportBusy = true;
+    try {
+      if (!(await this.requirePro('Animated GIF export'))) return;
+      const indices = this.exportFrameIndices();
+      const gif = GIFEncoder();
+      this.exportProgress = { done: 0, total: indices.length };
+      for (let i = 0; i < indices.length; i += 1) {
+        this.exportProgress = { done: i, total: indices.length };
+        // Yield each frame so the overlay can repaint (encode is otherwise blocking).
+        await new Promise<void>((r) => setTimeout(r));
+        const canvas = this.renderFrameCanvas(indices[i], scale);
+        const ctx = canvas.getContext('2d');
+        if (!ctx) continue;
+        const delay = Math.max(20, Math.round(this.frames[indices[i]]?.duration ?? 100));
+        this.writeGifFrame(gif, ctx, canvas.width, canvas.height, delay);
+      }
+      gif.finish();
+      this.downloadBlob(
+        new Blob([gif.bytes()], { type: 'image/gif' }),
+        `${this.exportBaseName()}.gif`,
+      );
+      this.notify.success(this.locale.t('export.gifDone'));
+    } finally {
+      this.exportBusy = false;
+      this.exportProgress = null;
     }
-    gif.finish();
-    this.downloadBlob(
-      new Blob([gif.bytes()], { type: 'image/gif' }),
-      `${this.exportBaseName()}.gif`,
-    );
   }
 
   /** Background fill for video export (video has no transparency). */
   videoBg = '#ffffff';
+
+  /** True while a long export (GIF / timelapse / video / sheet) runs — drives the overlay + disables export buttons. */
+  exportBusy = false;
+  /** Per-frame progress for encodes that loop over frames; null = indeterminate. */
+  exportProgress: { done: number; total: number } | null = null;
 
   /**
    * Export the animation as a video for social media (GIF is often rejected).
@@ -4074,78 +4130,86 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
    */
   async exportVideo(scale = 4): Promise<void> {
     this.exportMenuOpen = false;
+    if (this.exportBusy) return;
     if (!this.isBrowser || typeof MediaRecorder === 'undefined') {
-      await this.showAlert({ title: 'Video', message: 'Trình duyệt không hỗ trợ ghi video.' });
+      this.notify.error(this.locale.t('notify.videoUnsupported'));
       return;
     }
-    if (!(await this.requirePro('Video (MP4) export'))) return;
-    const indices = this.exportFrameIndices();
-    if (!indices.length) return;
-    const W = this.width * scale;
-    const H = this.height * scale;
-    const off = document.createElement('canvas');
-    off.width = W;
-    off.height = H;
-    const ctx = off.getContext('2d');
-    if (!ctx) return;
-    ctx.imageSmoothingEnabled = false;
+    this.exportBusy = true;
+    try {
+      if (!(await this.requirePro('Video (MP4) export'))) return;
+      const indices = this.exportFrameIndices();
+      if (!indices.length) return;
+      const W = this.width * scale;
+      const H = this.height * scale;
+      const off = document.createElement('canvas');
+      off.width = W;
+      off.height = H;
+      const ctx = off.getContext('2d');
+      if (!ctx) return;
+      ctx.imageSmoothingEnabled = false;
 
-    const mp4 = 'video/mp4;codecs=avc1.42E01E';
-    const webm = 'video/webm;codecs=vp9';
-    const type = MediaRecorder.isTypeSupported(mp4)
-      ? mp4
-      : MediaRecorder.isTypeSupported(webm)
-        ? webm
-        : 'video/webm';
-    const ext = type.startsWith('video/mp4') ? 'mp4' : 'webm';
+      const mp4 = 'video/mp4;codecs=avc1.42E01E';
+      const webm = 'video/webm;codecs=vp9';
+      const type = MediaRecorder.isTypeSupported(mp4)
+        ? mp4
+        : MediaRecorder.isTypeSupported(webm)
+          ? webm
+          : 'video/webm';
+      const ext = type.startsWith('video/mp4') ? 'mp4' : 'webm';
 
-    const durs = indices.map((fi) => Math.max(40, this.frames[fi]?.duration ?? 130));
-    const total = durs.reduce((a, b) => a + b, 0);
-    const drawAt = (elapsed: number) => {
-      let t = elapsed % total;
-      let fi = indices[0];
-      for (let k = 0; k < indices.length; k += 1) {
-        if (t < durs[k]) {
-          fi = indices[k];
-          break;
+      const durs = indices.map((fi) => Math.max(40, this.frames[fi]?.duration ?? 130));
+      const total = durs.reduce((a, b) => a + b, 0);
+      const drawAt = (elapsed: number) => {
+        let t = elapsed % total;
+        let fi = indices[0];
+        for (let k = 0; k < indices.length; k += 1) {
+          if (t < durs[k]) {
+            fi = indices[k];
+            break;
+          }
+          t -= durs[k];
         }
-        t -= durs[k];
-      }
-      ctx.fillStyle = this.videoBg;
-      ctx.fillRect(0, 0, W, H);
-      ctx.drawImage(this.renderFrameCanvas(fi, scale), 0, 0);
-    };
-
-    drawAt(0);
-    const stream = off.captureStream(60);
-    const chunks: BlobPart[] = [];
-    const rec = new MediaRecorder(stream, { mimeType: type, videoBitsPerSecond: 12_000_000 });
-    rec.ondataavailable = (e) => {
-      if (e.data.size) chunks.push(e.data);
-    };
-    const stopped = new Promise<void>((res) => {
-      rec.onstop = () => res();
-    });
-    rec.start();
-    // Loop a few times so very short animations aren't sub-second clips.
-    const loops = Math.max(1, Math.ceil(2000 / total));
-    const runMs = total * loops;
-    const start = performance.now();
-    await new Promise<void>((res) => {
-      const tick = () => {
-        const e = performance.now() - start;
-        drawAt(e);
-        if (e >= runMs) {
-          res();
-          return;
-        }
-        requestAnimationFrame(tick);
+        ctx.fillStyle = this.videoBg;
+        ctx.fillRect(0, 0, W, H);
+        ctx.drawImage(this.renderFrameCanvas(fi, scale), 0, 0);
       };
-      tick();
-    });
-    rec.stop();
-    await stopped;
-    this.downloadBlob(new Blob(chunks, { type }), `${this.exportBaseName()}.${ext}`);
+
+      drawAt(0);
+      const stream = off.captureStream(60);
+      const chunks: BlobPart[] = [];
+      const rec = new MediaRecorder(stream, { mimeType: type, videoBitsPerSecond: 12_000_000 });
+      rec.ondataavailable = (e) => {
+        if (e.data.size) chunks.push(e.data);
+      };
+      const stopped = new Promise<void>((res) => {
+        rec.onstop = () => res();
+      });
+      rec.start();
+      // Loop a few times so very short animations aren't sub-second clips.
+      const loops = Math.max(1, Math.ceil(2000 / total));
+      const runMs = total * loops;
+      const start = performance.now();
+      await new Promise<void>((res) => {
+        const tick = () => {
+          const e = performance.now() - start;
+          drawAt(e);
+          if (e >= runMs) {
+            res();
+            return;
+          }
+          requestAnimationFrame(tick);
+        };
+        tick();
+      });
+      rec.stop();
+      await stopped;
+      this.downloadBlob(new Blob(chunks, { type }), `${this.exportBaseName()}.${ext}`);
+      this.notify.success(this.locale.t('export.videoDone'));
+    } finally {
+      this.exportBusy = false;
+      this.exportProgress = null;
+    }
   }
 
   /**
@@ -4299,6 +4363,7 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
       }, 900);
     } catch {
       this.saveState = 'error';
+      this.notify.error(this.locale.t('notify.saveFailed'));
     }
   }
 
@@ -4311,7 +4376,7 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
       this.setCurrentProject(id);
       this.projectsModalOpen = false;
     } catch {
-      await this.showAlert({ title: 'Mở thất bại', message: 'Project không hợp lệ.' });
+      this.notify.error(this.locale.t('notify.openFailed'));
     }
   }
 
@@ -5279,14 +5344,6 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
     });
   }
 
-  /** Info dialog with a single OK button. */
-  private showAlert(opts: { title: string; message?: string }): Promise<void> {
-    return new Promise((resolve) => {
-      this.dialog = { type: 'alert', title: opts.title, message: opts.message, okLabel: 'OK' };
-      this.dialogResolve = () => resolve();
-    });
-  }
-
   dialogOk(): void {
     const d = this.dialog;
     const resolve = this.dialogResolve;
@@ -5863,10 +5920,28 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
 
   /** Edit ▾ → Adjustments: reveal the dock panel and start a fresh session. */
   openAdjust(): void {
-    if (this.activeLayerLocked) return;
     this.editMenuOpen = false;
-    this.dock.show('adjust');
+    if (this.activeLayerLocked) {
+      this.notify.info(this.locale.t('notify.layerLocked'));
+      return;
+    }
+    this.floatAdjust();
     this.beginAdjust(true);
+  }
+
+  /** Reveal the Adjust panel as a floating window over the canvas (not docked). */
+  private floatAdjust(): void {
+    if (this.dock.isFloating('adjust')) {
+      if (this.dock.isCollapsed('adjust')) this.dock.toggleCollapse('adjust');
+      this.dock.bringToFront('adjust');
+      return;
+    }
+    const host = this.hostRef.nativeElement.getBoundingClientRect();
+    const w = 320;
+    const h = 440;
+    const x = this.clamp(host.width - w - 24, 8, Math.max(8, host.width - w - 8));
+    const y = this.clamp(80, 8, Math.max(8, host.height - 80));
+    this.dock.float('adjust', { x, y, w, h });
   }
 
   /** Capture the current layer as the adjust base (optionally zero the sliders). */
@@ -6942,6 +7017,9 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
       } else if (key === 'v') {
         event.preventDefault();
         this.pasteSelection();
+      } else if (key === 'l') {
+        event.preventDefault();
+        this.openAdjust();
       }
       return;
     }
@@ -9449,10 +9527,10 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
       this.timelapseFrames.shift();
       if (!this.timelapseLimitHit) {
         this.timelapseLimitHit = true;
-        void this.showAlert({
-          title: 'Timelapse đã đầy',
-          message: `Đã đạt giới hạn ${EditorComponent.MAX_TIMELAPSE_FRAMES} frame — từ giờ các bước cũ nhất sẽ bị bỏ dần để giữ phần mới nhất. Export GIF nếu muốn lưu lại.`,
-        });
+        this.notify.info(
+          this.locale.t('notify.timelapseFull', { max: EditorComponent.MAX_TIMELAPSE_FRAMES }),
+          { sticky: true },
+        );
       }
     }
   }
@@ -9462,13 +9540,10 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
     this.fileMenuOpen = false;
     this.captureTimelapseFrame();
     if (this.timelapseFrames.length < 2) {
-      await this.showAlert({
-        title: 'Timelapse',
-        message: 'Turn on “Record timelapse”, draw a few edits, then export.',
-      });
+      this.notify.info(this.locale.t('notify.timelapseNeedFrames'));
       return;
     }
-    this.encodeTimelapseGif(this.timelapseFrames);
+    await this.encodeTimelapseGif(this.timelapseFrames);
   }
 
   /**
@@ -9481,16 +9556,12 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
     // Oldest → newest: each undo snapshot is the state before an edit, plus the live state.
     const snapshots = [...this.undoStack, this.serialize()];
     if (snapshots.length < 2) {
-      await this.showAlert({
-        title: 'Timelapse',
-        message:
-          'Chưa đủ lịch sử vẽ trong phiên này để dựng GIF. Lịch sử undo chỉ tồn tại khi tab editor còn mở và bạn chưa tải lại trang.',
-      });
+      this.notify.info(this.locale.t('notify.timelapseNeedHistory'));
       return;
     }
     const frames = this.renderSnapshotFrames(snapshots);
     if (frames.length < 2) return;
-    this.encodeTimelapseGif(frames);
+    await this.encodeTimelapseGif(frames);
   }
 
   /** Render each serialized snapshot's active frame to a 1× canvas, restoring live state after. */
@@ -9526,37 +9597,50 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
   }
 
   /** Encode a sequence of frame canvases into a watermarked, video-friendly GIF. */
-  private encodeTimelapseGif(sources: HTMLCanvasElement[]): void {
-    const first = sources[0];
-    const scale = Math.max(
-      1,
-      Math.floor(384 / Math.max(first.width, first.height)),
-    );
-    const w = first.width * scale;
-    const h = first.height * scale;
-    const gif = GIFEncoder();
-    sources.forEach((src, i) => {
-      const c = document.createElement('canvas');
-      c.width = w;
-      c.height = h;
-      const ctx = c.getContext('2d');
-      if (!ctx) return;
-      ctx.imageSmoothingEnabled = false;
-      // Solid background so the clip isn't transparent — video editors (CapCut,
-      // etc.) ignore GIF alpha and would otherwise show it as black.
-      ctx.fillStyle = this.videoBg;
-      ctx.fillRect(0, 0, w, h);
-      ctx.drawImage(src, 0, 0, src.width, src.height, 0, 0, w, h);
-      this.stampWatermark(ctx, w, h);
-      // Linger on the final frame so the result is readable in a loop.
-      const last = i === sources.length - 1;
-      this.writeGifFrame(gif, ctx, w, h, last ? 1200 : 90);
-    });
-    gif.finish();
-    this.downloadBlob(
-      new Blob([gif.bytes()], { type: 'image/gif' }),
-      `${this.exportBaseName()}-timelapse.gif`,
-    );
+  private async encodeTimelapseGif(sources: HTMLCanvasElement[]): Promise<void> {
+    if (this.exportBusy) return;
+    this.exportBusy = true;
+    try {
+      const first = sources[0];
+      const scale = Math.max(
+        1,
+        Math.floor(384 / Math.max(first.width, first.height)),
+      );
+      const w = first.width * scale;
+      const h = first.height * scale;
+      const gif = GIFEncoder();
+      this.exportProgress = { done: 0, total: sources.length };
+      for (let i = 0; i < sources.length; i += 1) {
+        this.exportProgress = { done: i, total: sources.length };
+        // Timelapses can be hundreds of frames — yield periodically so the UI repaints.
+        if (i % 5 === 0) await new Promise<void>((r) => setTimeout(r));
+        const src = sources[i];
+        const c = document.createElement('canvas');
+        c.width = w;
+        c.height = h;
+        const ctx = c.getContext('2d');
+        if (!ctx) continue;
+        ctx.imageSmoothingEnabled = false;
+        // Solid background so the clip isn't transparent — video editors (CapCut,
+        // etc.) ignore GIF alpha and would otherwise show it as black.
+        ctx.fillStyle = this.videoBg;
+        ctx.fillRect(0, 0, w, h);
+        ctx.drawImage(src, 0, 0, src.width, src.height, 0, 0, w, h);
+        this.stampWatermark(ctx, w, h);
+        // Linger on the final frame so the result is readable in a loop.
+        const last = i === sources.length - 1;
+        this.writeGifFrame(gif, ctx, w, h, last ? 1200 : 90);
+      }
+      gif.finish();
+      this.downloadBlob(
+        new Blob([gif.bytes()], { type: 'image/gif' }),
+        `${this.exportBaseName()}-timelapse.gif`,
+      );
+      this.notify.success(this.locale.t('export.timelapseDone'));
+    } finally {
+      this.exportBusy = false;
+      this.exportProgress = null;
+    }
   }
 
   private serialize(): string {

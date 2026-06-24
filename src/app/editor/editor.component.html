@@ -853,36 +853,36 @@
             </div>
             <span class="menu-label">{{ 'export.image' | t }}</span>
             <div class="menu-row">
-              <button type="button" (click)="exportPngScale(1)">1x</button>
-              <button type="button" (click)="exportPngScale(2)">2x</button>
-              <button type="button" class="pro" (click)="exportPngScale(4)">4x ✦</button>
-              <button type="button" class="pro" (click)="exportPngScale(8)">8x ✦</button>
+              <button type="button" [disabled]="exportBusy" (click)="exportPngScale(1)">1x</button>
+              <button type="button" [disabled]="exportBusy" (click)="exportPngScale(2)">2x</button>
+              <button type="button" class="pro" [disabled]="exportBusy" (click)="exportPngScale(4)">4x ✦</button>
+              <button type="button" class="pro" [disabled]="exportBusy" (click)="exportPngScale(8)">8x ✦</button>
             </div>
             <span class="menu-label">{{ 'export.animation' | t }}</span>
             <div class="menu-row">
-              <button type="button" class="pro" (click)="exportGif(1)">1x ✦</button>
-              <button type="button" class="pro" (click)="exportGif(2)">2x ✦</button>
-              <button type="button" class="pro" (click)="exportGif(4)">4x ✦</button>
-              <button type="button" class="pro" (click)="exportGif(8)">8x ✦</button>
+              <button type="button" class="pro" [disabled]="exportBusy" (click)="exportGif(1)">1x ✦</button>
+              <button type="button" class="pro" [disabled]="exportBusy" (click)="exportGif(2)">2x ✦</button>
+              <button type="button" class="pro" [disabled]="exportBusy" (click)="exportGif(4)">4x ✦</button>
+              <button type="button" class="pro" [disabled]="exportBusy" (click)="exportGif(8)">8x ✦</button>
             </div>
             <span class="menu-label">{{ 'export.video' | t }}</span>
             <div class="menu-row">
-              <button type="button" class="pro" (click)="exportVideo(4)">MP4/WebM 4x ✦</button>
-              <button type="button" class="pro" (click)="exportVideo(8)">8x ✦</button>
+              <button type="button" class="pro" [disabled]="exportBusy" (click)="exportVideo(4)">MP4/WebM 4x ✦</button>
+              <button type="button" class="pro" [disabled]="exportBusy" (click)="exportVideo(8)">8x ✦</button>
             </div>
             <label class="export-bg" (click)="$event.stopPropagation()">{{ 'export.videoBg' | t }} <input type="color" [(ngModel)]="videoBg" /></label>
             <span class="menu-label">{{ 'export.spriteSheet' | t }}</span>
             <div class="menu-row">
-              <button type="button" class="pro" (click)="exportSpriteSheet('grid', 1)">{{ 'export.spriteGrid' | t }} ✦</button>
-              <button type="button" class="pro" (click)="exportSpriteSheet('row', 1)">{{ 'export.spriteRow' | t }} ✦</button>
+              <button type="button" class="pro" [disabled]="exportBusy" (click)="exportSpriteSheet('grid', 1)">{{ 'export.spriteGrid' | t }} ✦</button>
+              <button type="button" class="pro" [disabled]="exportBusy" (click)="exportSpriteSheet('row', 1)">{{ 'export.spriteRow' | t }} ✦</button>
             </div>
             <span class="menu-sep"></span>
             <span class="menu-label">{{ 'export.timelapse' | t }}</span>
             <button type="button" [class.danger-action]="recording" (click)="toggleRecording()">
               {{ recording ? ('export.stopRecording' | t) + ' (' + timelapseFrames.length + ')' : ('export.record' | t) }}
             </button>
-            <button type="button" [disabled]="timelapseFrames.length < 2" (click)="exportTimelapse()">{{ 'export.exportTimelapse' | t }}</button>
-            <button type="button" (click)="exportTimelapseFromHistory()">{{ 'export.fromUndo' | t }}</button>
+            <button type="button" [disabled]="exportBusy || timelapseFrames.length < 2" (click)="exportTimelapse()">{{ 'export.exportTimelapse' | t }}</button>
+            <button type="button" [disabled]="exportBusy" (click)="exportTimelapseFromHistory()">{{ 'export.fromUndo' | t }}</button>
           </div>
         </div>
 
@@ -896,8 +896,17 @@
             </label>
             <span class="menu-sep"></span>
             <button type="button" (click)="resetLayout()">{{ 'view.resetLayout' | t }}</button>
+            <button type="button" (click)="replayWelcome()">{{ 'view.replayTour' | t }}</button>
           </div>
         </div>
+
+        <button
+          type="button"
+          class="icon-btn"
+          [class.on]="!dock.isHidden('tilemap')"
+          (click)="dock.toggleHidden('tilemap')"
+          [title]="'topbar.tilemap' | t"
+          [attr.aria-label]="'topbar.tilemap' | t">▦</button>
 
         <a
           class="icon-btn help-btn"
@@ -963,6 +972,9 @@
           (pointercancel)="onPointerUp($event)"
           (contextmenu)="$event.preventDefault()">
         </canvas>
+        <div class="canvas-empty-hint" *ngIf="!workspaceInProgress" aria-hidden="true">
+          {{ 'canvas.emptyHint' | t }}
+        </div>
       </div>
 
       <div class="minimap" *ngIf="minimapVisible">
@@ -1488,6 +1500,20 @@
         </div>
       </div>
     </div>
+  </div>
+</div>
+
+<app-welcome *ngIf="showWelcome" (done)="dismissWelcome()"></app-welcome>
+
+<!-- ============================================================
+     Export progress overlay — blocks interaction during a long encode
+     ============================================================ -->
+<div class="export-overlay" *ngIf="exportBusy" role="status" aria-live="polite">
+  <div class="export-overlay__box">
+    <span class="export-overlay__spinner" aria-hidden="true"></span>
+    <span class="export-overlay__text">
+      {{ exportProgress ? ('export.encodingFrame' | t: { done: exportProgress.done + 1, total: exportProgress.total }) : ('export.encoding' | t) }}
+    </span>
   </div>
 </div>
 
