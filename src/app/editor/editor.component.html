@@ -130,6 +130,7 @@
       type="range"
       min="0"
       max="360"
+      [attr.aria-label]="'modal.hue' | t"
       [ngModel]="pickerHueDeg"
       (ngModelChange)="setHue($event)" />
 
@@ -317,7 +318,7 @@
 </ng-template>
 
 <ng-template dockPanelDef="display">
-  <div class="display-wrap">
+  <div class="display-wrap" tabindex="0">
     <canvas
       #display
       class="display-canvas"
@@ -664,6 +665,7 @@
             </button>
             <input
               class="timeline-layer-name"
+              [attr.aria-label]="'modal.layer' | t"
               [value]="layerNameAt(layerIndex)"
               (click)="selectLayer(layerIndex); $event.stopPropagation()"
               (change)="renameLayer(layerIndex, $event)" />
@@ -904,6 +906,14 @@
         <button
           type="button"
           class="icon-btn"
+          [class.on]="!dock.isHidden('adjust') || dock.isFloating('adjust')"
+          (click)="openAdjust()"
+          [title]="'topbar.adjust' | t"
+          [attr.aria-label]="'topbar.adjust' | t">◧</button>
+
+        <button
+          type="button"
+          class="icon-btn"
           [class.on]="!dock.isHidden('tilemap')"
           (click)="dock.toggleHidden('tilemap')"
           [title]="'topbar.tilemap' | t"
@@ -954,6 +964,7 @@
       <div
         #canvasWrap
         class="canvas-wrap"
+        tabindex="0"
         [class.space-pan]="isSpacePanning"
         [class.panning]="isPanning"
         (pointerdown)="onCanvasWrapPointerDown($event)"
@@ -1476,13 +1487,15 @@
         <ng-container [ngSwitch]="saveState">
           <span *ngSwitchCase="'saving'">{{ 'projects.saving' | t }}</span>
           <span *ngSwitchCase="'saved'">{{ 'projects.saved' | t }}</span>
-          <span *ngSwitchCase="'error'">{{ 'projects.error' | t }}</span>
+          <span *ngSwitchCase="'error'">{{ saveError || ('projects.error' | t) }}</span>
           <span *ngSwitchDefault>{{ (currentProjectId ? 'projects.willOverwrite' : 'projects.localHint') | t }}</span>
         </ng-container>
       </p>
       <div class="save-progress" *ngIf="saveState === 'saving'"><span></span></div>
     </div>
     <footer class="modal-foot" *ngIf="projectsTab === 'save'">
+      <button type="button" class="quiet-action" *ngIf="saveState === 'error'"
+        (click)="saveProject()">{{ 'projects.retry' | t }}</button>
       <button type="button" class="quiet-action" *ngIf="currentProjectId" [disabled]="saveState === 'saving'"
         (click)="saveProject(true)">{{ 'projects.saveAsNew' | t }}</button>
       <button type="button" class="primary-action" [disabled]="saveState === 'saving' || !saveName.trim()"

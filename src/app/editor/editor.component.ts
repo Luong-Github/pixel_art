@@ -4408,10 +4408,14 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
     }
   }
 
+  /** Human-readable reason shown when a save fails (quota etc.). */
+  saveError: string | null = null;
+
   /** Save the whole project. `asNew` forces a new library entry (Save As). */
   async saveProject(asNew = false): Promise<void> {
     const name = this.saveName.trim() || 'Untitled';
     this.saveState = 'saving';
+    this.saveError = null;
     try {
       const now = Date.now();
       const reuse = !asNew && this.currentProjectId;
@@ -4436,9 +4440,13 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
       setTimeout(() => {
         if (this.saveState === 'saved') this.projectsModalOpen = false;
       }, 900);
-    } catch {
+    } catch (err) {
       this.saveState = 'error';
-      this.notify.error(this.locale.t('notify.saveFailed'));
+      const quota =
+        err instanceof DOMException &&
+        (err.name === 'QuotaExceededError' || err.name === 'NS_ERROR_DOM_QUOTA_REACHED');
+      this.saveError = this.locale.t(quota ? 'projects.errorQuota' : 'projects.errorGeneric');
+      this.notify.error(this.saveError);
     }
   }
 
