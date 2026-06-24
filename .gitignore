@@ -44,3 +44,9 @@ Thumbs.db
 
 # Internal planning docs (not for the public repo)
 /docs/
+
+# Playwright
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/

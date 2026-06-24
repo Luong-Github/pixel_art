@@ -28,6 +28,22 @@ import { ProjectStoreService, ProjectMeta } from './projects/project-store.servi
 import { LocaleService } from '../i18n/locale.service';
 import { NotificationService } from '../core/notify/notification.service';
 import { WelcomeComponent } from './onboarding/welcome.component';
+import {
+  hexToRgb as uHexToRgb,
+  rgbToHex as uRgbToHex,
+  colorAlpha as uColorAlpha,
+  withAlpha as uWithAlpha,
+  rgbToHsv as uRgbToHsv,
+  hsvToRgb as uHsvToRgb,
+  rgbToHsl as uRgbToHsl,
+  hslToRgb as uHslToRgb,
+} from './utils/color.utils';
+import { buildCurveLut as uBuildCurveLut } from './utils/curve.utils';
+import { adjustPixel as uAdjustPixel, AdjustSettings, LevelCh } from './utils/adjust.utils';
+import {
+  buildPalette as uBuildPalette,
+  nearestPaletteColor as uNearestPaletteColor,
+} from './utils/quantize.utils';
 import { TranslatePipe } from '../i18n/translate.pipe';
 import { Lang } from '../i18n/translations';
 import { BUILTIN_PALETTES, NamedPalette, PALETTE_STORAGE_KEY } from './palettes';
@@ -67,8 +83,6 @@ type Tool =
   | 'move'
   | 'transform';
 type Pixel = string | null;
-/** One channel's Levels parameters (input black/white + gamma, output black/white). */
-interface LevelCh { inB: number; inW: number; gamma: number; outB: number; outW: number; }
 type ImportFit = 'contain' | 'cover' | 'stretch';
 /** Symmetry axes for drawing. 'mandala' = 8-fold radial (square canvas only). */
 type SymmetryMode = 'off' | 'x' | 'y' | 'both' | 'mandala';
@@ -446,15 +460,28 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
     this.locale.setLang(lang);
   }
 
+  /** Held source image for the Convert modal live preview. */
+  convertSource: HTMLImageElement | null = null;
+  convertPreviewUrl: string | null = null;
+  private convertPreviewTimer: ReturnType<typeof setTimeout> | null = null;
+
   openConvertModal(): void {
     this.fileMenuOpen = false;
     // Default to a new tab when the current one already has artwork.
     this.importTarget = this.workspaceInProgress ? 'new' : 'current';
+    this.convertSource = null;
+    this.convertPreviewUrl = null;
     this.convertModalOpen = true;
   }
 
   closeConvertModal(): void {
+    if (this.convertPreviewTimer) {
+      clearTimeout(this.convertPreviewTimer);
+      this.convertPreviewTimer = null;
+    }
     this.convertModalOpen = false;
+    this.convertSource = null;
+    this.convertPreviewUrl = null;
   }
 
   /** True when the active workspace has drawn content (multiple frames or any pixel). */
@@ -468,8 +495,9 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
     return false;
   }
 
-  /** Triggered by the modal's "Choose image & convert"; confirms before overwriting. */
-  async startImageImport(): Promise<void> {
+  /** Apply the held Convert source image to the canvas (confirms overwrite first). */
+  async applyConvert(): Promise<void> {
+    if (!this.convertSource) return;
     if (this.importTarget === 'current' && this.workspaceInProgress) {
       const ok = await this.askConfirm({
         title: 'Overwrite this tab?',
@@ -480,7 +508,69 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
       });
       if (!ok) return;
     }
-    this.triggerImport();
+    const image = this.convertSource;
+    if (this.importTarget === 'new') this.addWorkspace();
+    this.pushUndo();
+    if (this.importResizeCanvas) {
+      this.resizeCanvasForImage(image);
+      this.frames = [this.createFrame('Frame 1')];
+      this.activeFrameIndex = 0;
+      this.activeLayerIndex = 0;
+    }
+    const sampled = this.sampleImage(image, this.width, this.height);
+    this.activeLayer.pixels = sampled.pixels;
+    this.palette = sampled.palette;
+    this.convertSource = null;
+    this.convertPreviewUrl = null;
+    this.convertModalOpen = false;
+    this.render();
+  }
+
+  /** Re-render the Convert preview (debounced) when a setting changes. */
+  scheduleConvertPreview(): void {
+    if (!this.convertSource) return;
+    if (this.convertPreviewTimer) clearTimeout(this.convertPreviewTimer);
+    this.convertPreviewTimer = setTimeout(() => this.renderConvertPreview(), 120);
+  }
+
+  private renderConvertPreview(): void {
+    const img = this.convertSource;
+    if (!img) {
+      this.convertPreviewUrl = null;
+      return;
+    }
+    const [pw, ph] = this.previewTargetSize(img);
+    const sampled = this.sampleImage(img, pw, ph);
+    const c = document.createElement('canvas');
+    c.width = pw;
+    c.height = ph;
+    const ctx = c.getContext('2d')!;
+    const id = ctx.createImageData(pw, ph);
+    for (let i = 0; i < sampled.pixels.length; i += 1) {
+      const hex = sampled.pixels[i];
+      const o = i * 4;
+      if (!hex) {
+        id.data[o + 3] = 0;
+        continue;
+      }
+      const [r, g, b] = this.hexToRgb(hex);
+      id.data[o] = r;
+      id.data[o + 1] = g;
+      id.data[o + 2] = b;
+      id.data[o + 3] = this.colorAlpha(hex);
+    }
+    ctx.putImageData(id, 0, 0);
+    this.convertPreviewUrl = c.toDataURL();
+  }
+
+  /** Target sample size for the preview, mirroring what Convert will produce. */
+  private previewTargetSize(img: HTMLImageElement): [number, number] {
+    if (!this.importResizeCanvas) return [this.width, this.height];
+    // Mirror resizeCanvasForImage exactly (floor + min 16) so preview == applied result.
+    const ls = this.clamp(Math.floor(this.importLongSide || 64), 16, 128);
+    const aspect = img.width / img.height;
+    if (aspect >= 1) return [ls, this.clamp(Math.round(ls / aspect), 8, 128)];
+    return [this.clamp(Math.round(ls * aspect), 8, 128), ls];
   }
 
   private buildToolIcons(): void {
@@ -3836,37 +3926,22 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
     this.importInputRef.nativeElement.click();
   }
 
+  /** A file was chosen in the Convert modal — load it and show a live preview (no apply yet). */
   async importImage(event: Event): Promise<void> {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0];
     if (!file) {
       return;
     }
-    let image: HTMLImageElement;
     try {
-      image = await this.loadImage(file);
+      this.convertSource = await this.loadImage(file);
     } catch {
       this.notify.error(this.locale.t('notify.importFailed'));
       input.value = '';
       return;
     }
-    // Land the import in a fresh tab when requested (keeps current work intact).
-    if (this.importTarget === 'new') {
-      this.addWorkspace();
-    }
-    this.pushUndo();
-    if (this.importResizeCanvas) {
-      this.resizeCanvasForImage(image);
-      this.frames = [this.createFrame('Frame 1')];
-      this.activeFrameIndex = 0;
-      this.activeLayerIndex = 0;
-    }
-    const sampled = this.sampleImage(image, this.width, this.height);
-    this.activeLayer.pixels = sampled.pixels;
-    this.palette = sampled.palette;
     input.value = '';
-    this.convertModalOpen = false;
-    this.render();
+    this.renderConvertPreview();
   }
 
   extractPaletteOnly(): void {
@@ -4367,16 +4442,24 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
     }
   }
 
+  /** Project id currently being loaded from Recent (drives the card spinner). */
+  loadingProjectId: string | null = null;
+
   /** Load a saved project into the editor. */
   async openStoredProject(id: string): Promise<void> {
-    const project = await this.projectStore.get(id);
-    if (!project) return;
+    // One load at a time: ignore further clicks (incl. other cards) while a load runs.
+    if (this.loadingProjectId) return;
+    this.loadingProjectId = id;
     try {
+      const project = await this.projectStore.get(id);
+      if (!project) return;
       this.loadProject(project.data as Parameters<typeof this.loadProject>[0]);
       this.setCurrentProject(id);
       this.projectsModalOpen = false;
     } catch {
       this.notify.error(this.locale.t('notify.openFailed'));
+    } finally {
+      this.loadingProjectId = null;
     }
   }
 
@@ -5514,37 +5597,11 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
   // ===================== HSV color picker =====================
 
   private rgbToHsv(r: number, g: number, b: number): [number, number, number] {
-    r /= 255;
-    g /= 255;
-    b /= 255;
-    const max = Math.max(r, g, b);
-    const min = Math.min(r, g, b);
-    const d = max - min;
-    let h = 0;
-    if (d !== 0) {
-      if (max === r) h = ((g - b) / d) % 6;
-      else if (max === g) h = (b - r) / d + 2;
-      else h = (r - g) / d + 4;
-      h *= 60;
-      if (h < 0) h += 360;
-    }
-    return [h, max === 0 ? 0 : d / max, max];
+    return uRgbToHsv(r, g, b);
   }
 
   private hsvToRgb(h: number, s: number, v: number): [number, number, number] {
-    const c = v * s;
-    const x = c * (1 - Math.abs(((h / 60) % 2) - 1));
-    const m = v - c;
-    let r = 0;
-    let g = 0;
-    let b = 0;
-    if (h < 60) [r, g] = [c, x];
-    else if (h < 120) [r, g] = [x, c];
-    else if (h < 180) [g, b] = [c, x];
-    else if (h < 240) [g, b] = [x, c];
-    else if (h < 300) [r, b] = [x, c];
-    else [r, b] = [c, x];
-    return [(r + m) * 255, (g + m) * 255, (b + m) * 255];
+    return uHsvToRgb(h, s, v);
   }
 
   /** Current primary as HSV, keeping the picker hue when grayscale. */
@@ -5658,31 +5715,10 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
   }
 
   private rgbToHsl(r: number, g: number, b: number): [number, number, number] {
-    r /= 255; g /= 255; b /= 255;
-    const max = Math.max(r, g, b), min = Math.min(r, g, b), d = max - min;
-    const l = (max + min) / 2;
-    let h = 0, s = 0;
-    if (d !== 0) {
-      s = d / (1 - Math.abs(2 * l - 1));
-      if (max === r) h = ((g - b) / d) % 6;
-      else if (max === g) h = (b - r) / d + 2;
-      else h = (r - g) / d + 4;
-      h = (h * 60 + 360) % 360;
-    }
-    return [h, s, l];
+    return uRgbToHsl(r, g, b);
   }
   private hslToRgb(h: number, s: number, l: number): [number, number, number] {
-    const c = (1 - Math.abs(2 * l - 1)) * s;
-    const x = c * (1 - Math.abs(((h / 60) % 2) - 1));
-    const m = l - c / 2;
-    let r = 0, g = 0, b = 0;
-    if (h < 60) [r, g] = [c, x];
-    else if (h < 120) [r, g] = [x, c];
-    else if (h < 180) [g, b] = [c, x];
-    else if (h < 240) [g, b] = [x, c];
-    else if (h < 300) [r, b] = [x, c];
-    else [r, b] = [c, x];
-    return [(r + m) * 255, (g + m) * 255, (b + m) * 255];
+    return uHslToRgb(h, s, l);
   }
   private primaryHsl(): [number, number, number] {
     const [r, g, b] = this.hexToRgb(this.primaryColor);
@@ -6140,45 +6176,7 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
 
   /** Build a smooth monotone-cubic (PCHIP) 256-entry LUT through the points. */
   private buildCurveLut(pts: { x: number; y: number }[]): number[] {
-    const p = [...pts].sort((a, b) => a.x - b.x);
-    const n = p.length;
-    const lut = new Array(256);
-    if (n === 1) { lut.fill(this.clamp(Math.round(p[0].y), 0, 255)); return lut; }
-    const xs = p.map((q) => q.x);
-    const ys = p.map((q) => q.y);
-    const dx: number[] = [], dy: number[] = [], m: number[] = [];
-    for (let i = 0; i < n - 1; i += 1) {
-      dx[i] = (xs[i + 1] - xs[i]) || 1;
-      dy[i] = ys[i + 1] - ys[i];
-      m[i] = dy[i] / dx[i];
-    }
-    const t: number[] = new Array(n);
-    t[0] = m[0];
-    t[n - 1] = m[n - 2];
-    for (let i = 1; i < n - 1; i += 1) {
-      t[i] = m[i - 1] * m[i] <= 0 ? 0 : (m[i - 1] + m[i]) / 2;
-    }
-    // Fritsch–Carlson limiter keeps the spline monotone (no overshoot ringing).
-    for (let i = 0; i < n - 1; i += 1) {
-      if (m[i] === 0) { t[i] = 0; t[i + 1] = 0; continue; }
-      const a = t[i] / m[i], bb = t[i + 1] / m[i];
-      const h = Math.hypot(a, bb);
-      if (h > 3) { const tau = 3 / h; t[i] = tau * a * m[i]; t[i + 1] = tau * bb * m[i]; }
-    }
-    for (let xi = 0; xi < 256; xi += 1) {
-      if (xi <= xs[0]) { lut[xi] = this.clamp(Math.round(ys[0]), 0, 255); continue; }
-      if (xi >= xs[n - 1]) { lut[xi] = this.clamp(Math.round(ys[n - 1]), 0, 255); continue; }
-      let s = 0;
-      while (s < n - 1 && !(xi >= xs[s] && xi <= xs[s + 1])) s += 1;
-      const h = dx[s], u = (xi - xs[s]) / h;
-      const h00 = 2 * u ** 3 - 3 * u ** 2 + 1;
-      const h10 = u ** 3 - 2 * u ** 2 + u;
-      const h01 = -2 * u ** 3 + 3 * u ** 2;
-      const h11 = u ** 3 - u ** 2;
-      const v = h00 * ys[s] + h10 * h * t[s] + h01 * ys[s + 1] + h11 * h * t[s + 1];
-      lut[xi] = this.clamp(Math.round(v), 0, 255);
-    }
-    return lut;
+    return uBuildCurveLut(pts);
   }
 
   /** Recompute the current channel's LUT and live-preview. */
@@ -6259,81 +6257,36 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
   applyAdjustPreview(): void {
     if (!this.adjustBase) return;
     const buf = [...this.adjustBase];
+    const s = this.buildAdjustSettings();
     const apply = (x: number, y: number) => {
       const i = this.index(x, y);
       const c = buf[i];
-      if (c) buf[i] = this.adjustPixel(c);
+      if (c) buf[i] = uAdjustPixel(c, s);
     };
     if (this.adjustScope === 'selection' && this.selection) {
       this.eachSelectionPixel(this.selection, apply);
     } else {
       for (let i = 0; i < buf.length; i += 1) {
-        if (buf[i]) buf[i] = this.adjustPixel(buf[i]!);
+        if (buf[i]) buf[i] = uAdjustPixel(buf[i]!, s);
       }
     }
     this.previewPixels = buf;
     this.render();
   }
 
-  private adjustPixel(hex: string): string {
-    let [r, g, b] = this.hexToRgb(hex);
-    const a = this.colorAlpha(hex);
-
-    // 1) Levels — composite (rgb) then per-channel remap with gamma.
-    const isIdentity = (L: LevelCh) =>
-      L.inB === 0 && L.inW === 255 && L.gamma === 1 && L.outB === 0 && L.outW === 255;
-    const remap = (vv: number, L: LevelCh) => {
-      const n = Math.pow(this.clamp((vv - L.inB) / Math.max(1, L.inW - L.inB), 0, 1), 1 / L.gamma);
-      return L.outB + n * (L.outW - L.outB);
+  /** Gather the current adjustment parameters once (then reuse per pixel). */
+  private buildAdjustSettings(): AdjustSettings {
+    return {
+      levels: this.levels,
+      curveLuts: this.curveLuts,
+      brightness: this.adjustBrightness,
+      contrast: this.adjustContrast,
+      shadows: this.adjustShadows,
+      highlights: this.adjustHighlights,
+      hue: this.adjustHue,
+      sat: this.adjustSat,
+      bright: this.adjustBright,
     };
-    const rgbL = this.levels.rgb;
-    if (!isIdentity(rgbL)) {
-      r = remap(r, rgbL); g = remap(g, rgbL); b = remap(b, rgbL);
-    }
-    if (!isIdentity(this.levels.r)) r = remap(r, this.levels.r);
-    if (!isIdentity(this.levels.g)) g = remap(g, this.levels.g);
-    if (!isIdentity(this.levels.b)) b = remap(b, this.levels.b);
-
-    // 1.5) Curves — composite (rgb) then per-channel LUT remap.
-    const cl = this.curveLuts;
-    if (cl.rgb || cl.r || cl.g || cl.b) {
-      const ap = (v: number, lut: number[] | null) =>
-        lut ? lut[this.clamp(Math.round(v), 0, 255)] : v;
-      if (cl.rgb) { r = ap(r, cl.rgb); g = ap(g, cl.rgb); b = ap(b, cl.rgb); }
-      r = ap(r, cl.r); g = ap(g, cl.g); b = ap(b, cl.b);
-    }
-
-    // 2) Brightness / Contrast.
-    if (this.adjustBrightness || this.adjustContrast) {
-      const br = (this.adjustBrightness / 100) * 127;
-      const c = (this.adjustContrast / 100) * 255;
-      const f = (259 * (c + 255)) / (255 * (259 - c));
-      const bc = (vv: number) => f * (vv + br - 128) + 128;
-      r = bc(r); g = bc(g); b = bc(b);
-    }
-
-    // 3) Shadows / Highlights — luminance-masked gain (PS sign convention).
-    if (this.adjustShadows || this.adjustHighlights) {
-      const L = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-      const sMask = this.clamp(1 - L * 2, 0, 1);
-      const hMask = this.clamp(L * 2 - 1, 0, 1);
-      const gain =
-        1 + (this.adjustShadows / 100) * sMask - (this.adjustHighlights / 100) * hMask;
-      r *= gain; g *= gain; b *= gain;
-    }
-
-    // 4) HSB (hue / saturation / brightness).
-    if (this.adjustHue || this.adjustSat || this.adjustBright) {
-      let [h, s, v] = this.rgbToHsv(
-        this.clamp(r, 0, 255), this.clamp(g, 0, 255), this.clamp(b, 0, 255),
-      );
-      h = (h + this.adjustHue + 360) % 360;
-      s = this.clamp(s * (1 + this.adjustSat / 100), 0, 1);
-      v = this.clamp(v * (1 + this.adjustBright / 100), 0, 1);
-      [r, g, b] = this.hsvToRgb(h, s, v);
-    }
-
-    return this.withAlpha(this.rgbToHex(r, g, b), a);
   }
 
   /** Bake the current preview into the active layer (no session change). */
@@ -6744,24 +6697,15 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
   }
 
   private hexToRgb(hex: string): [number, number, number] {
-    let h = hex.replace('#', '');
-    if (h.length === 3) h = h.split('').map((c) => c + c).join('');
-    // For #rrggbbaa only the rgb part matters here (alpha handled separately).
-    const n = parseInt(h.slice(0, 6), 16);
-    return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+    return uHexToRgb(hex);
   }
 
-  /** Alpha (0–255) of a colour string; 255 for 6-digit hex. */
   private colorAlpha(hex: string): number {
-    const h = hex.replace('#', '');
-    return h.length >= 8 ? parseInt(h.slice(6, 8), 16) : 255;
+    return uColorAlpha(hex);
   }
 
-  /** Combine an #rrggbb with alpha (0–255) → #rrggbb (a=255) or #rrggbbaa. */
   private withAlpha(hex: string, a: number): string {
-    const base = this.rgbToHex(...this.hexToRgb(hex));
-    const aa = this.clamp(Math.round(a), 0, 255);
-    return aa >= 255 ? base : base + aa.toString(16).padStart(2, '0');
+    return uWithAlpha(hex, a);
   }
 
   /** Ordered 4×4 Bayer matrix for pixel-perfect dithering. */
@@ -6956,6 +6900,7 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
 
   setImportPreset(longSide: number): void {
     this.importLongSide = longSide;
+    this.scheduleConvertPreview();
   }
 
   setSecondaryFromPalette(event: MouseEvent, color: string): void {
@@ -8814,90 +8759,11 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
   }
 
   private buildPalette(data: Uint8ClampedArray, size: number): number[][] {
-    const buckets = new Map<string, { rgb: number[]; count: number }>();
-    for (let i = 0; i < data.length; i += 4) {
-      if (data[i + 3] < 20) {
-        continue;
-      }
-      const r = Math.round(data[i] / 8) * 8;
-      const g = Math.round(data[i + 1] / 8) * 8;
-      const b = Math.round(data[i + 2] / 8) * 8;
-      const key = `${r},${g},${b}`;
-      const bucket = buckets.get(key);
-      if (bucket) {
-        bucket.count += 1;
-      } else {
-        buckets.set(key, { rgb: [r, g, b], count: 1 });
-      }
-    }
-    let colors = [...buckets.values()]
-      .sort((a, b) => b.count - a.count)
-      .slice(0, Math.max(size * 8, size))
-      .map((item) => ({ rgb: item.rgb, cluster: 0 }));
-    if (colors.length <= size) {
-      return colors.map((item) => item.rgb);
-    }
-    let centers = colors
-      .filter(
-        (_, index) =>
-          index % Math.max(1, Math.floor(colors.length / size)) === 0,
-      )
-      .slice(0, size)
-      .map((item) => [...item.rgb]);
-    for (let iteration = 0; iteration < 8; iteration += 1) {
-      colors = colors.map((color) => ({
-        ...color,
-        cluster: this.nearestPaletteIndex(
-          color.rgb[0],
-          color.rgb[1],
-          color.rgb[2],
-          centers,
-        ),
-      }));
-      centers = centers.map((center, index) => {
-        const group = colors.filter((color) => color.cluster === index);
-        if (!group.length) {
-          return center;
-        }
-        return [0, 1, 2].map((channel) =>
-          Math.round(
-            group.reduce((sum, color) => sum + color.rgb[channel], 0) /
-              group.length,
-          ),
-        );
-      });
-    }
-    return centers;
+    return uBuildPalette(data, size);
   }
 
-  private nearestPaletteColor(
-    r: number,
-    g: number,
-    b: number,
-    palette: number[][],
-  ): number[] {
-    return palette[this.nearestPaletteIndex(r, g, b, palette)];
-  }
-
-  private nearestPaletteIndex(
-    r: number,
-    g: number,
-    b: number,
-    palette: number[][],
-  ): number {
-    let best = 0;
-    let bestDistance = Number.POSITIVE_INFINITY;
-    palette.forEach((color, index) => {
-      const dr = r - color[0];
-      const dg = g - color[1];
-      const db = b - color[2];
-      const distance = dr * dr * 0.3 + dg * dg * 0.59 + db * db * 0.11;
-      if (distance < bestDistance) {
-        bestDistance = distance;
-        best = index;
-      }
-    });
-    return best;
+  private nearestPaletteColor(r: number, g: number, b: number, palette: number[][]): number[] {
+    return uNearestPaletteColor(r, g, b, palette);
   }
 
   private spreadDitherError(
@@ -8935,7 +8801,7 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
   }
 
   private rgbToHex(r: number, g: number, b: number): string {
-    return `#${[r, g, b].map((value) => this.clamp(Math.round(value), 0, 255).toString(16).padStart(2, '0')).join('')}`;
+    return uRgbToHex(r, g, b);
   }
 
   private loadImage(file: File): Promise<HTMLImageElement> {

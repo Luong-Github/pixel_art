@@ -2764,3 +2764,56 @@ input[type="color"] {
   animation: export-spin 0.7s linear infinite;
 }
 @keyframes export-spin { to { transform: rotate(360deg); } }
+
+/* Timelapse "buffer full" badge on the Record button */
+.rec-full {
+  margin-left: 6px;
+  font-size: 10px;
+  font-weight: 700;
+  color: #e0a23a;
+  white-space: nowrap;
+}
+
+/* Recent-project card loading state */
+.project-card.loading {
+  pointer-events: none;
+}
+.project-loading {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(5, 8, 12, 0.55);
+  border-radius: inherit;
+}
+.project-spinner {
+  width: 22px;
+  height: 22px;
+  border: 2px solid var(--line);
+  border-top-color: var(--accent-strong, #34e0c6);
+  border-radius: 50%;
+  animation: export-spin 0.7s linear infinite;
+}
+
+/* Convert modal live preview */
+.convert-preview-wrap {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.convert-preview-box {
+  display: grid;
+  place-items: center;
+  max-height: 220px;
+  padding: 8px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: repeating-conic-gradient(#2b2f36 0 25%, #20242b 0 50%) 0 0 / 16px 16px;
+}
+.convert-preview {
+  max-width: 100%;
+  max-height: 200px;
+  image-rendering: pixelated;
+}

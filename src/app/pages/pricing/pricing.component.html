@@ -18,12 +18,16 @@
         </div>
         <p class="blurb">{{ p.blurbKey | t }}</p>
         <a
+          *ngIf="!p.ctaDisabled"
           [routerLink]="p.ctaLink"
           class="btn"
           [class.btn-primary]="p.featured"
           [class.btn-ghost]="!p.featured"
           >{{ p.ctaKey | t }}</a
         >
+        <button *ngIf="p.ctaDisabled" type="button" class="btn btn-ghost is-soon" disabled>
+          {{ p.ctaKey | t }}
+        </button>
         <ul>
           <li *ngFor="let f of p.featureKeys">{{ f | t }}</li>
         </ul>

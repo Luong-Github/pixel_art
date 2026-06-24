@@ -12,6 +12,8 @@ interface Plan {
   ctaKey: string;
   ctaLink: string;
   featured?: boolean;
+  /** Billing not enabled yet — render a disabled button instead of a link. */
+  ctaDisabled?: boolean;
 }
 
 @Component({
@@ -53,6 +55,7 @@ export class PricingComponent {
       ],
       ctaKey: 'pricing.ctaComingSoon',
       ctaLink: '/contact',
+      ctaDisabled: true,
     },
     {
       nameKey: 'pricing.planTeamName',

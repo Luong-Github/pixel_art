@@ -59,6 +59,10 @@
 .plan .btn {
   width: 100%;
 }
+.plan .btn.is-soon {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
 .plan ul {
   list-style: none;
   margin: 22px 0 0;

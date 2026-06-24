@@ -880,6 +880,7 @@
             <span class="menu-label">{{ 'export.timelapse' | t }}</span>
             <button type="button" [class.danger-action]="recording" (click)="toggleRecording()">
               {{ recording ? ('export.stopRecording' | t) + ' (' + timelapseFrames.length + ')' : ('export.record' | t) }}
+              <span class="rec-full" *ngIf="recording && timelapseLimitHit">{{ 'export.recordingFull' | t }}</span>
             </button>
             <button type="button" [disabled]="exportBusy || timelapseFrames.length < 2" (click)="exportTimelapse()">{{ 'export.exportTimelapse' | t }}</button>
             <button type="button" [disabled]="exportBusy" (click)="exportTimelapseFromHistory()">{{ 'export.fromUndo' | t }}</button>
@@ -1168,15 +1169,15 @@
       <div class="field-grid">
         <label>
           <span>{{ 'modal.longSide' | t }}</span>
-          <input type="number" min="16" max="128" [(ngModel)]="importLongSide" />
+          <input type="number" min="16" max="128" [(ngModel)]="importLongSide" (ngModelChange)="scheduleConvertPreview()" />
         </label>
         <label>
           <span>{{ 'common.palette' | t }}</span>
-          <input type="number" min="4" max="64" [(ngModel)]="importPaletteSize" />
+          <input type="number" min="4" max="64" [(ngModel)]="importPaletteSize" (ngModelChange)="scheduleConvertPreview()" />
         </label>
         <label>
           <span>{{ 'modal.fit' | t }}</span>
-          <select [(ngModel)]="importFit">
+          <select [(ngModel)]="importFit" (ngModelChange)="scheduleConvertPreview()">
             <option value="contain">{{ 'modal.fitContain' | t }}</option>
             <option value="cover">{{ 'modal.fitCover' | t }}</option>
             <option value="stretch">{{ 'modal.fitStretch' | t }}</option>
@@ -1184,19 +1185,27 @@
         </label>
         <label>
           <span>{{ 'modal.contrast' | t }}</span>
-          <input type="range" min="0.8" max="1.4" step="0.02" [(ngModel)]="importContrast" />
+          <input type="range" min="0.8" max="1.4" step="0.02" [(ngModel)]="importContrast" (ngModelChange)="scheduleConvertPreview()" />
         </label>
         <label>
           <span>{{ 'modal.sharpen' | t }}</span>
-          <input type="range" min="0" max="1" step="0.05" [(ngModel)]="importSharpen" />
+          <input type="range" min="0" max="1" step="0.05" [(ngModel)]="importSharpen" (ngModelChange)="scheduleConvertPreview()" />
         </label>
-        <label class="check"><input type="checkbox" [(ngModel)]="importResizeCanvas" /> {{ 'modal.resizeCanvas' | t }}</label>
-        <label class="check"><input type="checkbox" [(ngModel)]="importDither" /> {{ 'modal.dither' | t }}</label>
+        <label class="check"><input type="checkbox" [(ngModel)]="importResizeCanvas" (ngModelChange)="scheduleConvertPreview()" /> {{ 'modal.resizeCanvas' | t }}</label>
+        <label class="check"><input type="checkbox" [(ngModel)]="importDither" (ngModelChange)="scheduleConvertPreview()" /> {{ 'modal.dither' | t }}</label>
+      </div>
+
+      <div class="convert-preview-wrap" *ngIf="convertSource">
+        <span class="modal-label">{{ 'modal.preview' | t }}</span>
+        <div class="convert-preview-box">
+          <img class="convert-preview" *ngIf="convertPreviewUrl" [src]="convertPreviewUrl" alt="" />
+        </div>
       </div>
     </div>
     <footer class="modal-foot">
       <button type="button" class="quiet-action" (click)="closeConvertModal()">{{ 'common.cancel' | t }}</button>
-      <button type="button" class="primary-action" (click)="startImageImport()">{{ 'modal.chooseImageConvert' | t }}</button>
+      <button type="button" class="quiet-action" (click)="triggerImport()">{{ 'modal.chooseImage' | t }}</button>
+      <button type="button" class="primary-action" [disabled]="!convertSource" (click)="applyConvert()">{{ 'modal.convert' | t }}</button>
     </footer>
   </div>
 </div>
@@ -1486,10 +1495,14 @@
       <div class="projects-grid" *ngIf="recentProjects.length">
         <div class="project-card" *ngFor="let p of recentProjects"
           [class.current]="p.id === currentProjectId"
+          [class.loading]="loadingProjectId === p.id"
           (click)="openStoredProject(p.id)" role="button" tabindex="0"
           (keydown.enter)="openStoredProject(p.id)">
           <div class="project-thumb">
             <img *ngIf="p.thumbnail" [src]="p.thumbnail" alt="" />
+          </div>
+          <div class="project-loading" *ngIf="loadingProjectId === p.id" aria-live="polite">
+            <span class="project-spinner" aria-hidden="true"></span>
           </div>
           <div class="project-meta">
             <span class="project-name" [title]="p.name">{{ p.name }}</span>
