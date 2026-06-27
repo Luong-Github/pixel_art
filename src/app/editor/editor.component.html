@@ -434,10 +434,10 @@
     </ng-container>
 
     <div class="check-row">
-      <label class="check" title="Dùng màu secondary làm tông thứ hai (tắt = để trong suốt)">
+      <label class="check" [title]="'gen.twoColoursTitle' | t">
         <input type="checkbox" [(ngModel)]="genTwoColor" /> {{ 'gen.twoColours' | t }}
       </label>
-      <label class="check" title="Xoá vùng trước khi sinh (tắt = vẽ chồng lên)">
+      <label class="check" [title]="'gen.replaceTitle' | t">
         <input type="checkbox" [(ngModel)]="genReplace" /> {{ 'gen.replace' | t }}
       </label>
     </div>
@@ -446,11 +446,11 @@
       {{ 'gen.generateIntoLayer' | t }}
     </button>
     <p class="gen-hint">
-      Dùng màu primary{{ genTwoColor ? ' + secondary' : '' }}. Có vùng chọn thì chỉ sinh trong vùng đó.
+      {{ 'gen.primaryHint' | t: { extra: genTwoColor ? ' + secondary' : '' } }}
     </p>
 
     <div class="gen-vfx">
-      <span class="tool-group-label">Animated VFX → tab mới</span>
+      <span class="tool-group-label">{{ 'gen.vfxLabel' | t }}</span>
       <label class="span-2">
         <span>{{ 'gen.effect' | t }}</span>
         <select [(ngModel)]="vfxPreset">
@@ -471,10 +471,10 @@
       </label>
       <button type="button" (click)="randomizeVfxSeed()">{{ 'gen.randomSeed' | t }}</button>
       <button type="button" class="gen-apply" (click)="generateVfx()">
-        Generate VFX → tab mới
+        {{ 'gen.generateVfx' | t }}
       </button>
       <p class="gen-hint">
-        Tạo một workspace mới {{ width }}×{{ height }} với {{ vfxFrames }} frame lặp. Nhấn ▶ để xem, rồi Export GIF.
+        {{ 'gen.vfxHint' | t: { w: width, h: height, n: vfxFrames } }}
       </p>
     </div>
   </div>
@@ -506,7 +506,7 @@
       <button type="button" class="tb-icon" [title]="'timeline.pasteFrames' | t" [disabled]="!hasFrameClipboard" [innerHTML]="uiIcons.paste" (click)="pasteFrames()"></button>
       <button type="button" class="tb-icon" [title]="'timeline.insertBefore' | t" (click)="insertFrame(false)">⇤</button>
       <button type="button" class="tb-icon" [title]="'timeline.insertAfter' | t" (click)="insertFrame(true)">⇥</button>
-      <button type="button" class="tb-icon" [title]="'timeline.reverseFrames' | t" (click)="reverseFrames()">⇄</button>
+      <button type="button" class="tb-icon" [title]="'timeline.reverseFrames' | t" [disabled]="frames.length < 2" (click)="reverseFrames()">⇄</button>
       <button type="button" class="tb-icon" [title]="'timeline.tagFrames' | t" (click)="addTagFromSelection()">🏷</button>
       <button type="button" class="tb-icon danger-action" [title]="'timeline.deleteFrame' | t" (click)="deleteFrame()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/><path d="M6 7l1 13a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-13"/></svg>
@@ -735,7 +735,7 @@
           <span class="dock-tools">
             <button type="button" class="dock-btn" [title]="(dock.isCollapsed(id) ? 'panel.expand' : 'panel.collapse') | t" (click)="dock.toggleCollapse(id)">{{ dock.isCollapsed(id) ? '▢' : '▬' }}</button>
             <button type="button" class="dock-btn" [title]="'panel.float' | t" (click)="floatPanel(id)">⧉</button>
-            <button type="button" class="dock-btn" [title]="'panel.close' | t" (click)="dock.hide(id)">✕</button>
+            <button type="button" class="dock-btn" [title]="'panel.close' | t" (click)="closePanel(id)">✕</button>
           </span>
         </header>
         <div class="dock-body" *ngIf="!dock.isCollapsed(id)">
@@ -839,6 +839,7 @@
         <div class="menu export-menu">
           <button type="button" (click)="toggleExportMenu()">{{ 'menu.export' | t }} ▾</button>
           <div class="menu-dropdown" *ngIf="exportMenuOpen" (click)="onMenuPick($event)">
+            <p class="menu-legend">{{ 'export.freeProLegend' | t }}</p>
             <div class="export-settings" (click)="$event.stopPropagation()">
               <label class="prop-row">
                 <span>{{ 'export.sheetColumns' | t }}</span>
@@ -893,7 +894,7 @@
           <button type="button" (click)="togglePanelsMenu()">{{ 'menu.view' | t }} ▾</button>
           <div class="menu-dropdown" *ngIf="panelsMenuOpen" (click)="onMenuPick($event)">
             <span class="menu-label">{{ 'view.panels' | t }}</span>
-            <label *ngFor="let id of panelIds" class="check">
+            <label *ngFor="let id of layoutPanels" class="check">
               <input type="checkbox" [checked]="!dock.isHidden(id)" (change)="dock.toggleHidden(id)" />
               {{ panelTitle(id) }}
             </label>
@@ -902,22 +903,6 @@
             <button type="button" (click)="replayWelcome()">{{ 'view.replayTour' | t }}</button>
           </div>
         </div>
-
-        <button
-          type="button"
-          class="icon-btn"
-          [class.on]="!dock.isHidden('adjust') || dock.isFloating('adjust')"
-          (click)="openAdjust()"
-          [title]="'topbar.adjust' | t"
-          [attr.aria-label]="'topbar.adjust' | t">◧</button>
-
-        <button
-          type="button"
-          class="icon-btn"
-          [class.on]="!dock.isHidden('tilemap')"
-          (click)="dock.toggleHidden('tilemap')"
-          [title]="'topbar.tilemap' | t"
-          [attr.aria-label]="'topbar.tilemap' | t">▦</button>
 
         <a
           class="icon-btn help-btn"
@@ -950,13 +935,14 @@
           <button type="button" class="icon-btn" [title]="'sel.flipV' | t" [innerHTML]="uiIcons.flipV" (click)="flipSelection(false)"></button>
         </span>
         <span class="sel-group">
-          <button type="button" class="icon-btn" [title]="'sel.copy' | t" [disabled]="!hasSelection" [innerHTML]="uiIcons.copy" (click)="copySelection()"></button>
-          <button type="button" class="icon-btn" [title]="'sel.cut' | t" [disabled]="!hasSelection" [innerHTML]="uiIcons.cut" (click)="cutSelection()"></button>
-          <button type="button" class="icon-btn" [title]="'sel.paste' | t" [innerHTML]="uiIcons.paste" (click)="pasteSelection()"></button>
+          <button *ngIf="hasSelection" type="button" class="icon-btn" [title]="'sel.copy' | t" [innerHTML]="uiIcons.copy" (click)="copySelection()"></button>
+          <button *ngIf="hasSelection" type="button" class="icon-btn" [title]="'sel.cut' | t" [innerHTML]="uiIcons.cut" (click)="cutSelection()"></button>
+          <button type="button" class="icon-btn" [title]="'sel.paste' | t" [disabled]="!hasClipboard" [innerHTML]="uiIcons.paste" (click)="pasteSelection()"></button>
         </span>
-        <span class="sel-group">
-          <button type="button" class="sel-btn" [title]="'sel.copyToLayer' | t" [disabled]="!hasSelection" (click)="selectionToNewLayer(false)">⧉ {{ 'sel.layer' | t }}</button>
-          <button type="button" class="sel-btn" [title]="'sel.cutToLayer' | t" [disabled]="!hasSelection" (click)="selectionToNewLayer(true)">✂ {{ 'sel.layer' | t }}</button>
+        <span class="sel-group" *ngIf="hasSelection">
+          <button type="button" class="sel-btn" [title]="'sel.copyToLayer' | t" (click)="selectionToNewLayer(false)">{{ 'sel.copyLayerBtn' | t }}</button>
+          <button type="button" class="sel-btn" [title]="'sel.cutToLayer' | t" (click)="selectionToNewLayer(true)">{{ 'sel.cutLayerBtn' | t }}</button>
+          <button type="button" class="sel-btn" [title]="'sel.deselect' | t" (click)="deselect()">{{ 'sel.deselectBtn' | t }}</button>
         </span>
         <span class="sel-hint">{{ hasSelection ? selectionLabel : ('sel.noSelection' | t) }}</span>
       </div>
@@ -981,7 +967,7 @@
           (pointerdown)="onPointerDown($event)"
           (pointermove)="onPointerMove($event)"
           (pointerup)="onPointerUp($event)"
-          (pointercancel)="onPointerUp($event)"
+          (pointercancel)="onPointerCancel($event)"
           (contextmenu)="$event.preventDefault()">
         </canvas>
         <div class="canvas-empty-hint" *ngIf="!workspaceInProgress" aria-hidden="true">
@@ -1049,7 +1035,7 @@
           <span class="dock-tools">
             <button type="button" class="dock-btn" [title]="dock.isCollapsed(id) ? 'Expand' : 'Collapse'" (click)="dock.toggleCollapse(id)">{{ dock.isCollapsed(id) ? '▢' : '▬' }}</button>
             <button type="button" class="dock-btn" title="Float panel" (click)="floatPanel(id)">⧉</button>
-            <button type="button" class="dock-btn" [title]="'common.closePanel' | t" (click)="dock.hide(id)">✕</button>
+            <button type="button" class="dock-btn" [title]="'common.closePanel' | t" (click)="closePanel(id)">✕</button>
           </span>
         </header>
         <div class="dock-body" *ngIf="!dock.isCollapsed(id)">
@@ -1096,7 +1082,7 @@
         <span class="dock-tools">
           <button type="button" class="dock-btn" [title]="dock.isCollapsed(id) ? 'Expand' : 'Collapse'" (click)="dock.toggleCollapse(id)">{{ dock.isCollapsed(id) ? '▢' : '▬' }}</button>
           <button type="button" class="dock-btn" title="Float panel" (click)="floatPanel(id)">⧉</button>
-          <button type="button" class="dock-btn" [title]="'common.closePanel' | t" (click)="dock.hide(id)">✕</button>
+          <button type="button" class="dock-btn" [title]="'common.closePanel' | t" (click)="closePanel(id)">✕</button>
         </span>
       </header>
       <div class="dock-body" *ngIf="!dock.isCollapsed(id)">
@@ -1132,7 +1118,7 @@
       <span class="dock-tools">
         <button type="button" class="dock-btn" [title]="dock.isCollapsed(f.id) ? ('modal.expand' | t) : ('modal.collapse' | t)" (pointerdown)="$event.stopPropagation()" (click)="dock.toggleCollapse(f.id)">{{ dock.isCollapsed(f.id) ? '▢' : '▬' }}</button>
         <button type="button" class="dock-btn" [title]="'modal.dockPanel' | t" (pointerdown)="$event.stopPropagation()" (click)="redock(f.id)">⤓</button>
-        <button type="button" class="dock-btn" [title]="'common.closePanel' | t" (pointerdown)="$event.stopPropagation()" (click)="dock.hide(f.id)">✕</button>
+        <button type="button" class="dock-btn" [title]="'common.closePanel' | t" (pointerdown)="$event.stopPropagation()" (click)="closePanel(f.id)">✕</button>
       </span>
     </header>
     <div class="dock-body float-body" *ngIf="!dock.isCollapsed(f.id)">
@@ -1361,20 +1347,20 @@
      ============================================================ -->
 <ng-template dockPanelDef="adjust">
   <div class="adj-panel">
-    <div class="modal-row">
+    <div class="modal-row" *ngIf="hasSelection">
       <span class="modal-label">{{ 'modal.scope' | t }}</span>
       <div class="seg">
         <button type="button" [class.on]="adjustScope === 'layer'" (click)="setAdjustScope('layer')">{{ 'modal.layer' | t }}</button>
-        <button type="button" [class.on]="adjustScope === 'selection'" [disabled]="!hasSelection" (click)="setAdjustScope('selection')">{{ 'modal.selection' | t }}</button>
+        <button type="button" [class.on]="adjustScope === 'selection'" (click)="setAdjustScope('selection')">{{ 'modal.selection' | t }}</button>
       </div>
     </div>
 
     <div class="adj-tabs">
-      <button type="button" [class.on]="adjustTab === 'bc'" (click)="adjustTab = 'bc'">{{ 'adj.tabBC' | t }}</button>
-      <button type="button" [class.on]="adjustTab === 'sh'" (click)="adjustTab = 'sh'">{{ 'adj.tabSH' | t }}</button>
-      <button type="button" [class.on]="adjustTab === 'levels'" (click)="openLevelsTab()">{{ 'adj.tabLevels' | t }}</button>
-      <button type="button" [class.on]="adjustTab === 'curves'" (click)="openCurvesTab()">{{ 'adj.tabCurves' | t }}</button>
-      <button type="button" [class.on]="adjustTab === 'hsb'" (click)="adjustTab = 'hsb'">{{ 'adj.tabHSB' | t }}</button>
+      <button type="button" [class.on]="adjustTab === 'bc'" [title]="'adj.tabBCFull' | t" (click)="adjustTab = 'bc'">{{ 'adj.tabBC' | t }}</button>
+      <button type="button" [class.on]="adjustTab === 'sh'" [title]="'adj.tabSHFull' | t" (click)="adjustTab = 'sh'">{{ 'adj.tabSH' | t }}</button>
+      <button type="button" [class.on]="adjustTab === 'levels'" [title]="'adj.tabLevels' | t" (click)="openLevelsTab()">{{ 'adj.tabLevels' | t }}</button>
+      <button type="button" [class.on]="adjustTab === 'curves'" [title]="'adj.tabCurves' | t" (click)="openCurvesTab()">{{ 'adj.tabCurves' | t }}</button>
+      <button type="button" [class.on]="adjustTab === 'hsb'" [title]="'adj.tabHSBFull' | t" (click)="adjustTab = 'hsb'">{{ 'adj.tabHSB' | t }}</button>
     </div>
 
     <ng-container *ngIf="adjustTab === 'bc'">

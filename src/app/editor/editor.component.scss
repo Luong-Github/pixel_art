@@ -504,6 +504,15 @@
   margin: 4px 6px;
   background: var(--line);
 }
+/* One-line legend at the top of a dropdown (e.g. Export free/Pro key). */
+.menu-legend {
+  margin: 2px 6px 6px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--line);
+  font-size: 10.5px;
+  line-height: 1.4;
+  color: var(--muted);
+}
 
 /* Small colour chip shown in the palette swatch context menu label. */
 .menu-swatch {

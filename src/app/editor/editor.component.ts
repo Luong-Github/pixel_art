@@ -315,6 +315,8 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
   /** Map of panel id -> body template, populated after view init. */
   panelTemplates = new Map<PanelId, TemplateRef<unknown>>();
   readonly panelIds = PANEL_IDS;
+  /** Panels shown as on/off toggles in View ▾. Adjust is a summoned float-tool, not a layout panel. */
+  readonly layoutPanels = PANEL_IDS.filter((id) => id !== 'adjust');
   readonly panelTitles = PANEL_TITLES;
   readonly zones = ZONES;
   panelsMenuOpen = false;
@@ -940,6 +942,9 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
   }
   get hasSelection(): boolean {
     return !!this.selection;
+  }
+  get hasClipboard(): boolean {
+    return !!this.clipboard;
   }
   private panState: PanState | null = null;
   private paneResizeState: PaneResizeState | null = null;
@@ -2707,6 +2712,15 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
     this.render();
   }
 
+  deselect(): void {
+    if (!this.selection) return;
+    this.selection = null;
+    this.moveStartSelection = null;
+    this.previewPixels = null;
+    this.lassoPoints = [];
+    this.render();
+  }
+
   newSprite(): void {
     this.pushUndo();
     this.width = this.clamp(Math.floor(this.width), 8, 128);
@@ -3652,6 +3666,12 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
         this.activeTool,
       );
     }
+    // Remember the last in-bounds pixel so releasing outside the canvas commits
+    // to where the preview last showed, not back at the press point.
+    if (this.activeTool !== 'pen' && this.activeTool !== 'eraser') {
+      this.pointer.x = point.x;
+      this.pointer.y = point.y;
+    }
     this.render();
   }
 
@@ -3693,8 +3713,13 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
       this.previewPixels = null;
       this.gradientBase = null;
     } else if (this.activeTool === 'select' && this.selection) {
-      this.selection = this.normalizeSelection(this.selection);
-      this.selection.pixels = this.copyPixels(this.selection);
+      // A plain click (no drag) clears the selection instead of leaving a 1x1 marquee.
+      if (point.x === this.pointer.startX && point.y === this.pointer.startY) {
+        this.selection = null;
+      } else {
+        this.selection = this.normalizeSelection(this.selection);
+        this.selection.pixels = this.copyPixels(this.selection);
+      }
     } else if (this.activeTool === 'lasso') {
       this.finishLasso();
     } else if (
@@ -3708,6 +3733,30 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
       this.moveStartSelection = null;
     }
 
+    this.pointer = null;
+    this.render();
+  }
+
+  // A cancelled gesture (OS/browser interruption, palm rejection) must NOT
+  // commit: it should abort the in-progress stroke/shape/move/lasso instead.
+  onPointerCancel(event: PointerEvent): void {
+    if (this.activeTool === 'transform') {
+      this.transformPointerUp(event);
+      return;
+    }
+    if (!this.pointer) {
+      return;
+    }
+    // Select only marks a region (non-destructive), so finalize it; everything
+    // else commits on pointerup, so dropping the preview reverts cleanly.
+    if (this.activeTool === 'select' && this.selection) {
+      this.selection = this.normalizeSelection(this.selection);
+      this.selection.pixels = this.copyPixels(this.selection);
+    }
+    this.previewPixels = null;
+    this.gradientBase = null;
+    this.moveStartSelection = null;
+    this.lassoPoints = [];
     this.pointer = null;
     this.render();
   }
@@ -5500,8 +5549,15 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
     this.layerMenu = null;
     this.tagMenu = null;
     this.groupMenu = null;
-    if (this.tf) this.cancelTransform();
-    if (this.dialog) this.dialogCancel();
+    if (this.tf) {
+      this.cancelTransform();
+      return;
+    }
+    if (this.dialog) {
+      this.dialogCancel();
+      return;
+    }
+    this.deselect();
   }
 
   selectTimelineCell(frameIndex: number, layerIndex: number): void {
@@ -6335,6 +6391,12 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
     this.endAdjust();
   }
 
+  /** Close a dock panel via its ✕. Closing Adjust discards a live session (✕ = cancel, not bake). */
+  closePanel(id: PanelId): void {
+    if (id === 'adjust' && this.adjustActive) this.cancelAdjust();
+    this.dock.hide(id);
+  }
+
   /** Build the palette from the distinct colours used in the active frame. */
   extractPaletteFromSprite(): void {
     const seen = new Set<string>();
@@ -6973,6 +7035,9 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
       } else if (key === 'l') {
         event.preventDefault();
         this.openAdjust();
+      } else if (key === 'd') {
+        event.preventDefault();
+        this.deselect();
       }
       return;
     }
@@ -7874,13 +7939,20 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
     try {
       project = JSON.parse(await file.text()) as PixelArtProjectFile;
     } catch {
+      this.notify.error(this.locale.t('notify.refLoadFailed'));
       return;
     }
     const ws = project?.workspaces?.[0];
     const frame = ws?.frames?.[0];
-    if (!ws || !frame) return;
+    if (!ws || !frame) {
+      this.notify.error(this.locale.t('notify.refLoadFailed'));
+      return;
+    }
     const dataUrl = this.flattenFrameToDataUrl(ws, frame);
-    if (!dataUrl) return;
+    if (!dataUrl) {
+      this.notify.error(this.locale.t('notify.refLoadFailed'));
+      return;
+    }
     const img = new Image();
     img.onload = () => {
       this.setReferenceImage(img, true);

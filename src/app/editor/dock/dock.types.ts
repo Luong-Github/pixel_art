@@ -63,7 +63,7 @@ export function defaultDockState(): DockState {
   return {
     zones: {
       left: ['tools', 'color'],
-      right: ['display', 'canvas', 'generate', 'adjust'],
+      right: ['display', 'canvas', 'generate'],
       bottom: ['timeline'],
     },
     floating: [],
@@ -74,4 +74,4 @@ export function defaultDockState(): DockState {
 }
 
 // Bump this when the default layout changes so stale saved layouts are discarded.
-export const DOCK_STORAGE_KEY = 'pixelart.dock.v9';
+export const DOCK_STORAGE_KEY = 'pixelart.dock.v10';
