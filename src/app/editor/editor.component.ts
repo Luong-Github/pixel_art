@@ -28,6 +28,7 @@ import { ProjectStoreService, ProjectMeta } from './projects/project-store.servi
 import { LocaleService } from '../i18n/locale.service';
 import { NotificationService } from '../core/notify/notification.service';
 import { WelcomeComponent } from './onboarding/welcome.component';
+import { SignInButtonComponent } from '../core/auth/sign-in-button/sign-in-button.component';
 import {
   hexToRgb as uHexToRgb,
   rgbToHex as uRgbToHex,
@@ -86,6 +87,8 @@ type Pixel = string | null;
 type ImportFit = 'contain' | 'cover' | 'stretch';
 /** Symmetry axes for drawing. 'mandala' = 8-fold radial (square canvas only). */
 type SymmetryMode = 'off' | 'x' | 'y' | 'both' | 'mandala';
+/** Tiled drawing: strokes near an edge wrap (mod w/h) to the opposite side. */
+type TileDrawMode = 'off' | 'x' | 'y' | 'both';
 
 interface SourceRect {
   x: number;
@@ -208,6 +211,7 @@ interface WorkspaceView {
   displayZoom: number;
   showGrid: boolean;
   symmetry: SymmetryMode;
+  tileDrawMode: TileDrawMode;
   pixelPerfect: boolean;
   brushSize: number;
   pivotPreset: 'center' | 'feet' | 'topleft';
@@ -249,6 +253,7 @@ interface PixelArtProjectFile {
     onionSkin: boolean;
     mirrorX?: boolean;
     symmetry?: SymmetryMode;
+    tileDrawMode?: TileDrawMode;
     pixelPerfect?: boolean;
     brushSize: number;
     importResizeCanvas: boolean;
@@ -264,7 +269,7 @@ interface PixelArtProjectFile {
 @Component({
   selector: 'app-editor',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, DragDropModule, DockPanelDefDirective, TranslatePipe, WelcomeComponent],
+  imports: [CommonModule, FormsModule, RouterLink, DragDropModule, DockPanelDefDirective, TranslatePipe, WelcomeComponent, SignInButtonComponent],
   templateUrl: './editor.component.html',
   styleUrl: './editor.component.scss',
   host: { class: 'editor-host' },
@@ -273,6 +278,9 @@ interface PixelArtProjectFile {
 export class EditorComponent implements AfterViewInit, AfterViewChecked {
   @ViewChild('stage', { static: true })
   stageRef!: ElementRef<HTMLCanvasElement>;
+  @ViewChild('tileUnderlay', { static: true })
+  tileUnderlayRef!: ElementRef<HTMLCanvasElement>;
+  private tileUnderlayCtx?: CanvasRenderingContext2D;
   @ViewChild('display')
   displayRef?: ElementRef<HTMLCanvasElement>;
   private displayCanvasEl?: HTMLCanvasElement;
@@ -776,9 +784,13 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
   onionTint = true;
   /** Drawing symmetry (replaces the old mirror-X toggle). */
   symmetry: SymmetryMode = 'off';
+  /** Tiled drawing: wrap strokes around the chosen edges for seamless textures. */
+  tileDrawMode: TileDrawMode = 'off';
   /** Pixel-perfect freehand: drop redundant corner pixels (brush size 1). */
   pixelPerfect = false;
   activeTool: Tool = 'pen';
+  /** True once the user has actively picked a tool — dismisses the empty-state hint. */
+  hasPickedTool = false;
   primaryColor = '#222831';
   secondaryColor = '#f6f1de';
   /** Hue retained for the HSV picker when the colour is grayscale. */
@@ -1141,6 +1153,8 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
       throw new Error('Canvas is not available.');
     }
     this.ctx = ctx;
+    this.tileUnderlayCtx =
+      this.tileUnderlayRef.nativeElement.getContext('2d') ?? undefined;
     // Panel bodies live in <ng-template>s; collect them, then render once they
     // are projected into their dock zones. Defer a microtask to avoid a
     // change-after-checked warning in dev.
@@ -2695,12 +2709,20 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
     this.render();
   }
 
+  setTileDrawMode(mode: TileDrawMode): void {
+    this.tileDrawMode = mode;
+    // Surface the seam: turn on the 3×3 preview the first time tiling is enabled.
+    if (mode !== 'off' && !this.tiledPreview) this.tiledPreview = true;
+    this.render();
+  }
+
   setTool(tool: Tool): void {
     // Leaving the transform tool bakes any in-progress transform.
     if (this.activeTool === 'transform' && tool !== 'transform' && this.tf) {
       this.commitTransform();
     }
     this.activeTool = tool;
+    this.hasPickedTool = true;
     if (tool !== 'move') {
       this.previewPixels = null;
     }
@@ -3376,7 +3398,7 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
     const point =
       this.activeTool === 'move' && this.selection && this.previewPixels
         ? this.eventToCanvasPixel(event)
-        : this.eventToPixel(event);
+        : this.strokePoint(event);
     if (!point) {
       return;
     }
@@ -3593,7 +3615,7 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
     if (!this.pointer) {
       return;
     }
-    const point = this.eventToPixel(event);
+    const point = this.strokePoint(event);
     if (!point) {
       return;
     }
@@ -4390,6 +4412,7 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
         showGrid: this.showGrid,
         onionSkin: this.onionSkin,
         symmetry: this.symmetry,
+        tileDrawMode: this.tileDrawMode,
         pixelPerfect: this.pixelPerfect,
         brushSize: this.brushSize,
         importResizeCanvas: this.importResizeCanvas,
@@ -7164,6 +7187,7 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
       displayZoom: this.displayZoom ?? d.displayZoom,
       showGrid: this.showGrid ?? d.showGrid,
       symmetry: this.symmetry ?? d.symmetry,
+      tileDrawMode: this.tileDrawMode ?? d.tileDrawMode,
       pixelPerfect: this.pixelPerfect ?? d.pixelPerfect,
       brushSize: this.brushSize ?? d.brushSize,
       pivotPreset: this.pivotPreset ?? d.pivotPreset,
@@ -7182,6 +7206,7 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
       displayZoom: 6,
       showGrid: true,
       symmetry: 'off',
+      tileDrawMode: 'off',
       pixelPerfect: false,
       brushSize: 1,
       pivotPreset: 'feet',
@@ -7200,6 +7225,7 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
     this.displayZoom = this.clamp(v.displayZoom ?? 6, 2, 12);
     this.showGrid = v.showGrid ?? true;
     this.symmetry = v.symmetry ?? 'off';
+    this.tileDrawMode = v.tileDrawMode ?? 'off';
     this.pixelPerfect = v.pixelPerfect ?? false;
     this.brushSize = this.clamp(v.brushSize ?? 1, 1, 8);
     this.pivotPreset = v.pivotPreset ?? 'feet';
@@ -7311,6 +7337,7 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
       // Migrate legacy mirrorX flag → symmetry mode.
       this.symmetry =
         settings.symmetry ?? (settings.mirrorX ? 'x' : this.symmetry);
+      this.tileDrawMode = settings.tileDrawMode ?? this.tileDrawMode;
       this.pixelPerfect = settings.pixelPerfect ?? this.pixelPerfect;
       this.brushSize = this.clamp(settings.brushSize ?? this.brushSize, 1, 8);
       this.importResizeCanvas =
@@ -7543,6 +7570,25 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
     return point;
   }
 
+  /** Freehand tools that paint cell-by-cell through setPixel (which can wrap). */
+  private isFreehandTool(): boolean {
+    // MVP: only pen/eraser wrap in tiled mode (consistent + correct). shade/spray
+    // and fill/gradient/shape stay clamped — wrapping them is a later enhancement.
+    return this.activeTool === 'pen' || this.activeTool === 'eraser';
+  }
+
+  /**
+   * Stroke point for the active tool. When tiled drawing is on, freehand tools
+   * use the raw (out-of-bounds) coord so edge strokes still reach setPixel and
+   * wrap; everything else keeps the clamped in-bounds point.
+   */
+  private strokePoint(event: PointerEvent): { x: number; y: number } | null {
+    if (this.tileDrawMode !== 'off' && this.isFreehandTool()) {
+      return this.eventToCanvasPixel(event);
+    }
+    return this.eventToPixel(event);
+  }
+
   private eventToCanvasPixel(event: PointerEvent): { x: number; y: number } {
     const rect = this.stageRef.nativeElement.getBoundingClientRect();
     const x = Math.floor((event.clientX - rect.left) / this.zoom);
@@ -7670,6 +7716,13 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
   }
 
   private paintCellSym(x: number, y: number, color: Pixel): void {
+    // Wrap before symmetry so mirror cells stay in-bounds and the restore map
+    // is keyed by the cell actually written.
+    if (this.tileDrawMode !== 'off') {
+      const w = this.wrapCoord(x, y);
+      x = w.x;
+      y = w.y;
+    }
     for (const p of this.symmetricPoints(x, y)) {
       const i = this.index(p.x, p.y);
       if (!this.ppOriginal.has(i)) {
@@ -7680,6 +7733,11 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
   }
 
   private restoreCellSym(x: number, y: number): void {
+    if (this.tileDrawMode !== 'off') {
+      const w = this.wrapCoord(x, y);
+      x = w.x;
+      y = w.y;
+    }
     for (const p of this.symmetricPoints(x, y)) {
       const i = this.index(p.x, p.y);
       if (this.ppOriginal.has(i)) {
@@ -7901,6 +7959,7 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
     this.drawLasso();
     if (this.tf) this.drawTransformHandles();
     this.renderDisplay();
+    this.renderTiledUnderlay();
     this.refreshActiveFrameThumbnail();
     this.drawMinimap();
     this.scheduleAutosave();
@@ -8136,6 +8195,63 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
         this.layerEffectiveOpacity(this.activeLayer),
       );
     }
+  }
+
+  /**
+   * Live tiled repeats on the main workspace (Aseprite-style). When tiled
+   * drawing is on, fill a 3× underlay sitting behind the stage with faint
+   * read-only copies of the canvas, repeated along the axes enabled by
+   * `tileDrawMode`. The centre cell is left empty — the crisp, editable stage
+   * sits over it (both share grid cell 1/1, so their centres coincide).
+   */
+  private renderTiledUnderlay(): void {
+    const ctx = this.tileUnderlayCtx;
+    const el = this.tileUnderlayRef?.nativeElement;
+    if (!ctx || !el) return;
+    const mode = this.tileDrawMode;
+    if (mode === 'off') {
+      // Collapse to zero footprint so the off-state stage centring/scroll is
+      // unchanged. (1×1 backing just frees the pixels.)
+      if (el.width !== 1) el.width = 1;
+      if (el.height !== 1) el.height = 1;
+      if (el.style.width !== '0px') el.style.width = '0px';
+      if (el.style.height !== '0px') el.style.height = '0px';
+      ctx.clearRect(0, 0, 1, 1);
+      return;
+    }
+
+    const cw = this.canvasWidth;
+    const ch = this.canvasHeight;
+    // Repeat only along the enabled axes; the off-axis stays 1× so it doesn't
+    // grow that axis' scroll. Centre (0,0) is skipped — the stage covers it.
+    const repeatX = mode === 'x' || mode === 'both';
+    const repeatY = mode === 'y' || mode === 'both';
+    const xs = repeatX ? [-1, 0, 1] : [0];
+    const ys = repeatY ? [-1, 0, 1] : [0];
+    const uw = cw * xs.length;
+    const uh = ch * ys.length;
+    if (el.width !== uw) el.width = uw;
+    if (el.height !== uh) el.height = uh;
+    if (el.style.width !== `${uw}px`) el.style.width = `${uw}px`;
+    if (el.style.height !== `${uh}px`) el.style.height = `${uh}px`;
+    ctx.clearRect(0, 0, uw, uh);
+
+    const tile = this.renderFrameCanvas(
+      this.isPlaying ? this.previewFrameIndex : this.activeFrameIndex,
+      this.zoom,
+    );
+    // Origin of the centre cell within the (possibly 1×) underlay.
+    const cx = repeatX ? cw : 0;
+    const cy = repeatY ? ch : 0;
+    ctx.imageSmoothingEnabled = false;
+    ctx.globalAlpha = 0.35;
+    for (const dy of ys) {
+      for (const dx of xs) {
+        if (dx === 0 && dy === 0) continue;
+        ctx.drawImage(tile, cx + dx * cw, cy + dy * ch);
+      }
+    }
+    ctx.globalAlpha = 1;
   }
 
   private refreshActiveFrameThumbnail(): void {
@@ -9602,6 +9718,7 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
       primaryColor: this.primaryColor,
       secondaryColor: this.secondaryColor,
       symmetry: this.symmetry,
+      tileDrawMode: this.tileDrawMode,
     });
   }
 
@@ -9618,6 +9735,7 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
     this.primaryColor = state.primaryColor;
     this.secondaryColor = state.secondaryColor;
     this.symmetry = state.symmetry ?? this.symmetry;
+    this.tileDrawMode = state.tileDrawMode ?? this.tileDrawMode;
     this.selection = null;
     this.previewPixels = null;
     this.refreshAllFrameThumbnails();
@@ -9755,6 +9873,14 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
     y: number,
     color: Pixel,
   ): void {
+    // Tiled drawing wraps the freehand cell here — before symmetry — so mirror
+    // images come from the in-bounds cell and brush overflow wraps too. Direct
+    // setPixel callers (fill/gradient/move) intentionally do NOT wrap.
+    if (this.tileDrawMode !== 'off') {
+      const w = this.wrapCoord(x, y);
+      x = w.x;
+      y = w.y;
+    }
     for (const p of this.symmetricPoints(x, y)) {
       this.setPixel(buffer, p.x, p.y, color);
     }
@@ -9807,6 +9933,18 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
 
   private inside(x: number, y: number): boolean {
     return x >= 0 && y >= 0 && x < this.width && y < this.height;
+  }
+
+  /** Wrap a coord around the edges enabled by tileDrawMode (modulo w/h). */
+  private wrapCoord(x: number, y: number): { x: number; y: number } {
+    const m = this.tileDrawMode;
+    const wx =
+      m === 'x' || m === 'both' ? ((x % this.width) + this.width) % this.width : x;
+    const wy =
+      m === 'y' || m === 'both'
+        ? ((y % this.height) + this.height) % this.height
+        : y;
+    return { x: wx, y: wy };
   }
 
   private clamp(value: number, min: number, max: number): number {

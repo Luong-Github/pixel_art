@@ -73,6 +73,15 @@
           <option value="mandala">{{ 'tools.symmetryMandala' | t }}</option>
         </select>
       </label>
+      <label class="opt-row" [title]="'tools.tiledDrawTitle' | t">
+        <span>{{ 'tools.tiledDraw' | t }}</span>
+        <select [ngModel]="tileDrawMode" (ngModelChange)="setTileDrawMode($event)">
+          <option value="off">{{ 'tools.symmetryOff' | t }}</option>
+          <option value="x">{{ 'tools.tiledDrawX' | t }}</option>
+          <option value="y">{{ 'tools.tiledDrawY' | t }}</option>
+          <option value="both">{{ 'tools.symmetryBoth' | t }}</option>
+        </select>
+      </label>
       <button
         type="button"
         class="opt-btn"
@@ -921,6 +930,8 @@
           ✦ {{ premium.isPro ? 'Pro' : ('pro.goPro' | t) }}
         </button>
 
+        <app-sign-in-button></app-sign-in-button>
+
         <input #importInput hidden type="file" accept="image/*" (change)="importImage($event)" />
         <input #projectInput hidden type="file" accept=".pixelart.json,application/json" (change)="importProject($event)" />
       </header>
@@ -959,6 +970,7 @@
         (pointercancel)="onCanvasWrapPointerUp($event)"
         (scroll)="onCanvasScroll()"
         (wheel)="onCanvasWheel($event)">
+        <canvas #tileUnderlay class="tile-underlay" aria-hidden="true"></canvas>
         <canvas
           #stage
           class="stage"
@@ -970,7 +982,7 @@
           (pointercancel)="onPointerCancel($event)"
           (contextmenu)="$event.preventDefault()">
         </canvas>
-        <div class="canvas-empty-hint" *ngIf="!workspaceInProgress" aria-hidden="true">
+        <div class="canvas-empty-hint" *ngIf="!workspaceInProgress && !hasPickedTool" aria-hidden="true">
           {{ 'canvas.emptyHint' | t }}
         </div>
       </div>
@@ -993,6 +1005,7 @@
         <span><strong>{{ 'status.layer' | t }}</strong>{{ activeLayer.name }}</span>
         <span><strong>{{ 'status.frame' | t }}</strong>{{ activeFrameIndex + 1 }} / {{ frames.length }}</span>
         <span *ngIf="symmetry !== 'off'" class="status-accent"><strong>{{ 'status.sym' | t }}</strong>{{ symmetry }}</span>
+        <span *ngIf="tileDrawMode !== 'off'" class="status-accent"><strong>{{ 'status.tile' | t }}</strong>{{ tileDrawMode }}</span>
         <span *ngIf="pixelPerfect" class="status-accent"><strong>{{ 'status.pp' | t }}</strong>{{ 'status.on' | t }}</span>
         <span *ngIf="recording" class="status-rec" [class.at-limit]="timelapseLimitHit">
           <strong>● REC</strong>{{ timelapseFrames.length }} / {{ maxTimelapseFrames }}{{ timelapseLimitHit ? ' · MAX' : '' }}

@@ -646,6 +646,8 @@
 }
 
 .stage {
+  grid-area: 1 / 1;
+  z-index: 1;
   display: block;
   background: #ffffff;
   border: 1px solid rgba(0, 0, 0, 0.6);
@@ -653,6 +655,19 @@
   image-rendering: pixelated;
   touch-action: none;
   cursor: crosshair;
+}
+
+/* Live tiled repeats behind the stage (Aseprite-style). 3× the stage, centred
+   in the same grid cell so its centre tracks the stage centre. Faint, read-only,
+   never intercepts pointer events. Hidden until tiled drawing is on. */
+.tile-underlay {
+  grid-area: 1 / 1;
+  z-index: 0;
+  display: block;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  image-rendering: pixelated;
 }
 
 .canvas-wrap.space-pan .stage,
