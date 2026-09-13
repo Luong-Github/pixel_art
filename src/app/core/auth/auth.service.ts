@@ -1,70 +1,80 @@
 import { computed, Injectable, signal } from '@angular/core';
-import type { Session, User } from '@supabase/supabase-js';
-import { SupabaseService } from '../supabase/supabase.service';
+import { ApiClientService, ApiError } from '../api/api-client.service';
 
 /** Result of an auth action — `{ error }` is the translated-ready message, or null on success. */
 export interface AuthResult {
   error: string | null;
 }
 
+/** The signed-in user, as far as the client is allowed to know. */
+export interface AuthUser {
+  id: string;
+  email?: string;
+  user_metadata?: Record<string, unknown>;
+}
+
 /**
  * Auth state for the "guest-draw, login-to-save" model. Login is optional and
- * only gates (future) cloud sync — the local IndexedDB flow is untouched.
+ * only gates cloud sync — the local IndexedDB flow is untouched.
  *
- * `user`/`session` are signals kept in sync via `onAuthStateChange`; the current
- * session is hydrated once on construction via `getSession`. All methods no-op
- * with a clear error when Supabase isn't configured yet (empty env / SSR) so the
- * UI can show a message instead of failing silently.
+ * The browser holds NO tokens. Sign-in happens entirely server-side: the API
+ * talks to the auth provider, then sets HttpOnly cookies the page can't read.
+ * So this service has no session to hydrate from storage — it simply asks
+ * `/me` who the caller is.
+ *
+ * The public shape (`user`, `signedIn`, `signInWithEmail`, `signInWithGoogle`,
+ * `signOut`) is unchanged from the previous supabase-js implementation on
+ * purpose: `sign-in-button.component.ts` didn't need a single edit.
  */
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  readonly session = signal<Session | null>(null);
-  readonly user = signal<User | null>(null);
+  readonly user = signal<AuthUser | null>(null);
   readonly signedIn = computed(() => !!this.user());
 
-  constructor(private readonly supabase: SupabaseService) {
-    const client = this.supabase.client;
-    if (!client) return;
-
-    client.auth.getSession().then(({ data }) => this.apply(data.session));
-    client.auth.onAuthStateChange((_event, session) => this.apply(session));
+  constructor(private readonly api: ApiClientService) {
+    if (this.api.isConfigured) void this.refresh();
   }
 
-  /** Send a magic-link (one-time code) sign-in email. */
+  /** Ask the server who we are. Also warms the CSRF cookie for later mutations. */
+  async refresh(): Promise<void> {
+    try {
+      this.user.set(await this.api.get<AuthUser>('/me'));
+    } catch {
+      // 401 is the normal "not signed in" answer, not an error worth surfacing.
+      this.user.set(null);
+    }
+  }
+
+  /** Send a magic-link sign-in email. The link completes the flow on the server. */
   async signInWithEmail(email: string): Promise<AuthResult> {
-    const client = this.supabase.client;
-    if (!client) return { error: 'auth.notConfigured' };
-    const { error } = await client.auth.signInWithOtp({
-      email,
-      options: { emailRedirectTo: this.redirectTo() },
-    });
-    return { error: error?.message ?? null };
+    return this.attempt(() => this.api.post<void>('/auth/magic-link', { email }));
   }
 
-  /** Start the Google OAuth redirect flow. On success the page navigates away. */
+  /**
+   * Start the Google OAuth redirect flow. On success the page navigates away, so
+   * nothing after this resolves matters.
+   */
   async signInWithGoogle(): Promise<AuthResult> {
-    const client = this.supabase.client;
-    if (!client) return { error: 'auth.notConfigured' };
-    const { error } = await client.auth.signInWithOAuth({
-      provider: 'google',
-      options: { redirectTo: this.redirectTo() },
-    });
-    return { error: error?.message ?? null };
+    if (!this.api.isConfigured) return { error: 'auth.notConfigured' };
+    // Must be a real navigation, not fetch: the OAuth provider needs to show its
+    // own consent screen and then redirect back to the API's callback.
+    window.location.href = this.api.urlFor('/auth/google');
+    return { error: null };
   }
 
   async signOut(): Promise<AuthResult> {
-    const client = this.supabase.client;
-    if (!client) return { error: 'auth.notConfigured' };
-    const { error } = await client.auth.signOut();
-    return { error: error?.message ?? null };
+    const result = await this.attempt(() => this.api.post<void>('/auth/signout'));
+    this.user.set(null);
+    return result;
   }
 
-  private apply(session: Session | null): void {
-    this.session.set(session);
-    this.user.set(session?.user ?? null);
-  }
-
-  private redirectTo(): string | undefined {
-    return typeof window !== 'undefined' ? window.location.origin : undefined;
+  private async attempt(action: () => Promise<unknown>): Promise<AuthResult> {
+    if (!this.api.isConfigured) return { error: 'auth.notConfigured' };
+    try {
+      await action();
+      return { error: null };
+    } catch (error) {
+      return { error: error instanceof ApiError ? error.message : 'auth.failed' };
+    }
   }
 }

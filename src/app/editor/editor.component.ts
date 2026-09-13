@@ -10,6 +10,7 @@ import {
   TemplateRef,
   ViewChild,
   ViewChildren,
+  effect,
 } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -25,6 +26,9 @@ import { GIFEncoder, quantize, applyPalette } from 'gifenc';
 import { DockService } from './dock/dock.service';
 import { PremiumService } from './premium.service';
 import { ProjectStoreService, ProjectMeta } from './projects/project-store.service';
+import { CloudSyncService, SyncConflict } from './projects/cloud-sync.service';
+import { AiApiService, SimilarAsset } from './projects/ai-api.service';
+import { AuthService } from '../core/auth/auth.service';
 import { LocaleService } from '../i18n/locale.service';
 import { NotificationService } from '../core/notify/notification.service';
 import { WelcomeComponent } from './onboarding/welcome.component';
@@ -385,6 +389,11 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
     public premium: PremiumService,
     public locale: LocaleService,
     private projectStore: ProjectStoreService,
+    // Injected for its side effect: CloudSyncService watches projectStore.lastChange
+    // and pushes in the background. Nothing in the drawing path calls it.
+    public cloudSync: CloudSyncService,
+    private aiApi: AiApiService,
+    private auth: AuthService,
     private notify: NotificationService,
     private hostRef: ElementRef<HTMLElement>,
     private sanitizer: DomSanitizer,
@@ -394,6 +403,28 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
     this.buildToolIcons();
     this.buildUiIcons();
     this.loadSavedPalettes();
+
+    // Cloud sync surfaces (TB.7/TB.8): the service only sets signals; showing a
+    // dialog or toast is the editor's job.
+    effect(() => {
+      const conflict = this.cloudSync.conflicts()[0];
+      if (conflict) void this.promptSyncConflict(conflict);
+    });
+    effect(() => {
+      const err = this.cloudSync.lastError();
+      if (err) this.notify.error(this.locale.t(err));
+    });
+    effect(() => {
+      const q = this.cloudSync.quota();
+      if (!q || q.maxProjects == null || this.quotaWarned) return;
+      // Warn while there is still room to act, not at the moment saving breaks.
+      if (q.usedProjects >= q.maxProjects - 2) {
+        this.quotaWarned = true;
+        this.notify.info(
+          this.locale.t('sync.quotaAlmostFull', { used: q.usedProjects, max: q.maxProjects }),
+        );
+      }
+    });
     if (this.isBrowser) {
       try {
         this.currentProjectId = localStorage.getItem(this.currentProjectKey);
@@ -402,6 +433,86 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
         /* storage unavailable */
       }
     }
+  }
+
+  // ----- Cloud sync UI (TB.7/TB.8) -----
+  private quotaWarned = false;
+  private conflictPrompting = false;
+
+  /** "Cloud: 5/25 · 3.2/100 MB" for the save modal, or null when signed out. */
+  cloudQuotaLabel(): string | null {
+    const q = this.cloudSync.quota();
+    if (!q) return null;
+    const mb = (n: number) => (n / 1048576).toFixed(1);
+    return this.locale.t('sync.cloudUsage', {
+      used: q.usedProjects,
+      max: q.maxProjects ?? '∞',
+      usedMb: mb(q.usedBytes),
+      maxMb: q.maxTotalBytes == null ? '∞' : mb(q.maxTotalBytes),
+    });
+  }
+
+  /**
+   * One conflict at a time. OK = keep both (the machine never deletes pixels);
+   * Cancel = decide later — the local edit stays put and the dialog returns on
+   * the next save attempt.
+   */
+  private async promptSyncConflict(conflict: SyncConflict): Promise<void> {
+    if (this.conflictPrompting) return;
+    this.conflictPrompting = true;
+    try {
+      const keepBoth = await this.askConfirm({
+        title: this.locale.t('sync.conflictTitle'),
+        message: this.locale.t('sync.conflictMessage', { name: conflict.name }),
+        okLabel: this.locale.t('sync.conflictKeepBoth'),
+      });
+      if (keepBoth) {
+        await this.cloudSync.resolveConflictKeepBoth(
+          conflict.id,
+          this.locale.t('sync.conflictCopySuffix'),
+        );
+        await this.refreshRecentProjects();
+      } else {
+        this.cloudSync.dismissConflict(conflict.id);
+      }
+    } finally {
+      this.conflictPrompting = false;
+    }
+  }
+
+  // ----- Similar assets panel (E1) -----
+  similarResults: SimilarAsset[] = [];
+  similarBusy = false;
+  similarSearched = false;
+
+  /** CLIP-based lookup of the user's own library, keyed by the current thumbnail. */
+  async findSimilar(): Promise<void> {
+    if (this.similarBusy) return;
+    if (!this.auth.signedIn()) {
+      this.notify.info(this.locale.t('similar.signInFirst'));
+      return;
+    }
+    this.similarBusy = true;
+    try {
+      const results = await this.aiApi.similar(this.projectThumbnail(), 8);
+      // The project being edited is not an interesting neighbour of itself.
+      this.similarResults = results.filter((r) => r.projectId !== this.currentProjectId);
+      this.similarSearched = true;
+    } catch {
+      this.notify.error(this.locale.t('similar.failed'));
+    } finally {
+      this.similarBusy = false;
+    }
+  }
+
+  /** Thumbnail for a result, from the local library (results are always own projects). */
+  similarThumb(id: string): string | null {
+    return this.recentProjects.find((p) => p.id === id)?.thumbnail ?? null;
+  }
+
+  async openSimilar(id: string): Promise<void> {
+    await this.refreshRecentProjects();
+    await this.openStoredProject(id);
   }
 
   // ----- First-run welcome -----
@@ -4044,26 +4155,33 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
   private async requirePro(feature: string): Promise<boolean> {
     if (this.premium.isPro) return true;
     const go = await this.askConfirm({
-      title: `${feature} is a Pro feature`,
-      message: 'Unlock Pro to use it. Enter a license key?',
-      okLabel: 'Enter key',
+      title: this.locale.t('pro.featureTitle', { feature }),
+      message: this.locale.t('pro.upgradeMessage'),
+      okLabel: this.locale.t('pro.upgradeCta'),
     });
     if (go) await this.promptActivatePro();
     return this.premium.isPro;
   }
 
+  /**
+   * The old flow prompted for a license key checked in the browser — the exact
+   * hole D-8 closes. Now: Pro exports are sold as a one-time license through
+   * Stripe Checkout; the server derives the entitlement from the webhook.
+   */
   async promptActivatePro(): Promise<void> {
-    const key = await this.askPrompt({
-      title: 'Unlock Pro',
-      message: 'Enter your Pro license key.',
-      placeholder: 'License key',
-      okLabel: 'Activate',
-    });
-    if (key == null) return;
-    if (this.premium.activate(key)) {
-      this.notify.success(this.locale.t('notify.proUnlocked'));
-    } else {
-      this.notify.error(this.locale.t('notify.proKeyInvalid'));
+    if (this.premium.isPro) {
+      this.notify.success(this.locale.t('pro.unlocked'));
+      return;
+    }
+    if (!this.auth.signedIn()) {
+      this.notify.info(this.locale.t('billing.signInFirst'));
+      return;
+    }
+    try {
+      await this.premium.startCheckout('license');
+      // On success the browser navigates to Stripe; nothing to do here.
+    } catch {
+      this.notify.error(this.locale.t('billing.notConfigured'));
     }
   }
 

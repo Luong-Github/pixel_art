@@ -7,7 +7,8 @@ export type PanelId =
   | 'generate'
   | 'adjust'
   | 'timeline'
-  | 'tilemap';
+  | 'tilemap'
+  | 'similar';
 
 export const PANEL_IDS: PanelId[] = [
   'tools',
@@ -18,6 +19,7 @@ export const PANEL_IDS: PanelId[] = [
   'adjust',
   'timeline',
   'tilemap',
+  'similar',
 ];
 
 /** Dockable edge zones. The center (canvas) is fixed and not a zone. */
@@ -57,6 +59,7 @@ export const PANEL_TITLES: Record<PanelId, string> = {
   adjust: 'Adjust',
   timeline: 'Timeline',
   tilemap: 'Tilemap',
+  similar: 'Similar',
 };
 
 export function defaultDockState(): DockState {
@@ -69,9 +72,9 @@ export function defaultDockState(): DockState {
     floating: [],
     collapsed: [],
     // Optional panels — hidden until opened from View ▾.
-    hidden: ['tilemap', 'adjust'],
+    hidden: ['tilemap', 'adjust', 'similar'],
   };
 }
 
 // Bump this when the default layout changes so stale saved layouts are discarded.
-export const DOCK_STORAGE_KEY = 'pixelart.dock.v10';
+export const DOCK_STORAGE_KEY = 'pixelart.dock.v11';

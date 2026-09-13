@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, signal } from '@angular/core';
 
 /** Lightweight project record (no pixel payload) — fast to list. */
 export interface ProjectMeta {
@@ -25,6 +25,13 @@ export interface StoredProject extends ProjectMeta {
  */
 @Injectable({ providedIn: 'root' })
 export class ProjectStoreService {
+  /**
+   * Last local write, for anything that wants to react to it (cloud sync). A signal
+   * rather than a callback so nothing has to be wired up at construction time, and
+   * so the editor keeps calling put/delete exactly as before.
+   */
+  readonly lastChange = signal<{ id: string; kind: 'put' | 'delete'; at: number } | null>(null);
+
   private readonly DB = 'pixelart.projects';
   private readonly VERSION = 1;
   private readonly META = 'meta';
@@ -114,6 +121,7 @@ export class ProjectStoreService {
       tx.onerror = () => reject(tx.error);
       tx.onabort = () => reject(tx.error);
     });
+    this.lastChange.set({ id: project.id, kind: 'put', at: Date.now() });
   }
 
   async delete(id: string): Promise<void> {
@@ -126,5 +134,6 @@ export class ProjectStoreService {
       tx.oncomplete = () => resolve();
       tx.onerror = () => reject(tx.error);
     });
+    this.lastChange.set({ id, kind: 'delete', at: Date.now() });
   }
 }

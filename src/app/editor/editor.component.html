@@ -273,6 +273,24 @@
   </ng-container>
 </ng-template>
 
+<ng-template dockPanelDef="similar">
+  <div class="similar-panel">
+    <button type="button" class="primary-action" [disabled]="similarBusy" (click)="findSimilar()">
+      {{ similarBusy ? ('similar.searching' | t) : ('similar.find' | t) }}
+    </button>
+    <p class="opt-hint">{{ 'similar.hint' | t }}</p>
+    <p class="opt-hint" *ngIf="similarSearched && !similarResults.length">{{ 'similar.empty' | t }}</p>
+    <div class="similar-results" *ngIf="similarResults.length">
+      <button type="button" class="similar-item" *ngFor="let r of similarResults"
+        [title]="r.name" (click)="openSimilar(r.projectId)">
+        <img *ngIf="similarThumb(r.projectId) as thumb" [src]="thumb" [alt]="r.name" />
+        <span class="similar-name">{{ r.name }}</span>
+        <span class="similar-score">{{ (1 - r.distance) * 100 | number: '1.0-0' }}%</span>
+      </button>
+    </div>
+  </div>
+</ng-template>
+
 <ng-template dockPanelDef="tilemap">
   <div class="tilemap-panel">
     <div class="tilemap-config">
@@ -1491,6 +1509,7 @@
         </ng-container>
       </p>
       <div class="save-progress" *ngIf="saveState === 'saving'"><span></span></div>
+      <p class="save-status" *ngIf="cloudQuotaLabel() as quotaLabel">{{ quotaLabel }}</p>
     </div>
     <footer class="modal-foot" *ngIf="projectsTab === 'save'">
       <button type="button" class="quiet-action" *ngIf="saveState === 'error'"

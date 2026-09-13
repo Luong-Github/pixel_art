@@ -2841,3 +2841,16 @@ input[type="color"] {
   max-height: 200px;
   image-rendering: pixelated;
 }
+
+/* Similar assets panel (E1) */
+.similar-panel { display: flex; flex-direction: column; gap: 8px; padding: 8px; }
+.similar-results { display: flex; flex-direction: column; gap: 6px; overflow-y: auto; }
+.similar-item {
+  display: flex; align-items: center; gap: 8px; padding: 4px 6px;
+  background: none; border: 1px solid transparent; border-radius: 6px;
+  color: inherit; cursor: pointer; text-align: left;
+  &:hover { border-color: var(--accent, #7aa2ff); }
+  img { width: 40px; height: 40px; image-rendering: pixelated; border-radius: 4px; background: #0003; }
+  .similar-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .similar-score { opacity: 0.7; font-size: 11px; }
+}

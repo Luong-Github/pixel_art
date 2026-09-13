@@ -1,6 +1,7 @@
 import { Component, ElementRef, HostListener, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../auth.service';
+import { AiApiService } from '../../../editor/projects/ai-api.service';
 import { TranslatePipe } from '../../../i18n/translate.pipe';
 
 /**
@@ -36,6 +37,12 @@ import { TranslatePipe } from '../../../i18n/translate.pipe';
         <div class="auth-pop" role="dialog" [attr.aria-label]="'auth.account' | t">
           @if (auth.signedIn()) {
             <span class="auth-email">{{ auth.user()?.email }}</span>
+            <span class="menu-sep"></span>
+            <label class="auth-optin" [title]="'auth.trainingOptInHint' | t">
+              <input type="checkbox" [checked]="trainingOptIn()" [disabled]="optInBusy()"
+                (change)="toggleTrainingOptIn($event)" />
+              {{ 'auth.trainingOptIn' | t }}
+            </label>
             <span class="menu-sep"></span>
             <button type="button" class="auth-action" [disabled]="busy()" (click)="doSignOut()">
               {{ 'auth.signOut' | t }}
@@ -172,6 +179,7 @@ export class SignInButtonComponent {
 
   constructor(
     public readonly auth: AuthService,
+    private readonly aiApi: AiApiService,
     private readonly host: ElementRef<HTMLElement>,
   ) {}
 
@@ -181,7 +189,40 @@ export class SignInButtonComponent {
     return src.charAt(0).toUpperCase();
   }
 
+  readonly trainingOptIn = signal(false);
+  readonly optInBusy = signal(false);
+  private optInLoaded = false;
+
+  /**
+   * Consent for using the user's art to train models (TE0.2). OFF by default and
+   * never flipped silently — pixel artists have every reason to distrust silent
+   * opt-ins, and one betrayed default costs more than the training data is worth.
+   */
+  async toggleTrainingOptIn(event: Event): Promise<void> {
+    const enabled = (event.target as HTMLInputElement).checked;
+    this.optInBusy.set(true);
+    try {
+      await this.aiApi.setTrainingOptIn(enabled);
+      this.trainingOptIn.set(enabled);
+    } catch {
+      (event.target as HTMLInputElement).checked = this.trainingOptIn();
+    } finally {
+      this.optInBusy.set(false);
+    }
+  }
+
+  private async loadTrainingOptIn(): Promise<void> {
+    if (this.optInLoaded || !this.auth.signedIn()) return;
+    this.optInLoaded = true;
+    try {
+      this.trainingOptIn.set((await this.aiApi.getTrainingOptIn()).enabled);
+    } catch {
+      /* hiển thị mặc định false — an toàn */
+    }
+  }
+
   toggle(): void {
+    void this.loadTrainingOptIn();
     const next = !this.open();
     if (next) this.reset();
     this.open.set(next);

@@ -2,16 +2,12 @@
  * Development environment. Replaced by environment.prod.ts in production builds
  * (see angular.json `fileReplacements` for the `production` configuration).
  *
- * Fill `supabaseUrl` + `supabaseAnonKey` from your Supabase project:
- *   Supabase dashboard → Project Settings → API.
- * The anon key is PUBLIC and safe to embed in the client. NEVER put the
- * `service_role` key here (it bypasses RLS = full DB compromise).
- *
- * Leaving these empty is fine for local UI work — auth calls will simply fail
- * until the values are provided.
+ * The client knows exactly ONE address: the backend API. No Supabase URL, no anon
+ * key, no Stripe key, no OAuth client id — every third-party credential lives in
+ * the server's environment only (BD-4). If a key ever shows up in this file, the
+ * architecture has regressed.
  */
 export const environment = {
   production: false,
-  supabaseUrl: '',
-  supabaseAnonKey: '',
+  apiUrl: 'http://localhost:8080',
 };
