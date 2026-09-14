@@ -34,7 +34,8 @@ import { TranslatePipe } from '../../../i18n/translate.pipe';
       }
 
       @if (open()) {
-        <div class="auth-pop" role="dialog" [attr.aria-label]="'auth.account' | t">
+        <div class="auth-pop" role="dialog" [attr.aria-label]="'auth.account' | t"
+          [style.left.px]="popLeft()" [style.top.px]="popTop()">
           @if (auth.signedIn()) {
             <span class="auth-email">{{ auth.user()?.email }}</span>
             <span class="menu-sep"></span>
@@ -83,6 +84,9 @@ import { TranslatePipe } from '../../../i18n/translate.pipe';
       .auth {
         position: relative;
         display: inline-flex;
+        /* Stacking context cao hon moi dock panel: khong co dong nay, panel Tools
+           (DOM dung sau topbar) de len nua trai cua popup du popup co z-index rieng. */
+        z-index: 250;
       }
       .avatar {
         display: inline-flex;
@@ -100,10 +104,12 @@ import { TranslatePipe } from '../../../i18n/translate.pipe';
         background: linear-gradient(135deg, var(--accent-strong), var(--accent));
       }
       .auth-pop {
-        position: absolute;
-        top: calc(100% + 6px);
-        right: 0;
-        z-index: 200;
+        /* fixed, KHONG absolute: .workspace co overflow hidden va cat cut moi thu
+           tho ra ngoai mep trai cua no — z-index cao den may cung khong cuu duoc
+           mot phan tu khong duoc VE. fixed thoat khoi cay clip (khong ancestor nao
+           co transform), vi tri neo theo nut duoc tinh luc mo. */
+        position: fixed;
+        z-index: 250;
         display: flex;
         flex-direction: column;
         gap: 6px;
@@ -123,6 +129,20 @@ import { TranslatePipe } from '../../../i18n/translate.pipe';
         font-size: 12px;
         color: var(--ink);
         word-break: break-all;
+      }
+      .auth-optin {
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
+        font-size: 12px;
+        line-height: 1.35;
+        color: var(--muted);
+        cursor: pointer;
+      }
+      .auth-optin input {
+        margin-top: 2px;
+        accent-color: var(--accent);
+        cursor: pointer;
       }
       .auth-input {
         width: 100%;
@@ -189,6 +209,29 @@ export class SignInButtonComponent {
     return src.charAt(0).toUpperCase();
   }
 
+  readonly popLeft = signal(0);
+  readonly popTop = signal(0);
+
+  private static readonly POP_WIDTH = 232;
+
+  /** Neo popup theo mép phải của nút, kẹp trong viewport (popup là position: fixed). */
+  private placePopup(): void {
+    const btn = this.host.nativeElement.querySelector('.avatar, .sign-in-btn') as HTMLElement | null;
+    if (!btn) return;
+    const r = btn.getBoundingClientRect();
+    const left = Math.min(
+      Math.max(8, r.right - SignInButtonComponent.POP_WIDTH),
+      window.innerWidth - SignInButtonComponent.POP_WIDTH - 8,
+    );
+    this.popLeft.set(Math.round(left));
+    this.popTop.set(Math.round(r.bottom + 6));
+  }
+
+  @HostListener('window:resize')
+  onWindowResize(): void {
+    if (this.open()) this.placePopup();
+  }
+
   readonly trainingOptIn = signal(false);
   readonly optInBusy = signal(false);
   private optInLoaded = false;
@@ -223,6 +266,7 @@ export class SignInButtonComponent {
 
   toggle(): void {
     void this.loadTrainingOptIn();
+    this.placePopup();
     const next = !this.open();
     if (next) this.reset();
     this.open.set(next);
