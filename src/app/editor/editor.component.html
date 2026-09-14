@@ -421,6 +421,15 @@
 </ng-template>
 
 <ng-template dockPanelDef="generate">
+  <div class="gen-ai">
+    <input type="text" [(ngModel)]="aiPrompt" [disabled]="aiGenBusy"
+      [placeholder]="'gen.aiPrompt' | t" (keydown.enter)="generateWithAi()" />
+    <button type="button" class="primary-action" [disabled]="aiGenBusy || !aiPrompt.trim()"
+      (click)="generateWithAi()">
+      {{ aiGenBusy ? ('gen.aiBusy' | t) : ('gen.aiBtn' | t) }}
+    </button>
+    <p class="gen-hint">{{ 'gen.aiHint' | t }}</p>
+  </div>
   <div class="gen-controls">
     <label class="span-2">
       <span>{{ 'gen.pattern' | t }}</span>

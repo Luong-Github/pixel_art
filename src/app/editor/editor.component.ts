@@ -29,6 +29,7 @@ import { ProjectStoreService, ProjectMeta } from './projects/project-store.servi
 import { CloudSyncService, SyncConflict } from './projects/cloud-sync.service';
 import { AiApiService, SimilarAsset } from './projects/ai-api.service';
 import { AuthService } from '../core/auth/auth.service';
+import { ApiError } from '../core/api/api-client.service';
 import { LocaleService } from '../i18n/locale.service';
 import { NotificationService } from '../core/notify/notification.service';
 import { WelcomeComponent } from './onboarding/welcome.component';
@@ -477,6 +478,48 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
       }
     } finally {
       this.conflictPrompting = false;
+    }
+  }
+
+  // ----- AI generate (E2) -----
+  aiPrompt = '';
+  aiGenBusy = false;
+
+  /**
+   * Text -> sprite via the server (quota-gated per month, Pro only). The result
+   * drops into the EXISTING Convert flow — same tab/resize choices, same Apply —
+   * so generating feels like importing any other image, not a new subsystem.
+   */
+  async generateWithAi(): Promise<void> {
+    const prompt = this.aiPrompt.trim();
+    if (!prompt || this.aiGenBusy) return;
+    if (!this.auth.signedIn()) {
+      this.notify.info(this.locale.t('gen.aiSignInFirst'));
+      return;
+    }
+    this.aiGenBusy = true;
+    try {
+      const result = await this.aiApi.generate(prompt, this.width, this.height);
+      const image = new Image();
+      await new Promise<void>((resolve, reject) => {
+        image.onload = () => resolve();
+        image.onerror = () => reject(new Error('bad image'));
+        image.src = result.png;
+      });
+      this.openConvertModal();
+      this.convertSource = image;
+      this.scheduleConvertPreview();
+    } catch (error) {
+      const code = error instanceof ApiError ? error.code : '';
+      this.notify.error(this.locale.t(
+        code === 'ai_quota_exhausted'
+          ? 'gen.aiQuota'
+          : code === 'not_authenticated'
+            ? 'gen.aiSignInFirst'
+            : 'gen.aiUnavailable',
+      ));
+    } finally {
+      this.aiGenBusy = false;
     }
   }
 

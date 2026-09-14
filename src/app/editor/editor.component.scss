@@ -2854,3 +2854,10 @@ input[type="color"] {
   .similar-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .similar-score { opacity: 0.7; font-size: 11px; }
 }
+
+/* AI generate (E2) — sits above the procedural generators */
+.gen-ai {
+  display: flex; flex-direction: column; gap: 6px; padding: 8px 8px 4px;
+  input { width: 100%; }
+  .gen-hint { margin: 0; }
+}
