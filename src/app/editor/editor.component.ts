@@ -1319,9 +1319,15 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
     this.panelDefs.changes.subscribe(() => this.buildPanelTemplates());
     this.render();
     // Restore the auto-saved project; fall back to the idle demo for newcomers.
-    if (!this.restoreAutosave()) {
-      void this.loadIdlePresetExample();
-    }
+    // Deferred one tick: ngAfterViewInit runs inside the first change-detection
+    // pass, and loadProject() replaces `workspaces` — mutating checked bindings
+    // in the same pass is exactly what NG0100 exists to catch (dev mode threw it
+    // on every startup that had an autosave).
+    setTimeout(() => {
+      if (!this.restoreAutosave()) {
+        void this.loadIdlePresetExample();
+      }
+    });
   }
 
   ngAfterViewChecked(): void {

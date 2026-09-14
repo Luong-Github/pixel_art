@@ -39,12 +39,19 @@ export class PremiumService {
     private readonly auth: AuthService,
   ) {
     this.restoreFromCache();
-    effect(() => {
-      // Signed in (now, or state changed): ask the server. Signed out: Pro is gone
-      // immediately — grace is for lost networks, not for logged-out sessions.
-      if (this.auth.signedIn()) void this.refresh();
-      else this.apply({ cloudTier: 'free', proExport: false, cloudUntil: null }, false);
-    });
+    effect(
+      () => {
+        // Signed in (now, or state changed): ask the server. Signed out: Pro is gone
+        // immediately — grace is for lost networks, not for logged-out sessions.
+        if (this.auth.signedIn()) void this.refresh();
+        else this.apply({ cloudTier: 'free', proExport: false, cloudUntil: null }, false);
+      },
+      // The signed-out branch writes our signals synchronously; that is the whole
+      // point of this effect (mirror auth state into entitlements), so writes are
+      // intentional — without this flag Angular throws NG0600 and KILLS the effect,
+      // leaving a stale Pro badge after sign-out.
+      { allowSignalWrites: true },
+    );
   }
 
   /**
